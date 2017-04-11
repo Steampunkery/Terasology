@@ -16,6 +16,7 @@
 
 package org.terasology.physics.engine;
 
+import com.badlogic.gdx.physics.bullet.collision.ConvexResultCallback;
 import org.terasology.math.geom.Vector3f;
 
 /**
@@ -50,5 +51,5 @@ public interface CharacterCollider {
      * @param slopeFactor
      * @return A sweep callback with the results of the sweep
      */
-    SweepCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor);
+    ConvexResultCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor);
 }

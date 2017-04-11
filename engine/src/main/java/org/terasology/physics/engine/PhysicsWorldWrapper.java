@@ -16,6 +16,7 @@
 
 package org.terasology.physics.engine;
 
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.voxel.VoxelInfo;
 import com.bulletphysics.collision.shapes.voxel.VoxelPhysicsWorld;
@@ -51,7 +52,7 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
 
         private boolean colliding;
         private boolean blocking;
-        private CollisionShape shape;
+        private btCollisionShape shape;
         private Vector3i position;
         private Vector3f offset;
 

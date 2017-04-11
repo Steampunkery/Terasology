@@ -130,7 +130,7 @@ public class BlockShapeImpl extends BlockShape {
             halfExtentsWithMargin.x = Math.abs(halfExtentsWithMargin.x);
             halfExtentsWithMargin.y = Math.abs(halfExtentsWithMargin.y);
             halfExtentsWithMargin.z = Math.abs(halfExtentsWithMargin.z);
-            
+
             //javax.vecmath.Vector3f extents = box.getHalfExtentsWithMargin(new javax.vecmath.Vector3f());
             //com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), extents, extents);
             //extents.absolute();

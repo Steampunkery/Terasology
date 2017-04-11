@@ -24,11 +24,8 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState;
-import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
-import com.bulletphysics.collision.dispatch.CollisionFlags;
-import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
-import com.bulletphysics.linearmath.Transform;
-import com.bulletphysics.util.ObjectArrayList;
+import com.badlogic.gdx.physics.bullet.linearmath.btVector3Array;
+import com.bulletphysics.BulletGlobals;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -199,9 +196,11 @@ public class BulletPhysics implements PhysicsEngine {
         if (excludedEntities == null) {
             return rayTrace(from1, direction, distance, collisionGroups);
         }
-        Vector3f to = new Vector3f(VecMath.to(direction));
-        Vector3f from = VecMath.to(from1);
-        to.scale(distance);
+        Vector3 to = new Vector3(VecMath.to(direction));
+        Vector3 from = VecMath.to(from1);
+        to.nor();
+        to.scl(distance);
+        //to.scale(distance);
         to.add(from);
 
         short filter = combineGroups(collisionGroups);
@@ -219,26 +218,37 @@ public class BulletPhysics implements PhysicsEngine {
                 excludedCollisionIds.add(entityTriggers.get(excludedEntity).getBroadphaseHandle().getUid());
             }
         }
-
-        CollisionWorld.ClosestRayResultWithUserDataCallback closest =
+        /*CollisionWorld.ClosestRayResultWithUserDataCallback closest =
                 new ClosestRayResultWithUserDataCallbackExcludingCollisionIds(from, to, excludedCollisionIds);
         closest.collisionFilterGroup = CollisionFilterGroups.ALL_FILTER;
-        closest.collisionFilterMask = filter;
+        closest.collisionFilterMask = filter;*/
 
-        discreteDynamicsWorld.rayTest(from, to, closest);
-        if (closest.hasHit()) {
-            if (closest.userData instanceof Vector3i) { //We hit a world block
-                final EntityRef entityAt = blockEntityRegistry.getEntityAt((Vector3i) closest.userData);
+        ClosestRayResultCallback callback = new ClosestRayResultCallback();
+        callback.setCollisionFilterGroup((short) btBroadphaseProxy.CollisionFilterGroups.AllFilter);
+        callback.setCollisionFilterMask(filter);
+
+        discreteDynamicsWorld.rayTest(from, to, callback);
+        if (callback.hasHit()) {
+            btCollisionObject collisionObject = callback.getCollisionObject();
+            Vector3 hitPointWorld = new Vector3();
+            callback.getHitPointWorld(hitPointWorld);
+
+            Vector3 hitNormalWorld = new Vector3();
+            callback.getHitNormalWorld(hitNormalWorld);
+
+            if (collisionObject.userData instanceof Vector3i) { //We hit a world block
+
+                final EntityRef entityAt = blockEntityRegistry.getEntityAt((Vector3i) collisionObject.userData);
                 return new HitResult(entityAt,
-                        VecMath.from(closest.hitPointWorld),
-                        VecMath.from(closest.hitNormalWorld),
-                        (Vector3i) closest.userData);
-            } else if (closest.userData instanceof EntityRef) { //we hit an other entity
-                return new HitResult((EntityRef) closest.userData,
-                        VecMath.from(closest.hitPointWorld),
-                        VecMath.from(closest.hitNormalWorld));
+                        VecMath.from(hitPointWorld),
+                        VecMath.from(hitNormalWorld),
+                        (Vector3i) collisionObject.userData);
+            } else if (collisionObject.userData instanceof EntityRef) { //we hit an other entity
+                return new HitResult((EntityRef) collisionObject.userData,
+                        VecMath.from(hitPointWorld),
+                        VecMath.from(hitNormalWorld));
             } else { //we hit something we don't understand, assume its nothing and log a warning
-                logger.warn("Unidentified object was hit in the physics engine: {}", closest.userData);
+                logger.warn("Unidentified object was hit in the physics engine: {}", collisionObject.userData);
                 return new HitResult();
             }
         } else { //nothing was hit
@@ -293,6 +303,7 @@ public class BulletPhysics implements PhysicsEngine {
             return false;
         } else if (rigidBody != null) {
             float scale = location.getWorldScale();
+
             if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling(new Vector3f()).x - scale) > BulletGlobals.SIMD_EPSILON
                     || rigidBody.collidesWith != combineGroups(rb.collidesWith)) {
                 removeRigidBody(rigidBody);
@@ -336,7 +347,7 @@ public class BulletPhysics implements PhysicsEngine {
 
     @Override
     public boolean removeTrigger(EntityRef entity) {
-        GhostObject ghost = entityTriggers.remove(entity);
+        btGhostObject ghost = entityTriggers.remove(entity);
         if (ghost != null) {
             removeCollider(ghost);
             return true;
@@ -349,7 +360,7 @@ public class BulletPhysics implements PhysicsEngine {
     //TODO: update if detectGroups changed
     public boolean updateTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
-        PairCachingGhostObject triggerObj = entityTriggers.get(entity);
+        btPairCachingGhostObject triggerObj = entityTriggers.get(entity);
 
         if (location == null) {
             logger.warn("Trying to update or create trigger of entity that has no LocationComponent?! Entity: {}", entity);
@@ -425,7 +436,8 @@ public class BulletPhysics implements PhysicsEngine {
 
     @Override
     public float getEpsilon() {
-        return BulletGlobals.SIMD_EPSILON;
+        //TODO: figure out how access this from libgdx
+        return 1.1920929E-7F;
     }
 
     //*******************Private helper methods**************************\\
@@ -694,9 +706,21 @@ public class BulletPhysics implements PhysicsEngine {
         List<PhysicsSystem.CollisionPair> collisionPairs = Lists.newArrayList();
 
         btDiscreteDynamicsWorld world = discreteDynamicsWorld;
-        ObjectArrayList<btPersistentManifold> manifolds = new ObjectArrayList<>();
+       // ObjectArrayList<btPersistentManifold> manifolds = new ObjectArrayList<>();
         for (btPairCachingGhostObject trigger : entityTriggers.values()) {
-            EntityRef entity = (EntityRef) trigger.getUserPointer();
+
+            EntityRef entity = (EntityRef) trigger.userData;
+            btHashedOverlappingPairCache overlappingPairCache = trigger.getOverlappingPairCache();
+            btBroadphasePairArray overlappingPairArray = overlappingPairCache.getOverlappingPairArray();
+            for (int i = 0; i < overlappingPairCache.GetCount(); i++) {
+                btBroadphasePair pair = overlappingPairArray.at(i);
+                //TODO review
+                if (pair.getPProxy0().getClientObject() == trigger.getUserPointer()) {
+
+                }
+            }
+        }
+/*
             for (btBroadphasePair initialPair : trigger.getOverlappingPairCache().getOverlappingPairArray()) {
                 EntityRef otherEntity = null;
                 if (initialPair.pProxy0.clientObject == trigger) {
@@ -733,30 +757,30 @@ public class BulletPhysics implements PhysicsEngine {
                     }
                 }
             }
-        }
+        }*/
         return collisionPairs;
     }
 
     //********************Private helper classes*********************\\
-
-    private static class ClosestRayResultWithUserDataCallbackExcludingCollisionIds extends CollisionWorld.ClosestRayResultWithUserDataCallback {
-        Set<Integer> excludedIds;
-
-        ClosestRayResultWithUserDataCallbackExcludingCollisionIds(Vector3f rayFromWorld, Vector3f rayToWorld, Set<Integer> excludedIds) {
-            super(rayFromWorld, rayToWorld);
-            this.excludedIds = excludedIds;
-        }
-
-        @Override
-        public boolean needsCollision(btBroadphaseProxy proxy0) {
-            if (excludedIds.contains(proxy0.getUid())) {
-                return false;
-            } else {
-                return super.needsCollision(proxy0);
-            }
-
-        }
-    }
+//
+//    private static class ClosestRayResultWithUserDataCallbackExcludingCollisionIds extends CollisionWorld.ClosestRayResultWithUserDataCallback {
+//        Set<Integer> excludedIds;
+//
+//        ClosestRayResultWithUserDataCallbackExcludingCollisionIds(Vector3f rayFromWorld, Vector3f rayToWorld, Set<Integer> excludedIds) {
+//            super(rayFromWorld, rayToWorld);
+//            this.excludedIds = excludedIds;
+//        }
+//
+//        @Override
+//        public boolean needsCollision(btBroadphaseProxy proxy0) {
+//            if (excludedIds.contains(proxy0.getUid())) {
+//                return false;
+//            } else {
+//                return super.needsCollision(proxy0);
+//            }
+//
+//        }
+//    }
 
     private static class RigidBodyRequest {
         final BulletRigidBody body;
@@ -774,7 +798,7 @@ public class BulletPhysics implements PhysicsEngine {
 
         public final btRigidBody rb;
         public short collidesWith;
-        private final Transform pooledTransform = new Transform();
+      //  private final Transform pooledTransform = new Transform();
         private final Vector3f pendingImpulse = new Vector3f();
         private final Vector3f pendingForce = new Vector3f();
 
@@ -891,7 +915,7 @@ public class BulletPhysics implements PhysicsEngine {
 
         boolean pending = true;
 
-        private final Transform temp = new Transform();
+        //private final Transform temp = new Transform();
         private final Vector3 tempPos = new Vector3();
 
 
@@ -926,9 +950,9 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
-        public void setLocation(Vector3 loc) {
+        public void setLocation(Vector3f loc) {
             Matrix4 matrix =  collider.getWorldTransform();
-            matrix.setToTranslation(loc);
+            matrix.setToTranslation(VecMath.to(loc));
             collider.setWorldTransform(matrix);
            // collider.getWorldTransform(temp);
            // temp.origin.set(VecMath.to(loc));
@@ -936,14 +960,19 @@ public class BulletPhysics implements PhysicsEngine {
         }
 
         @Override
-        public BulletSweepCallback sweep(org.terasology.math.geom.Vector3f startPos, org.terasology.math.geom.Vector3f endPos, float allowedPenetration, float slopeFactor) {
+        public ConvexResultCallback sweep(org.terasology.math.geom.Vector3f startPos, org.terasology.math.geom.Vector3f endPos, float allowedPenetration, float slopeFactor) {
             Matrix4 startTransform = new Matrix4(VecMath.to(startPos),new Quaternion(0, 0, 0, 1), new Vector3(1.0f,1.0f,1.0f));
             Matrix4 endTransform = new Matrix4(VecMath.to(endPos),new Quaternion(0, 0, 0, 1), new Vector3(1.0f,1.0f,1.0f));
-            BulletSweepCallback callback = new BulletSweepCallback(collider, new Vector3(0, 1, 0), slopeFactor);
+            ConvexResultCallback callback = new ConvexResultCallback();//collider, new Vector3(0, 1, 0), slopeFactor);
 
-            callback.collisionFilterGroup = collider.getBroadphaseHandle().collisionFilterGroup;
-            callback.collisionFilterMask = collider.getBroadphaseHandle().collisionFilterMask;
-            collider.convexSweepTest((btConvexShape) (collider.getCollisionShape()),startTransform, endTransform, callback, allowedPenetration);
+            callback.setCollisionFilterGroup(collider.getBroadphaseHandle().getCollisionFilterGroup());
+            callback.setCollisionFilterMask(collider.getBroadphaseHandle().getCollisionFilterMask());
+
+
+//            callback.collisionFilterGroup = collider.getBroadphaseHandle().collisionFilterGroup;
+  //          callback.collisionFilterMask = collider.getBroadphaseHandle().collisionFilterMask;
+            //collider.convexSweepTest((btConvexShape) (collider.getCollisionShape()),startTransform, endTransform, callback, allowedPenetration);
+            collider.convexSweepTest((btConvexShape)(collider.getCollisionShape()),startTransform,endTransform,callback,allowedPenetration);
 
             return callback;
         }
