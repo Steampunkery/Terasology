@@ -24,7 +24,11 @@ import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState;
+import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
+import com.bulletphysics.collision.dispatch.CollisionFlags;
+import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.bulletphysics.linearmath.Transform;
+import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -666,9 +670,10 @@ public class BulletPhysics implements PhysicsEngine {
         }
     }
 
-    private PairCachingGhostObject createCollider(Vector3f pos, ConvexShape shape, short groups, short filters, int collisionFlags) {
-        Transform startTransform = new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1), pos, 1.0f));
-        PairCachingGhostObject result = new PairCachingGhostObject();
+    private btPairCachingGhostObject createCollider(Vector3f pos, btConvexShape shape, short groups, short filters, int collisionFlags) {
+
+        Matrix4 startTransform =  new Matrix4(VecMath.to(pos),new Quaternion(0,0,0,1),new Vector3(1,1,1));;
+        btPairCachingGhostObject result = new btPairCachingGhostObject();
         result.setWorldTransform(startTransform);
         result.setCollisionShape(shape);
         result.setCollisionFlags(collisionFlags);
@@ -679,11 +684,11 @@ public class BulletPhysics implements PhysicsEngine {
     private Collection<? extends PhysicsSystem.CollisionPair> getNewCollisionPairs() {
         List<PhysicsSystem.CollisionPair> collisionPairs = Lists.newArrayList();
 
-        DynamicsWorld world = discreteDynamicsWorld;
-        ObjectArrayList<PersistentManifold> manifolds = new ObjectArrayList<>();
-        for (PairCachingGhostObject trigger : entityTriggers.values()) {
+        btDiscreteDynamicsWorld world = discreteDynamicsWorld;
+        ObjectArrayList<btPersistentManifold> manifolds = new ObjectArrayList<>();
+        for (btPairCachingGhostObject trigger : entityTriggers.values()) {
             EntityRef entity = (EntityRef) trigger.getUserPointer();
-            for (BroadphasePair initialPair : trigger.getOverlappingPairCache().getOverlappingPairArray()) {
+            for (btBroadphasePair initialPair : trigger.getOverlappingPairCache().getOverlappingPairArray()) {
                 EntityRef otherEntity = null;
                 if (initialPair.pProxy0.clientObject == trigger) {
                     if (((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof EntityRef) {
