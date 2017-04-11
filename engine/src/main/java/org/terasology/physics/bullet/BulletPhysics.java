@@ -15,6 +15,7 @@
  */
 package org.terasology.physics.bullet;
 
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.bulletphysics.BulletGlobals;
 import com.bulletphysics.collision.broadphase.BroadphaseInterface;
 import com.bulletphysics.collision.broadphase.BroadphasePair;
@@ -79,6 +80,8 @@ import org.terasology.physics.shapes.SphereShapeComponent;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
+
+
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Matrix4f;
