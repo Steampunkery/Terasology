@@ -89,7 +89,10 @@ configurations.all {
 dependencies {
 
     //bullet
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    compile "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
 
     // Storage and networking
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
