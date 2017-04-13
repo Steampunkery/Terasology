@@ -229,8 +229,7 @@ public class BulletPhysics implements PhysicsEngine {
                 new ClosestRayResultWithUserDataCallbackExcludingCollisionIds(from, to, excludedCollisionIds);
         closest.collisionFilterGroup = CollisionFilterGroups.ALL_FILTER;
         closest.collisionFilterMask = filter;*/
-
-        ClosestRayResultCallback callback = new ClosestRayResultCallback();
+        ClosestRayResultCallback callback = new ClosestRayResultCallback(from,to);
         callback.setCollisionFilterGroup((short) btBroadphaseProxy.CollisionFilterGroups.AllFilter);
         callback.setCollisionFilterMask(filter);
 
@@ -287,9 +286,10 @@ public class BulletPhysics implements PhysicsEngine {
         if (rigidBody != null) {
             removeRigidBody(rigidBody);
             // wake up this entities neighbors
-            float[] radius = new float[1];
-            rigidBody.rb.getCollisionShape().getBoundingSphere(new Vector3f(), radius);
-            awakenArea(rigidBody.getLocation(new org.terasology.math.geom.Vector3f()), radius[0]);
+           // float[] radius = new float[1];
+
+            //rigidBody.rb.getCollisionShape().getBoundingSphere(new Vector3(), radius);
+            //awakenArea(rigidBody.getLocation(new org.terasology.math.geom.Vector3f()), radius[0]);
             return true;
         } else {
             logger.warn("Deleting non existing rigidBody from physics engine?! Entity: {}", entity);
@@ -436,11 +436,11 @@ public class BulletPhysics implements PhysicsEngine {
 
     @Override
     public void awakenArea(org.terasology.math.geom.Vector3f pos, float radius) {
-        Vector3f min = new Vector3f(VecMath.to(pos));
+        /*Vector3f min = new Vector3f(VecMath.to(pos));
         min.sub(new Vector3f(0.6f, 0.6f, 0.6f));
         Vector3f max = new Vector3f(VecMath.to(pos));
         max.add(new Vector3f(0.6f, 0.6f, 0.6f));
-        discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);
+        discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);*/
     }
 
     @Override
@@ -459,19 +459,21 @@ public class BulletPhysics implements PhysicsEngine {
     private boolean newTrigger(EntityRef entity) {
         LocationComponent location = entity.getComponent(LocationComponent.class);
         TriggerComponent trigger = entity.getComponent(TriggerComponent.class);
-        ConvexShape shape = getShapeFor(entity);
+        btConvexShape shape = getShapeFor(entity);
         if (shape != null && location != null && trigger != null) {
             float scale = location.getWorldScale();
-            shape.setLocalScaling(new Vector3f(scale, scale, scale));
+            shape.setLocalScaling(new Vector3(scale,scale,scale));
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
-            PairCachingGhostObject triggerObj = createCollider(
-                    VecMath.to(location.getWorldPosition()),
+
+            btPairCachingGhostObject triggerObj = createCollider(
+                    location.getWorldPosition(),
                     shape,
                     StandardCollisionGroup.SENSOR.getFlag(),
                     combineGroups(detectGroups),
-                    CollisionFlags.NO_CONTACT_RESPONSE);
-            triggerObj.setUserPointer(entity);
-            PairCachingGhostObject oldTrigger = entityTriggers.put(entity, triggerObj);
+                    btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
+            triggerObj.userData = entity;
+            //triggerObj.setUserPointer(entity);
+            btPairCachingGhostObject oldTrigger = entityTriggers.put(entity, triggerObj);
             if (oldTrigger != null) {
                 logger.warn("Creating a trigger for an entity that already has a trigger. " +
                         "Multiple trigger pre entity are not supported. Removing old one. Entity: {}", entity);
@@ -517,18 +519,18 @@ public class BulletPhysics implements PhysicsEngine {
         btConvexShape shape = getShapeFor(entity);
         if (location != null && rigidBody != null && shape != null) {
             float scale = location.getWorldScale();
-            shape.setLocalScaling(new Vector3f(scale, scale, scale));
+            shape.setLocalScaling(new Vector3(scale, scale, scale));
 
             if (rigidBody.mass < 1) {
                 logger.warn("RigidBodyComponent.mass is set to less than 1.0, this can lead to strange behaviour, such as the objects moving through walls. " +
                         "Entity: {}", entity);
             }
             Vector3f fallInertia = new Vector3f();
-            shape.calculateLocalInertia(rigidBody.mass, fallInertia);
+            shape.calculateLocalInertia(rigidBody.mass,VecMath.to(fallInertia));
 
-            btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, fallInertia);
+            btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, VecMath.to(fallInertia));
             BulletRigidBody collider = new BulletRigidBody(info);
-            collider.rb.setUserPointer(entity);
+            collider.rb.userData = entity;
             collider.rb.setAngularFactor(VecMath.to(rigidBody.angularFactor));
             collider.rb.setLinearFactor(VecMath.to(rigidBody.linearFactor));
             collider.rb.setFriction(rigidBody.friction);
@@ -605,8 +607,8 @@ public class BulletPhysics implements PhysicsEngine {
 
         for (Map.Entry<EntityRef, BulletRigidBody> entree : entityRigidBodies.entrySet()) {
             BulletRigidBody body = entree.getValue();
-            body.rb.applyCentralImpulse(body.pendingImpulse);
-            body.rb.applyCentralForce(body.pendingForce);
+            body.rb.applyCentralImpulse(VecMath.to(body.pendingImpulse));
+            body.rb.applyCentralForce(VecMath.to(body.pendingForce));
             body.pendingImpulse.x = 0;
             body.pendingImpulse.y = 0;
             body.pendingImpulse.z = 0;
@@ -946,7 +948,7 @@ public class BulletPhysics implements PhysicsEngine {
 
         private BulletCharacterMoverCollider(Vector3f pos, btConvexShape shape, short groups, short filters, int collisionFlags, EntityRef owner) {
             collider = createCollider(pos, shape, groups, filters, collisionFlags);
-            collider.setUserPointer(owner);
+            collider.userData = owner;
         }
 
         @Override
