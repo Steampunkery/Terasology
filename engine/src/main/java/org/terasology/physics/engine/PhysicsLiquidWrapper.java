@@ -27,6 +27,7 @@ import org.terasology.world.block.Block;
 
 /**
  */
+/*
 public class PhysicsLiquidWrapper implements VoxelPhysicsWorld {
     private WorldProvider world;
 
@@ -85,4 +86,4 @@ public class PhysicsLiquidWrapper implements VoxelPhysicsWorld {
             return blocking;
         }
     }
-}
+}*/

@@ -154,12 +154,12 @@ public class BlockShapeImpl extends BlockShape {
             }*/
             return newShape;
         } else if (shape instanceof btConvexHullShape) {
-            btConvexHullShape convexHull = (btConvexHullShape) shape;
+            /*btConvexHullShape convexHull = (btConvexHullShape) shape;
             ObjectArrayList<javax.vecmath.Vector3f> transformedVerts = new ObjectArrayList<>();
             for (javax.vecmath.Vector3f vert : convexHull.getPoints()) {
                 transformedVerts.add(com.bulletphysics.linearmath.QuaternionUtil.quatRotate(VecMath.to(rot), vert, new javax.vecmath.Vector3f()));
             }
-            return new ConvexHullShape(transformedVerts);
+            return new ConvexHullShape(transformedVerts);*/
         }
         return shape;
     }

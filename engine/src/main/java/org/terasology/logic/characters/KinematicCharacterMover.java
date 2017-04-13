@@ -15,6 +15,9 @@
  */
 package org.terasology.logic.characters;
 
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.bullet.collision.ClosestConvexResultCallback;
+import com.badlogic.gdx.physics.bullet.collision.ConvexResultCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -26,6 +29,7 @@ import org.terasology.logic.characters.events.SwimStrokeEvent;
 import org.terasology.logic.characters.events.VerticalCollisionEvent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.TeraMath;
+import org.terasology.math.VecMath;
 import org.terasology.math.Vector3fUtil;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
@@ -381,7 +385,8 @@ public class KinematicCharacterMover implements CharacterMover {
         boolean hit = false;
         int iteration = 0;
         while (remainingDist > physics.getEpsilon() && iteration++ < 10) {
-            SweepCallback callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
+
+            ClosestConvexResultCallback callback = collider.sweep(position, targetPos, VERTICAL_PENETRATION, -1.0f);
             float actualDist = Math.max(0,
                     (remainingDist + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction() - VERTICAL_PENETRATION_LEEWAY);
             Vector3f expectedMove = new Vector3f(targetPos);
@@ -396,9 +401,12 @@ public class KinematicCharacterMover implements CharacterMover {
                 break;
             }
             if (callback.hasHit()) {
-                float originalSlope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
+
+                Vector3 normal = new Vector3();
+                callback.getHitNormalWorld(normal);
+                float originalSlope = normal.dot(new Vector3(0,1,0));
                 if (originalSlope < slopeFactor) {
-                    float slope = callback.calculateAverageSlope(originalSlope, CHECK_FORWARD_DIST);
+                    /*float slope = callback.calculateAverageSlope(originalSlope, CHECK_FORWARD_DIST);
                     if (slope < slopeFactor) {
                         remainingDist -= actualDist;
                         expectedMove.set(targetPos);
@@ -426,7 +434,7 @@ public class KinematicCharacterMover implements CharacterMover {
                     } else {
                         hit = true;
                         break;
-                    }
+                    }*/
                 } else {
                     hit = true;
                     break;
@@ -464,7 +472,8 @@ public class KinematicCharacterMover implements CharacterMover {
         int iteration = 0;
         Vector3f lastHitNormal = new Vector3f(0, 1, 0);
         while (remainingFraction >= 0.01f && iteration++ < 10) {
-            SweepCallback callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
+
+            ClosestConvexResultCallback callback = collider.sweep(position, targetPos, HORIZONTAL_PENETRATION, slopeFactor);
 
             /* Note: this isn't quite correct (after the first iteration the closestHitFraction is only for part of the moment)
              but probably close enough */
@@ -482,12 +491,14 @@ public class KinematicCharacterMover implements CharacterMover {
                 dist -= actualDist;
                 Vector3f newDir = new Vector3f(normalizedDir);
                 newDir.scale(dist);
-                float slope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
+                Vector3 normal = new Vector3();
+                callback.getHitNormalWorld(normal);
+                float slope = normal.dot(new Vector3(0, 1, 0));
 
                 // We step up if we're hitting a big slope, or if we're grazing
                 // the ground, otherwise we move up a shallow slope.
                 if (slope < slopeFactor || 1 - slope < physics.getEpsilon()) {
-                    boolean stepping = checkStep(collider, position, newDir, callback, slopeFactor, stepHeight);
+                    /*boolean stepping = checkStep(collider, position, newDir, callback, slopeFactor, stepHeight);
                     if (!stepping) {
                         horizontalHit = true;
                         Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
@@ -502,11 +513,12 @@ public class KinematicCharacterMover implements CharacterMover {
                             extractResidualMovement(horizNormal, newHorizDir);
                         }
                         newDir.set(newHorizDir);
-                    }
+                    }*/
+                    return true;
                 } else {
                     // Hitting a shallow slope, move up it
                     Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
-                    extractResidualMovement(callback.getHitNormalWorld(), newDir);
+                    extractResidualMovement(VecMath.from(normal), newDir);
                     Vector3f modHorizDir = new Vector3f(newDir);
                     modHorizDir.y = 0;
                     newDir.scale(newHorizDir.length() / modHorizDir.length());
@@ -537,7 +549,7 @@ public class KinematicCharacterMover implements CharacterMover {
     private float moveUp(float riseAmount, CharacterCollider collider, Vector3f position) {
         Vector3f to = new Vector3f(position.x, position.y + riseAmount + VERTICAL_PENETRATION_LEEWAY, position.z);
         if (collider != null) {
-            SweepCallback callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+            ClosestConvexResultCallback callback = collider.sweep(position, to, VERTICAL_PENETRATION_LEEWAY, -1f);
             if (callback.hasHit()) {
                 float actualDist = Math.max(0,
                         ((riseAmount + VERTICAL_PENETRATION_LEEWAY) * callback.getClosestHitFraction()) - VERTICAL_PENETRATION_LEEWAY);

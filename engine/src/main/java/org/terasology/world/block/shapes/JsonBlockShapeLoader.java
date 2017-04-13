@@ -62,7 +62,7 @@ import java.util.Locale;
  */
 @RegisterAssetFileFormat
 public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData> {
-    private static final btBoxShape CUBE_SHAPE = new btBoxShape(new Vector3(.5f,.5f,.5f));//new javax.vecmath.Vector3f(0.5f, 0.5f, 0.5f));
+    //private static final btBoxShape CUBE_SHAPE = new btBoxShape(new Vector3(.5f,.5f,.5f));//new javax.vecmath.Vector3f(0.5f, 0.5f, 0.5f));
     private Gson gson;
 
     public JsonBlockShapeLoader() {
@@ -125,7 +125,9 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 JsonObject collisionInfo = shapeObj.get(COLLISION).getAsJsonObject();
                 processCollision(context, shape, collisionInfo);
             } else {
-                shape.setCollisionShape(CUBE_SHAPE);
+
+                //CUBE_SHAPE
+                shape.setCollisionShape(new btBoxShape(new Vector3(.5f,.5f,.5f)));
                 shape.setCollisionSymmetric(true);
             }
             return shape;
@@ -162,7 +164,8 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 JsonArray colliderArray = collisionInfo.get(COLLIDERS).getAsJsonArray();
                 processColliders(context, colliderArray, shape);
             } else {
-                shape.setCollisionShape(CUBE_SHAPE);
+                //CUBE_SHAPE
+                shape.setCollisionShape(new btBoxShape(new Vector3(.5f,.5f,.5f)));
                 shape.setCollisionSymmetric(true);
             }
         }
@@ -217,7 +220,8 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 shape.setCollisionShape(colliders.get(0).collisionShape);
                 shape.setCollisionOffset(colliders.get(0).offset);
             } else {
-                shape.setCollisionShape(CUBE_SHAPE);
+                //CUBE_SHAPE
+                shape.setCollisionShape(new btBoxShape(new Vector3(.5f,.5f,.5f)));
                 shape.setCollisionOffset(new Vector3f(0, 0, 0));
                 shape.setCollisionSymmetric(true);
             }
