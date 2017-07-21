@@ -25,6 +25,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState;
 import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
+import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
 import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -462,12 +463,14 @@ public class BulletPhysics implements PhysicsEngine {
             shape.setLocalScaling(new Vector3(scale,scale,scale));
             List<CollisionGroup> detectGroups = Lists.newArrayList(trigger.detectGroups);
 
+            CollisionGroup collisionGroup = trigger.collisionGroup;
             btPairCachingGhostObject triggerObj = createCollider(
                     location.getWorldPosition(),
                     shape,
-                    StandardCollisionGroup.SENSOR.getFlag(),
+                    collisionGroup.getFlag(),
                     combineGroups(detectGroups),
                     btCollisionObject.CollisionFlags.CF_NO_CONTACT_RESPONSE);
+
             triggerObj.userData = entity;
             //triggerObj.setUserPointer(entity);
             btPairCachingGhostObject oldTrigger = entityTriggers.put(entity, triggerObj);
@@ -743,7 +746,7 @@ public class BulletPhysics implements PhysicsEngine {
                         otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer();
                     }
                 }
-                if (otherEntity == null) {
+                if (otherEntity == null || otherEntity == EntityRef.NULL) {
                     continue;
                 }
                 BroadphasePair pair = world.getPairCache().findPair(initialPair.pProxy0, initialPair.pProxy1);

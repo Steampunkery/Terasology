@@ -120,6 +120,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private boolean isAutoMove = false;
     private boolean runPerDefault = true;
     private boolean run = runPerDefault;
+    private boolean crouch = false;
     private boolean jump;
     private float lookPitch;
     private float lookPitchDelta;
@@ -165,6 +166,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
         Quat4f viewRotation;
         switch (characterMovementComponent.mode) {
+            case CROUCHING:
             case WALKING:
                 if (!config.getRendering().isVrSupport()) {
                     viewRotation = new Quat4f(TeraMath.DEG_TO_RAD * lookYaw, 0, 0);
@@ -187,7 +189,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         }
         // For some reason, Quat4f.rotate is returning NaN for valid inputs. This prevents those NaNs from causing trouble down the line.
         if (!Float.isNaN(relMove.getX()) && !Float.isNaN(relMove.getY()) && !Float.isNaN(relMove.getZ())) {
-            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, jump, time.getGameDeltaInMs()));
+            entity.send(new CharacterMoveInputEvent(inputSequenceNumber++, lookPitch, lookYaw, relMove, run, crouch, jump, time.getGameDeltaInMs()));
         }
         jump = false;
     }
@@ -196,6 +198,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
      * Reduces height and eyeHeight by crouchFraction and changes MovementMode.
      */
     private void crouchPlayer(EntityRef entity) {
+        crouch = true;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
         float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
@@ -211,6 +214,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
      * If not present, increases height and eyeHeight by crouchFraction and changes MovementMode.
      */
     private void standPlayer(EntityRef entity) {
+        crouch = false;
         ClientComponent clientComp = entity.getComponent(ClientComponent.class);
         GazeMountPointComponent gazeMountPointComponent = clientComp.character.getComponent(GazeMountPointComponent.class);
         float height = clientComp.character.getComponent(CharacterMovementComponent.class).height;
@@ -232,8 +236,8 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
 
     // To check if a valid key has been assigned, either primary or secondary and return it
     private Input getValidKey(List<Input> inputs) {
-        for(Input input: inputs) {
-            if(input != null) {
+        for (Input input : inputs) {
+            if (input != null) {
                 return input;
             }
         }
@@ -247,7 +251,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     private void stopAutoMove() {
         List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
         Input forwardKey = getValidKey(inputs);
-        if(forwardKey != null) {
+        if (forwardKey != null) {
             inputSystem.cancelSimulatedKeyStroke(forwardKey);
             isAutoMove = false;
         }
@@ -263,7 +267,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         bindsConfig = config.getInput().getBinds();
         List<Input> inputs = bindsConfig.getBinds(new SimpleUri("engine:forwards"));
         Input forwardKey = getValidKey(inputs);
-        if(forwardKey != null) {
+        if (forwardKey != null) {
             isAutoMove = true;
             inputSystem.simulateSingleKeyStroke(forwardKey);
             inputSystem.simulateRepeatedKeyStroke(forwardKey);
@@ -329,7 +333,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
     @ReceiveEvent(components = {ClientComponent.class})
     public void updateForwardsMovement(ForwardsMovementAxis event, EntityRef entity) {
         relativeMovement.z = event.getValue();
-        if(relativeMovement.z == 0f && isAutoMove) {
+        if (relativeMovement.z == 0f && isAutoMove) {
             stopAutoMove();
         }
         event.consume();

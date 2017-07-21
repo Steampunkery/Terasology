@@ -30,7 +30,7 @@ import org.terasology.world.block.Block;
  * This class links Terasology's voxel world with the physics engine, providing it with the collision information for each block location.
  *
  */
-/*
+
 public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
 
     private WorldProvider world;
@@ -75,7 +75,7 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
             return position;
         }
 
-        /*@Override
+        @Override
         public CollisionShape getCollisionShape() {
             return shape;
         }
@@ -89,5 +89,17 @@ public class PhysicsWorldWrapper implements VoxelPhysicsWorld {
         public boolean isBlocking() {
             return blocking;
         }
+
+        @Override
+        public float getFriction() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public float getRestitution() {
+            // TODO Auto-generated method stub
+            return 0;
+        }
     }
-}*/
+}
