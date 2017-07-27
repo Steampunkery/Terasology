@@ -16,21 +16,23 @@
 
 package org.terasology.physics;
 
+import com.badlogic.gdx.physics.bullet.collision.btBroadphaseProxy;
+
 import java.util.Locale;
 
 /**
  */
 public enum StandardCollisionGroup implements CollisionGroup {
     NONE((short) 0b00000000),
-    DEFAULT((short) 0b00000001),
-    STATIC((short) 0b00000010),
-    KINEMATIC((short) 0b00000100),
-    DEBRIS((short) 0b00001000),
-    SENSOR((short) 0b00010000),
-    CHARACTER((short) 0b00100000),
-    WORLD((short) 0b01000000),
-    LIQUID((short) 0b10000000),
-    ALL((short) 0b11111111);
+    DEFAULT((short) btBroadphaseProxy.CollisionFilterGroups.DefaultFilter),
+    STATIC((short) btBroadphaseProxy.CollisionFilterGroups.StaticFilter),
+    KINEMATIC((short) btBroadphaseProxy.CollisionFilterGroups.KinematicFilter),
+    DEBRIS((short) btBroadphaseProxy.CollisionFilterGroups.DefaultFilter),
+    SENSOR((short) btBroadphaseProxy.CollisionFilterGroups.SensorTrigger),
+    CHARACTER((short) btBroadphaseProxy.CollisionFilterGroups.CharacterFilter),
+    WORLD((short) 128),
+    LIQUID((short) 256),
+    ALL((short) btBroadphaseProxy.CollisionFilterGroups.AllFilter);
 
     private short flag;
 

@@ -363,7 +363,6 @@ public final class Terasology {
     }
 
     private static void populateSubsystems(TerasologyEngineBuilder builder) {
-        Bullet.init();
 
         if (isHeadless) {
             builder.add(new HeadlessGraphics())

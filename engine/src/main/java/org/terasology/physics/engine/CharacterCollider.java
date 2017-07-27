@@ -52,5 +52,5 @@ public interface CharacterCollider {
      * @param slopeFactor
      * @return A sweep callback with the results of the sweep
      */
-    ClosestConvexResultCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor);
+    SweepCallback sweep(Vector3f startPos, Vector3f endPos, float allowedPenetration, float slopeFactor);
 }

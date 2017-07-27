@@ -224,7 +224,7 @@ public class LocalPlayerSystem extends BaseComponentSystem implements UpdateSubs
         CharacterCollider collider = physics.getCharacterCollider(clientComp.character);
         // height used below = (1 - crouch_fraction) * standing_height
         Vector3f to = new Vector3f(pos.x, pos.y + (1 - crouchFraction) * height / crouchFraction, pos.z);
-        ClosestConvexResultCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
+        SweepCallback callback = collider.sweep(pos, to, VERTICAL_PENETRATION_LEEWAY, -1f);
         if (callback.hasHit()) {
             entity.send(new NotificationMessageEvent("Cannot stand up here!", entity));
             return;
