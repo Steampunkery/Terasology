@@ -55,17 +55,17 @@ public class EntityMotionState extends btDefaultMotionState {
         Vector3f location = loc.getWorldPosition();
         transform.translate(location.x,location.y,location.z);
         transform.rotate(VecMath.to(loc.getWorldRotation()));
-        super.getWorldTransform(transform);
+//        super.getWorldTransform(transform);
     }
 
     @Override
     public void setWorldTransform(Matrix4 transform) {
+        super.setWorldTransform(transform);
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(VecMath.from(transform.getTranslation(Vector3.Zero)));
             loc.setWorldRotation(VecMath.from(transform.getRotation(new Quaternion())));
         }
-        super.setWorldTransform(transform);
     }
 
 }

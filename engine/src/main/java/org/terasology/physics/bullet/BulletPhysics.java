@@ -18,16 +18,13 @@ package org.terasology.physics.bullet;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.*;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
-import com.badlogic.gdx.physics.bullet.dynamics.btTypedConstraint;
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState;
+import com.badlogic.gdx.utils.FloatArray;
 import com.bulletphysics.collision.broadphase.CollisionFilterGroups;
-import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
-import com.bulletphysics.collision.shapes.voxel.VoxelWorldShape;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -107,12 +104,9 @@ public class BulletPhysics implements PhysicsEngine {
 
         wrapper = new PhysicsWorldWrapper(world);
         btVoxelShape worldShape = new btVoxelShape(wrapper,new Vector3(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3(AABB_SIZE, AABB_SIZE, AABB_SIZE));
-        //VoxelWorldCollisionShape worldShape = new VoxelWorldCollisionShape();//wrapper);
 
         liquidWrapper = new PhysicsLiquidWorldWrapper(world);
         btVoxelShape liquidShape = new btVoxelShape(liquidWrapper,new Vector3(-AABB_SIZE, -AABB_SIZE, -AABB_SIZE),new Vector3(AABB_SIZE, AABB_SIZE, AABB_SIZE));//liquidWrapper);*/
-
-        //figure out voxel implementation
 
         btDefaultMotionState blockMotionState = new btDefaultMotionState(new Matrix4().idt());
         btRigidBody.btRigidBodyConstructionInfo blockConsInf = new btRigidBody.btRigidBodyConstructionInfo(0, blockMotionState, worldShape, new Vector3());
@@ -204,7 +198,6 @@ public class BulletPhysics implements PhysicsEngine {
         Vector3 from = VecMath.to(from1);
         to.nor();
         to.scl(distance);
-        //to.scale(distance);
         to.add(from);
 
         short filter = combineGroups(collisionGroups);
@@ -226,6 +219,7 @@ public class BulletPhysics implements PhysicsEngine {
         callback.setCollisionFilterGroup((short) btBroadphaseProxy.CollisionFilterGroups.AllFilter);
         callback.setCollisionFilterMask(filter);
 
+
         discreteDynamicsWorld.rayTest(from, to, callback);
         if (callback.hasHit()) {
             btCollisionObject collisionObject = callback.getCollisionObject();
@@ -237,12 +231,18 @@ public class BulletPhysics implements PhysicsEngine {
             btVoxelInfo info  = callback.getVoxelInfo();
 
             if (!info.isEmpty()) {
-                Vector3i voxelPosition = new Vector3i(info.getVoxelPosition().x(), info.getVoxelPosition().y(), info.getVoxelPosition().z());
-                final EntityRef entityAt = blockEntityRegistry.getEntityAt(voxelPosition);
-                return new HitResult(entityAt,
-                        VecMath.from(hitPointWorld),
-                        VecMath.from(hitNormalWorld),
-                        voxelPosition);
+                try {
+                    Vector3i voxelPosition = new Vector3i(info.getVoxelPosition().x(), info.getVoxelPosition().y(), info.getVoxelPosition().z());
+                    final EntityRef entityAt = blockEntityRegistry.getEntityAt(voxelPosition);
+                    return new HitResult(entityAt,
+                            VecMath.from(hitPointWorld),
+                            VecMath.from(hitNormalWorld),
+                            voxelPosition);
+                }
+                catch (Exception e)
+                {
+                    return new HitResult();
+                }
             } else if (collisionObject.userData instanceof EntityRef) { //we hit an other entity
                 return new HitResult((EntityRef) collisionObject.userData,
                         VecMath.from(hitPointWorld),
@@ -263,7 +263,7 @@ public class BulletPhysics implements PhysicsEngine {
         applyPendingImpulsesAndForces();
         try {
             PerformanceMonitor.startActivity("Step Simulation");
-            if (discreteDynamicsWorld.stepSimulation(delta, 8) != 0) {
+            if (discreteDynamicsWorld.stepSimulation(delta, 8,1f/60f) != 0) {
                 for (BulletCharacterMoverCollider collider : entityColliders.values()) {
                     collider.pending = false;
                 }
@@ -287,8 +287,12 @@ public class BulletPhysics implements PhysicsEngine {
             removeRigidBody(rigidBody);
             // wake up this entities neighbors
 
-//            rigidBody.rb.getCollisionShape().getBoundingSphere(new Vector3(), radius);
-//            awakenArea(rigidBody.getLocation(new org.terasology.math.geom.Vector3f()), radius);
+            Matrix4 m = new Matrix4();
+            Vector3 aabbMin = new Vector3();
+            Vector3 aabbMax = new Vector3();
+
+            rigidBody.rb.getCollisionShape().getAabb(m,aabbMin,aabbMax);
+            awakenArea(rigidBody.getLocation(new Vector3f()), (aabbMax.sub(aabbMin)).len() * .5f);
             return true;
         } else {
             logger.warn("Deleting non existing rigidBody from physics engine?! Entity: {}", entity);
@@ -309,7 +313,6 @@ public class BulletPhysics implements PhysicsEngine {
             return false;
         } else if (rigidBody != null) {
             float scale = location.getWorldScale();
-
             if (Math.abs(rigidBody.rb.getCollisionShape().getLocalScaling().x - scale) > this.getEpsilon()
                     || rigidBody.collidesWith != combineGroups(rb.collidesWith)) {
                 removeRigidBody(rigidBody);
@@ -435,11 +438,19 @@ public class BulletPhysics implements PhysicsEngine {
 
     @Override
     public void awakenArea(org.terasology.math.geom.Vector3f pos, float radius) {
-        /*Vector3f min = new Vector3f(VecMath.to(pos));
-        min.sub(new Vector3f(0.6f, 0.6f, 0.6f));
-        Vector3f max = new Vector3f(VecMath.to(pos));
-        max.add(new Vector3f(0.6f, 0.6f, 0.6f));
-        discreteDynamicsWorld.awakenRigidBodiesInArea(min, max);*/
+        btPairCachingGhostObject ghost = new btPairCachingGhostObject();
+        btSphereShape shape = new btSphereShape(radius);
+        ghost.setCollisionShape(shape);
+        ghost.setWorldTransform(new Matrix4(new Vector3(pos.x,pos.y,pos.z),new Quaternion(),new Vector3(1,1,1)));
+
+        discreteDynamicsWorld.addCollisionObject(ghost,(short)-1,(short)-1);
+        broadphase.calculateOverlappingPairs(dispatcher);
+        List<EntityRef> result = Lists.newArrayList();
+        for (int i = 0; i < ghost.getNumOverlappingObjects(); ++i) {
+            btCollisionObject other = ghost.getOverlappingObject(i);
+            other.activate(true);
+        }
+        discreteDynamicsWorld.removeCollisionObject(ghost);
     }
 
     @Override
@@ -526,10 +537,10 @@ public class BulletPhysics implements PhysicsEngine {
                 logger.warn("RigidBodyComponent.mass is set to less than 1.0, this can lead to strange behaviour, such as the objects moving through walls. " +
                         "Entity: {}", entity);
             }
-            Vector3f fallInertia = new Vector3f();
-            shape.calculateLocalInertia(rigidBody.mass,VecMath.to(fallInertia));
+            Vector3 inertia = Vector3.Zero;
+            shape.calculateLocalInertia(rigidBody.mass,inertia);
 
-            btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(rigidBody.mass, new EntityMotionState(entity), shape, VecMath.to(fallInertia));
+            btRigidBody.btRigidBodyConstructionInfo info = new btRigidBody.btRigidBodyConstructionInfo(rigidBody.mass, new btDefaultMotionState(), shape, inertia);
             BulletRigidBody collider = new BulletRigidBody(info);
             collider.rb.userData = entity;
             collider.rb.setAngularFactor(VecMath.to(rigidBody.angularFactor));
@@ -674,11 +685,6 @@ public class BulletPhysics implements PhysicsEngine {
             //ObjectArrayList<Vector3f> verts = new ObjectArrayList<>();
             TFloatIterator iterator = hull.sourceMesh.getVertices().iterator();
             while (iterator.hasNext()) {
-//                Vector3f newVert = new Vector3f();
- //               newVert.x = iterator.next();
-  //              newVert.y = iterator.next();
-   //             newVert.z = iterator.next();
-  //              verts.add(newVert);
                 buffer.put(iterator.next());
                 buffer.put(iterator.next());
                 buffer.put(iterator.next());
@@ -707,7 +713,7 @@ public class BulletPhysics implements PhysicsEngine {
 
     private btPairCachingGhostObject createCollider(Vector3f pos, btConvexShape shape, short groups, short filters, int collisionFlags) {
 
-        Matrix4 startTransform =  new Matrix4(VecMath.to(pos),new Quaternion(0,0,0,1),new Vector3(1,1,1));;
+        Matrix4 startTransform =  new Matrix4(VecMath.to(pos),new Quaternion(),new Vector3(1,1,1));;
         btPairCachingGhostObject result = new btPairCachingGhostObject();
         result.setWorldTransform(startTransform);
         result.setCollisionShape(shape);
@@ -719,59 +725,63 @@ public class BulletPhysics implements PhysicsEngine {
     private Collection<? extends PhysicsSystem.CollisionPair> getNewCollisionPairs() {
         List<PhysicsSystem.CollisionPair> collisionPairs = Lists.newArrayList();
 
-        btDiscreteDynamicsWorld world = discreteDynamicsWorld;
-        // ObjectArrayList<btPersistentManifold> manifolds = new ObjectArrayList<>();
+        btPersistentManifoldArray manifolds = new btPersistentManifoldArray();
         for (btPairCachingGhostObject trigger : entityTriggers.values()) {
-
             EntityRef entity = (EntityRef) trigger.userData;
-            btHashedOverlappingPairCache overlappingPairCache = trigger.getOverlappingPairCache();
-            btBroadphasePairArray overlappingPairArray = overlappingPairCache.getOverlappingPairArray();
-            for (int i = 0; i < overlappingPairCache.GetCount(); i++) {
-                btBroadphasePair pair = overlappingPairArray.at(i);
-                //TODO review
-                if (pair.getPProxy0().getClientObject() == trigger.getUserPointer()) {
-
-                }
-            }
-        }
-/*
-            for (btBroadphasePair initialPair : trigger.getOverlappingPairCache().getOverlappingPairArray()) {
+            for(int x = 0; x < trigger.getOverlappingPairCache().getOverlappingPairArray().size(); x++)
+            {
+                btBroadphasePair initialPair = trigger.getOverlappingPairCache().getOverlappingPairArray().at(x);
                 EntityRef otherEntity = null;
-                if (initialPair.pProxy0.clientObject == trigger) {
-                    if (((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer() instanceof EntityRef) {
-                        otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy1.clientObject).getUserPointer();
+                if (initialPair.getPProxy0().getClientObject() == trigger.getCPointer()) {
+                    btCollisionObject other = new btCollisionObject(initialPair.getPProxy1().getClientObject(),false);
+                    if (other.userData instanceof EntityRef) {
+                        otherEntity = (EntityRef) other.userData;
                     }
                 } else {
-                    if (((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer() instanceof EntityRef) {
-                        otherEntity = (EntityRef) ((CollisionObject) initialPair.pProxy0.clientObject).getUserPointer();
+                    btCollisionObject other = new btCollisionObject(initialPair.getPProxy0().getClientObject(),false);
+                    if (other.userData instanceof EntityRef) {
+                        otherEntity = (EntityRef) other.userData;
                     }
                 }
                 if (otherEntity == null || otherEntity == EntityRef.NULL) {
                     continue;
                 }
-                BroadphasePair pair = world.getPairCache().findPair(initialPair.pProxy0, initialPair.pProxy1);
+                btBroadphasePair pair = discreteDynamicsWorld.getPairCache().findPair(initialPair.getPProxy0(), initialPair.getPProxy1());
                 if (pair == null) {
                     continue;
                 }
                 manifolds.clear();
-                if (pair.algorithm != null) {
-                    pair.algorithm.getAllContactManifolds(manifolds);
+                if (pair.getAlgorithm() != null) {
+                    pair.getAlgorithm().getAllContactManifolds(manifolds);
                 }
-                for (PersistentManifold manifold : manifolds) {
+                for(int y = 0; y < manifolds.size(); y++)
+                {
+                    btPersistentManifold manifold = manifolds.at(y);
                     for (int point = 0; point < manifold.getNumContacts(); ++point) {
-                        ManifoldPoint manifoldPoint = manifold.getContactPoint(point);
+                        btManifoldPoint manifoldPoint = manifold.getContactPoint(point);
                         if (manifoldPoint.getDistance() < 0) {
+                            Vector3 a1 = Vector3.Zero;
+                            manifoldPoint.getPositionWorldOnA(a1);
+
+                            Vector3 a2 = Vector3.Zero;
+                            manifoldPoint.getPositionWorldOnB(a2);
+
+
+                            Vector3 a3 = Vector3.Zero;
+                            manifoldPoint.getNormalWorldOnB(a3);
+
                             collisionPairs.add(new PhysicsSystem.CollisionPair(entity, otherEntity,
-                                    VecMath.from(manifoldPoint.positionWorldOnA),
-                                    VecMath.from(manifoldPoint.positionWorldOnB),
+                                    VecMath.from(a1),
+                                    VecMath.from(a2),
                                     manifoldPoint.getDistance(),
-                                    VecMath.from(manifoldPoint.normalWorldOnB)));
+                                    VecMath.from(a3)));
                             break;
                         }
                     }
                 }
+
             }
-        }*/
+        }
         return collisionPairs;
     }
 
@@ -837,12 +847,32 @@ public class BulletPhysics implements PhysicsEngine {
 
         @Override
         public org.terasology.math.geom.Quat4f getOrientation(org.terasology.math.geom.Quat4f out) {
-            return VecMath.from(rb.getOrientation());
+            Quaternion rotation = new Quaternion();
+            rb.getWorldTransform().getRotation(rotation);
+            return VecMath.from(rotation);
         }
 
         @Override
         public org.terasology.math.geom.Vector3f getLocation(org.terasology.math.geom.Vector3f out) {
-            return VecMath.from(rb.getCenterOfMassPosition());
+            Vector3 result = new Vector3();
+            rb.getWorldTransform().getTranslation(result);
+            out.x = result.x;
+            out.y = result.y;
+            out.z = result.z;
+            return out;
+        }
+
+        @Override
+        public Matrix4 getWorldTransform()
+        {
+            return  rb.getWorldTransform();
+        }
+
+        @Override
+        public  Matrix4 setWorldTransform(Matrix4 trans)
+        {
+            rb.setWorldTransform(trans);
+            return trans;
         }
 
         @Override
@@ -867,22 +897,20 @@ public class BulletPhysics implements PhysicsEngine {
 
         @Override
         public void setOrientation(org.terasology.math.geom.Quat4f orientation) {
-            //rb.getWorldTransform(pooledTransform);
-            //pooledTransform.setRotation(VecMath.to(orientation));
-            //rb.proceedToTransform(pooledTransform);
             Matrix4 transform =  rb.getWorldTransform();
-            transform.rotate(VecMath.to(orientation));
-            rb.proceedToTransform(transform);
+            Vector3 translation = Vector3.Zero;
+            transform.getTranslation(translation);
+            transform.set(translation,VecMath.to(orientation));
+            rb.setWorldTransform(transform);
         }
 
         @Override
         public void setLocation(org.terasology.math.geom.Vector3f location) {
-//            rb.getWorldTransform(pooledTransform);
- //           pooledTransform.origin.set(VecMath.to(location));
- //           rb.proceedToTransform(pooledTransform);
-            Matrix4 transform =  rb.getWorldTransform();
-            transform.translate(location.x,location.y,location.z);
-            rb.proceedToTransform(transform);
+            Matrix4 translation = rb.getWorldTransform();
+            Quaternion quaternion = new Quaternion();
+            translation.getRotation(quaternion);
+            translation.set(VecMath.to(location),quaternion);
+            rb.setWorldTransform(translation);
 
         }
 
@@ -895,14 +923,8 @@ public class BulletPhysics implements PhysicsEngine {
         @Override
         public void setTransform(org.terasology.math.geom.Vector3f location, org.terasology.math.geom.Quat4f orientation) {
             Matrix4 transform =  new Matrix4(rb.getWorldTransform());
-            transform.translate(location.x,location.y,location.z);
-            transform.rotate(VecMath.to(orientation));
-            rb.proceedToTransform(transform);
-
-            //rb.getWorldTransform(pooledTransform);
-            //pooledTransform.origin.set(VecMath.to(location));
-            //pooledTransform.setRotation(VecMath.to(orientation));
-            //rb.proceedToTransform(pooledTransform);
+            transform.set(VecMath.to(location),VecMath.to(orientation));
+            rb.setWorldTransform(transform);
         }
 
         @Override

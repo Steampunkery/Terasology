@@ -15,6 +15,10 @@
  */
 package org.terasology.physics.engine;
 
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
+import com.bulletphysics.linearmath.VectorUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -31,6 +35,7 @@ import org.terasology.entitySystem.systems.RegisterSystem;
 import org.terasology.entitySystem.systems.UpdateSubscriberSystem;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.logic.location.LocationResynchEvent;
+import org.terasology.math.VecMath;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
@@ -96,6 +101,14 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
     public void newRigidBody(OnActivatedComponent event, EntityRef entity) {
         //getter also creates the rigid body
         physics.getRigidBody(entity);
+    }
+
+    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
+    public void onLocationChange(OnChangedComponent event, EntityRef entity) {
+//        LocationComponent  loc = entity.getComponent(LocationComponent.class);
+//        RigidBody rigidBody = physics.getRigidBody(entity);
+//        rigidBody.setLocation(loc.getWorldPosition());
+//        rigidBody.setOrientation(loc.getWorldRotation());
     }
 
     @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
@@ -198,14 +211,28 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
                 Vector3f vLocation = Vector3f.zero();
                 body.getLocation(vLocation);
 
-                Vector3f vDirection = new Vector3f(comp.velocity);
-                float fDistanceThisFrame = vDirection.length();
-                vDirection.normalize();
+
+                LocationComponent loc = entity.getComponent(LocationComponent.class);
+                if (loc != null) {
+                    Matrix4 trans = body.getWorldTransform();
+
+                    Vector3 pos = Vector3.Zero;
+                    trans.getTranslation(pos);
+                    loc.setWorldPosition(VecMath.from(pos));
+
+                    Quaternion rot = new Quaternion();
+                    trans.getRotation(rot);
+                    loc.setWorldRotation(VecMath.from(rot));
+                }
+
+                Vector3 vDirection = new Vector3(VecMath.to(comp.velocity));
+                float fDistanceThisFrame = vDirection.len();
+                vDirection.nor();
 
                 fDistanceThisFrame = fDistanceThisFrame * delta;
 
                 while (true) {
-                    HitResult hitInfo = physics.rayTrace(vLocation, vDirection, fDistanceThisFrame + 0.5f, DEFAULT_COLLISION_GROUP);
+                    HitResult hitInfo = physics.rayTrace(vLocation, VecMath.from(vDirection), fDistanceThisFrame + 0.5f, DEFAULT_COLLISION_GROUP);
                     if (hitInfo.isHit()) {
                         Block hitBlock = worldProvider.getBlock(hitInfo.getBlockPosition());
                         if (hitBlock != null) {

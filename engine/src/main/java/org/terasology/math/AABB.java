@@ -153,13 +153,9 @@ public final class AABB {
         return transform(transform);
     }
 
-    //TODO: not sure about implementation
     public AABB transform(Matrix4 transform) {
-
-        //btAABB aabb = new btAABB()
         btAABB aabb =  new btAABB(VecMath.to(min),VecMath.to(max),new Vector3(),.01f);
         aabb.appy_transform(transform);
-        //AabbUtil2.transformAabb(VecMath.to(min), VecMath.to(max), 0.01f, transform, newMin, newMax);
         return new AABB(new Vector3f(aabb.getMin().x(),aabb.getMin().y(),aabb.getMin().z()), new Vector3f(aabb.getMax().x(),aabb.getMax().y(),aabb.getMax().z()));
     }
 
