@@ -15,10 +15,8 @@
  */
 package org.terasology.physics.engine;
 
-import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.bulletphysics.linearmath.VectorUtil;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.engine.Time;
@@ -46,21 +44,12 @@ import org.terasology.physics.HitResult;
 import org.terasology.physics.StandardCollisionGroup;
 import org.terasology.physics.components.RigidBodyComponent;
 import org.terasology.physics.components.TriggerComponent;
-import org.terasology.physics.events.ChangeVelocityEvent;
-import org.terasology.physics.events.CollideEvent;
-import org.terasology.physics.events.ForceEvent;
-import org.terasology.physics.events.ImpulseEvent;
-import org.terasology.physics.events.PhysicsResynchEvent;
-import org.terasology.physics.events.ImpactEvent;
-import org.terasology.physics.events.EntityImpactEvent;
-import org.terasology.physics.events.BlockImpactEvent;
+import org.terasology.physics.events.*;
 import org.terasology.registry.In;
 import org.terasology.world.OnChangedBlock;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockComponent;
-
-import com.google.common.collect.Lists;
 
 import java.util.Iterator;
 import java.util.List;
@@ -103,16 +92,8 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
         physics.getRigidBody(entity);
     }
 
-    @ReceiveEvent(components = {RigidBodyComponent.class, LocationComponent.class})
-    public void onLocationChange(OnChangedComponent event, EntityRef entity) {
-//        LocationComponent  loc = entity.getComponent(LocationComponent.class);
-//        RigidBody rigidBody = physics.getRigidBody(entity);
-//        rigidBody.setLocation(loc.getWorldPosition());
-//        rigidBody.setOrientation(loc.getWorldRotation());
-    }
-
-    @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
     //update also creates the trigger
+    @ReceiveEvent(components = {TriggerComponent.class, LocationComponent.class})
     public void newTrigger(OnActivatedComponent event, EntityRef entity) {
         physics.updateTrigger(entity);
     }
@@ -210,20 +191,6 @@ public class PhysicsSystem extends BaseComponentSystem implements UpdateSubscrib
 
                 Vector3f vLocation = Vector3f.zero();
                 body.getLocation(vLocation);
-
-
-                LocationComponent loc = entity.getComponent(LocationComponent.class);
-                if (loc != null) {
-                    Matrix4 trans = body.getWorldTransform();
-
-                    Vector3 pos = Vector3.Zero;
-                    trans.getTranslation(pos);
-                    loc.setWorldPosition(VecMath.from(pos));
-
-                    Quaternion rot = new Quaternion();
-                    trans.getRotation(rot);
-                    loc.setWorldRotation(VecMath.from(rot));
-                }
 
                 Vector3 vDirection = new Vector3(VecMath.to(comp.velocity));
                 float fDistanceThisFrame = vDirection.len();

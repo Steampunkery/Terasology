@@ -27,6 +27,8 @@ import org.terasology.physics.bullet.BulletPhysics;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 
+import java.util.HashSet;
+
 /**
  * This class links Terasology's voxel world with the physics engine, providing it with the collision information for each block location.
  *
@@ -53,7 +55,7 @@ public class PhysicsWorldWrapper extends btVoxelContentProvider {
                 shape != null && block.isTargetable(),
                 shape != null && !block.isPenetrable(),
                 block.getId(),
-                new Vector3(x,y,z),
+                x,y,z,
                 shape,
                 VecMath.to(block.getCollisionOffset()),
                 0,0,0);

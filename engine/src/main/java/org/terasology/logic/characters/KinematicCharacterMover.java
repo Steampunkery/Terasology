@@ -409,9 +409,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 break;
             }
             if (callback.hasHit()) {
-
-                Vector3f normal = callback.getHitNormalWorld();
-                float originalSlope = normal.dot(new Vector3f(0,1,0));
+                float originalSlope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
                 if (originalSlope < slopeFactor) {
                     //TODO: implement sweep callback
                     float slope = callback.calculateAverageSlope(originalSlope, CHECK_FORWARD_DIST);
@@ -419,8 +417,7 @@ public class KinematicCharacterMover implements CharacterMover {
                         remainingDist -= actualDist;
                         expectedMove.set(targetPos);
                         expectedMove.sub(position);
-                        Vector3f hitNormal = callback.getHitNormalWorld();
-                        extractResidualMovement(hitNormal, expectedMove);
+                        extractResidualMovement(callback.getHitNormalWorld(), expectedMove);
                         float sqrDist = expectedMove.lengthSquared();
                         if (sqrDist > physics.getEpsilon()) {
                             expectedMove.normalize();
@@ -500,8 +497,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 dist -= actualDist;
                 Vector3f newDir = new Vector3f(normalizedDir);
                 newDir.scale(dist);
-                Vector3f normal = callback.getHitNormalWorld();
-                float slope = normal.dot(new Vector3f(0, 1, 0));
+                float slope = callback.getHitNormalWorld().dot(new Vector3f(0, 1, 0));
 
                 // We step up if we're hitting a big slope, or if we're grazing
                 // the ground, otherwise we move up a shallow slope.
@@ -525,7 +521,7 @@ public class KinematicCharacterMover implements CharacterMover {
                 } else {
                     // Hitting a shallow slope, move up it
                     Vector3f newHorizDir = new Vector3f(newDir.x, 0, newDir.z);
-                    extractResidualMovement(normal, newDir);
+                    extractResidualMovement(callback.getHitNormalWorld(), newDir);
                     Vector3f modHorizDir = new Vector3f(newDir);
                     modHorizDir.y = 0;
                     newDir.scale(newHorizDir.length() / modHorizDir.length());

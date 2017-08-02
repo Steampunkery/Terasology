@@ -39,7 +39,7 @@ public class BulletSweepCallback extends ClosestConvexResultCallback implements 
     protected final Vector3 up;
     protected float minSlopeDot;
 
-    public BulletSweepCallback(btCollisionObject me, org.terasology.math.geom.Vector3f up, float minSlopeDot) {
+    public BulletSweepCallback(btCollisionObject me, Vector3f up, float minSlopeDot) {
         super(Vector3.Zero,Vector3.Zero);
         this.me = me;
         this.up = new Vector3(up.x, up.y, up.z);

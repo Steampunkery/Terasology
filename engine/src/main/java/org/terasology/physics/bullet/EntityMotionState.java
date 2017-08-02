@@ -19,9 +19,8 @@ package org.terasology.physics.bullet;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState;
-import com.bulletphysics.linearmath.MotionState;
-import com.bulletphysics.linearmath.Transform;
+import com.badlogic.gdx.physics.bullet.linearmath.LinearMathJNI;
+import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.VecMath;
@@ -35,7 +34,7 @@ import javax.vecmath.Matrix4f;
  * as it moves under physics.
  *
  */
-public class EntityMotionState extends btDefaultMotionState {
+public class EntityMotionState extends btMotionState {
     private EntityRef entity;
 
     /**
@@ -45,22 +44,19 @@ public class EntityMotionState extends btDefaultMotionState {
      *               LocationComponent of.
      */
     EntityMotionState(EntityRef entity) {
+        super();
         this.entity = entity;
     }
 
     @Override
-    public void getWorldTransform(Matrix4 transform)
-    {
+    public void getWorldTransform(Matrix4 worldTrans) {
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         Vector3f location = loc.getWorldPosition();
-        transform.translate(location.x,location.y,location.z);
-        transform.rotate(VecMath.to(loc.getWorldRotation()));
-//        super.getWorldTransform(transform);
+        worldTrans.set(new Vector3(location.x,location.y,location.z),VecMath.to(loc.getWorldRotation()));
     }
 
     @Override
     public void setWorldTransform(Matrix4 transform) {
-        super.setWorldTransform(transform);
         LocationComponent loc = entity.getComponent(LocationComponent.class);
         if (loc != null) {
             loc.setWorldPosition(VecMath.from(transform.getTranslation(Vector3.Zero)));

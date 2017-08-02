@@ -41,7 +41,7 @@ public class PhysicsLiquidWorldWrapper extends btVoxelContentProvider {
                 false,
                 block.isLiquid(),
                 block.getId(),
-                new Vector3(x,y,z),
+                x,y,z,
                 shape,
                 VecMath.to(block.getCollisionOffset()),
                 0,0,0);
