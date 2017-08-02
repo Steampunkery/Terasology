@@ -19,17 +19,10 @@ package org.terasology.world.block.shapes;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.*;
-import com.badlogic.gdx.physics.bullet.linearmath.LinearMath;
-import com.badlogic.gdx.physics.bullet.linearmath.btVector3;
 import com.google.common.collect.Maps;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.Pitch;
-import org.terasology.math.Roll;
-import org.terasology.math.Rotation;
-import org.terasology.math.Side;
-import org.terasology.math.VecMath;
-import org.terasology.math.Yaw;
+import org.terasology.math.*;
 import org.terasology.math.geom.Quat4f;
 import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
@@ -147,11 +140,10 @@ public class BlockShapeImpl extends BlockShape {
         } else if (shape instanceof btConvexHullShape) {
             btConvexHullShape result = new btConvexHullShape();
             btConvexHullShape convexHull = (btConvexHullShape) shape;
-            for(int x =0 ; x< convexHull.getNumPoints(); x++)
+            for(int x = 0; x < convexHull.getNumPoints(); x++)
             {
                 result.addPoint(convexHull.getScaledPoint(x),true);
             }
-
             return result;
         }
         return shape;

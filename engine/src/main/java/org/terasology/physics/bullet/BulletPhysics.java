@@ -98,7 +98,7 @@ public class BulletPhysics implements PhysicsEngine {
         discreteDynamicsWorld.setGravity(new Vector3(0f, -15f, 0f));
          blockEntityRegistry = CoreRegistry.get(BlockEntityRegistry.class);
 
-        broadphase.getOverlappingPairCache().setInternalGhostPairCallback(new btGhostPairCallback());
+        discreteDynamicsWorld.getBroadphase().getOverlappingPairCache().setInternalGhostPairCallback(new btGhostPairCallback());
 
         //TODO: reimplement wrapper
 
@@ -701,23 +701,25 @@ public class BulletPhysics implements PhysicsEngine {
 
         result.setWorldTransform(startTransform);
         result.setCollisionShape(shape);
-        result.setCollisionFlags(result.getCollisionFlags() | collisionFlags);
+        result.setCollisionFlags(collisionFlags);
         discreteDynamicsWorld.addCollisionObject(result, groups, filters);
         return result;
     }
 
     private Collection<? extends PhysicsSystem.CollisionPair> getNewCollisionPairs() {
+
         List<PhysicsSystem.CollisionPair> collisionPairs = Lists.newArrayList();
         btPersistentManifoldArray manifolds = new btPersistentManifoldArray();
+
         for (btPairCachingGhostObject trigger : entityTriggers.values()) {
             EntityRef entity = (EntityRef) trigger.userData;
-            btBroadphasePairArray pairs = trigger.getOverlappingPairCache().getOverlappingPairArray();
+            btBroadphasePairArray pairs = discreteDynamicsWorld.getBroadphase().getOverlappingPairCache().getOverlappingPairArray();
             for(int x = 0; x < pairs.size(); x++)
             {
                 btBroadphasePair initialPair = pairs.at(x);
                 EntityRef otherEntity = null;
-                btBroadphaseProxy p0 = initialPair.getPProxy0();
-                btBroadphaseProxy p1 = initialPair.getPProxy1();
+                btBroadphaseProxy p0 = btBroadphaseProxy.obtain(initialPair.getPProxy0().getCPointer(),false);
+                btBroadphaseProxy p1 = btBroadphaseProxy.obtain(initialPair.getPProxy1().getCPointer(),false);
 
                 if (p0.getClientObject() == trigger.getCPointer()) {
 
@@ -733,8 +735,8 @@ public class BulletPhysics implements PhysicsEngine {
                 }
                 if (otherEntity == null || otherEntity == EntityRef.NULL) {
                     continue;
-                };
-                btBroadphasePair pair = broadphase.getOverlappingPairCache().findPair(initialPair.getPProxy0(),initialPair.getPProxy1());
+                }
+                btBroadphasePair pair = discreteDynamicsWorld.getPairCache().findPair(p0,p1);
                 if (pair.getCPointer() == 0) {
                     continue;
                 }
