@@ -29,16 +29,16 @@ import java.util.Collections;
  * The standard block group consisting of a single symmetrical block that doesn't need rotations
  *
  */
+@RegisterBlockFamily("symmetric")
 public class SymmetricFamily extends AbstractBlockFamily {
 
     private Block block;
 
-    public SymmetricFamily(BlockUri uri, Block block) {
-        this(uri, block, Collections.<String>emptyList());
+    public SymmetricFamily() {
     }
 
     public SymmetricFamily(BlockUri uri, Block block, Iterable<String> categories) {
-        super(uri, categories);
+//        super(uri, categories);
         this.block = block;
         block.setBlockFamily(this);
         block.setUri(uri);

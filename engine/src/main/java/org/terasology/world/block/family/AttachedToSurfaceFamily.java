@@ -29,6 +29,7 @@ import java.util.Map;
 
 /**
  */
+@RegisterBlockFamily("attachedToSurface")
 public class AttachedToSurfaceFamily extends AbstractBlockFamily {
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private Block archetype;

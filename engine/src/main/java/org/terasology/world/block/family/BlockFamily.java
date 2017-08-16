@@ -15,12 +15,20 @@
  */
 package org.terasology.world.block.family;
 
+import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A collection of blocks that are all different rotations of the same core block.
@@ -29,6 +37,7 @@ import org.terasology.world.block.BlockUri;
  *
  */
 public interface BlockFamily {
+    ResourceUrn CUBE_SHAPE_URN = new ResourceUrn("engine:cube");
 
     /**
      * @return The block uri for this family
@@ -55,6 +64,30 @@ public interface BlockFamily {
      * @return The base block defining the block group. Can be used for orientation-irrelevant behaviours
      */
     Block getArchetypeBlock();
+
+    /**
+     * @return The set of block names this family contains. A block definition will be loaded for each one.
+     */
+    default Set<String> getSectionNames() {
+        return Collections.emptySet();
+    }
+
+
+    void registerFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper);
+
+    default void registerFamily(BlockFamilyDefinition blockFamilyDefinition, BlockShape shape, BlockBuilderHelper blockBuilderHelper){
+        throw new UnsupportedOperationException("Freeform blocks not supported");
+    }
+
+    default boolean isFreeformSupported(){return false;}
+
+    /**
+     * @return The multi-sections that should be applied to the final main sections.
+     */
+    default List<MultiSection> getMultiSections() {
+        return Collections.emptyList();
+    }
+
 
     /**
      * Resolves a block within this family

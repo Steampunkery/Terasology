@@ -49,17 +49,21 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
     }
 
     public boolean isFreeform() {
-        return getData().getFamilyFactory().isFreeformSupported();
+        return getData().getBlockFamily().isFreeformSupported();
     }
 
     public BlockFamily createFamily(BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(!isFreeform());
-        return getData().getFamilyFactory().createBlockFamily(this, blockBuilderHelper);
+        BlockFamily family = getData().getBlockFamily();
+        family.registerFamily(this, blockBuilderHelper);
+        return family;
     }
 
     public BlockFamily createFamily(BlockShape shape, BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(isFreeform());
-        return getData().getFamilyFactory().createBlockFamily(this, shape, blockBuilderHelper);
+        BlockFamily family = getData().getBlockFamily();
+        family.registerFamily(this, shape, blockBuilderHelper);
+        return  family;
     }
 
 

@@ -29,11 +29,12 @@ public abstract class AbstractBlockFamily implements BlockFamily {
     private BlockUri uri;
     private Set<String> categories = Sets.newHashSet();
 
-    public AbstractBlockFamily(BlockUri uri, Iterable<String> categories) {
-        this.uri = uri;
-        for (String category : categories) {
-            this.categories.add(category.toLowerCase(Locale.ENGLISH));
-        }
+//    BlockUri uri, Iterable<String> categories
+    public AbstractBlockFamily() {
+//        this.uri = uri;
+//        for (String category : categories) {
+//            this.categories.add(category.toLowerCase(Locale.ENGLISH));
+//        }
     }
 
     @Override

@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.assets.AssetData;
 import org.terasology.module.sandbox.API;
+import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyFactory;
 
 import java.util.List;
@@ -30,7 +31,7 @@ public class BlockFamilyDefinitionData implements AssetData {
 
     private SectionDefinitionData baseSection = new SectionDefinitionData();
     private Map<String, SectionDefinitionData> sections = Maps.newLinkedHashMap();
-    private BlockFamilyFactory familyFactory;
+    private BlockFamily family;
 
     private List<String> categories = Lists.newArrayList();
 
@@ -43,12 +44,12 @@ public class BlockFamilyDefinitionData implements AssetData {
         for (Map.Entry<String, SectionDefinitionData> entry : other.getSections().entrySet()) {
             sections.put(entry.getKey(), new SectionDefinitionData(entry.getValue()));
         }
-        this.familyFactory = other.familyFactory;
+        this.family = other.family;
         this.categories = Lists.newArrayList(other.categories);
     }
 
     public boolean isValid() {
-        return familyFactory != null;
+        return family != null;
     }
 
     public boolean isTemplate() {
@@ -83,12 +84,12 @@ public class BlockFamilyDefinitionData implements AssetData {
         return result;
     }
 
-    public BlockFamilyFactory getFamilyFactory() {
-        return familyFactory;
+    public BlockFamily getBlockFamily() {
+        return family;
     }
 
-    public void setFamilyFactory(BlockFamilyFactory familyFactory) {
-        this.familyFactory = familyFactory;
+    public void setBlockFamily(BlockFamily family) {
+        this.family = family;
     }
 
     public List<String> getCategories() {

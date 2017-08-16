@@ -17,6 +17,11 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Lists;
+import org.terasology.math.Side;
+import org.terasology.math.geom.Vector3i;
+import org.terasology.world.BlockEntityRegistry;
+import org.terasology.world.WorldProvider;
+import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockUri;
 
 import java.util.Collections;
@@ -27,16 +32,37 @@ import java.util.List;
  * family.
  *
  */
-public class FreeformFamily {
+@RegisterBlockFamily("freeform")
+public class FreeformFamily extends AbstractBlockFamily{
     public BlockUri uri;
     public List<String> categories;
 
-    public FreeformFamily(BlockUri uri) {
-        this(uri, Collections.<String>emptyList());
+    public FreeformFamily() {
+//        this(uri, Collections.<String>emptyList());
     }
 
     public FreeformFamily(BlockUri uri, Iterable<String> categories) {
         this.uri = uri;
         this.categories = Lists.newArrayList(categories);
+    }
+
+    @Override
+    public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+        return null;
+    }
+
+    @Override
+    public Block getArchetypeBlock() {
+        return null;
+    }
+
+    @Override
+    public Block getBlockFor(BlockUri blockUri) {
+        return null;
+    }
+
+    @Override
+    public Iterable<Block> getBlocks() {
+        return null;
     }
 }

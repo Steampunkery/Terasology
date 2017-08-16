@@ -16,28 +16,42 @@
 package org.terasology.world.block.family;
 
 import com.google.common.collect.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
 
 import java.util.Map;
 
-public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyFactoryRegistry {
-    private Map<String, BlockFamilyFactory> registryMap = Maps.newHashMap();
-    private BlockFamilyFactory defaultBlockFamilyFactory = new SymmetricBlockFamilyFactory();
+public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyRegistry {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultBlockFamilyFactoryRegistry.class);
 
-    public void setBlockFamilyFactory(String id, BlockFamilyFactory blockFamilyFactory) {
-        registryMap.put(id.toLowerCase(), blockFamilyFactory);
+
+    private Map<String, Class<?>> registryMap = Maps.newHashMap();
+    private AbstractBlockFamily defaultBlockFamilyFactory = new SymmetricFamily();
+
+    public void setBlockFamily(String id, Class<?> blockFamily) {
+        registryMap.put(id.toLowerCase(), blockFamily);
     }
 
     @Override
-    public BlockFamilyFactory getBlockFamilyFactory(String blockFamilyFactoryId) {
-        if (blockFamilyFactoryId == null || blockFamilyFactoryId.isEmpty()) {
+    public BlockFamily getBlockFamily(String blockFamilyId) {
+        if (blockFamilyId == null || blockFamilyId.isEmpty()) {
             return defaultBlockFamilyFactory;
         }
-        BlockFamilyFactory factory = registryMap.get(blockFamilyFactoryId.toLowerCase());
-        if (factory == null) {
-            return defaultBlockFamilyFactory;
+
+        try {
+            AbstractBlockFamily family = (AbstractBlockFamily) registryMap.get(blockFamilyId.toLowerCase()).newInstance();
+            if (family == null) {
+                return defaultBlockFamilyFactory;
+            }
+            return family;
+        } catch (InstantiationException | IllegalAccessException e) {
+            logger.error("Failed to load blockFamily {}", blockFamilyId, e);
+            e.printStackTrace();
         }
-        return factory;
+        return null;
     }
+
 
     public void clear() {
         registryMap.clear();
