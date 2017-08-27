@@ -20,7 +20,10 @@ import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
+import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,11 +40,40 @@ public class SymmetricFamily extends AbstractBlockFamily {
     public SymmetricFamily() {
     }
 
-    public SymmetricFamily(BlockUri uri, Block block, Iterable<String> categories) {
-//        super(uri, categories);
-        this.block = block;
+    @Override
+    public void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        if (definition.isFreeform()) {
+            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
+        }
+
+        BlockUri uri = new BlockUri(definition.getUrn());
+
+        block = blockBuilder.constructSimpleBlock(definition);
         block.setBlockFamily(this);
         block.setUri(uri);
+        this.setBlockUri(uri);
+        this.setCategory(definition.getCategories());
+
+    }
+
+    @Override
+    public void registerFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        if (!definition.isFreeform()) {
+            throw new IllegalStateException("A shape cannot be provided when creating a family for a non-freeform block family definition");
+        }
+        block = blockBuilder.constructSimpleBlock(definition, shape);
+        BlockUri uri;
+        if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
+            uri = new BlockUri(definition.getUrn());
+        } else {
+            uri = new BlockUri(definition.getUrn(), shape.getUrn());
+        }
+
+        block.setBlockFamily(this);
+        block.setUri(uri);
+
+        this.setBlockUri(uri);
+        this.setCategory(definition.getCategories());
     }
 
     @Override
@@ -53,6 +85,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     public Block getArchetypeBlock() {
         return block;
     }
+
 
     @Override
     public Block getBlockFor(BlockUri blockUri) {

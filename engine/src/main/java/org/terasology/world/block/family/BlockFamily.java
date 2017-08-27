@@ -72,15 +72,6 @@ public interface BlockFamily {
         return Collections.emptySet();
     }
 
-
-    void registerFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper);
-
-    default void registerFamily(BlockFamilyDefinition blockFamilyDefinition, BlockShape shape, BlockBuilderHelper blockBuilderHelper){
-        throw new UnsupportedOperationException("Freeform blocks not supported");
-    }
-
-    default boolean isFreeformSupported(){return false;}
-
     /**
      * @return The multi-sections that should be applied to the final main sections.
      */
@@ -88,6 +79,14 @@ public interface BlockFamily {
         return Collections.emptyList();
     }
 
+
+    void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder);
+
+    default void registerFamily(BlockFamilyDefinition blockFamilyDefinition, BlockShape shape, BlockBuilderHelper blockBuilderHelper){
+        throw new UnsupportedOperationException("Freeform blocks not supported");
+    }
+
+    default boolean isFreeformSupported(){return false;}
 
     /**
      * Resolves a block within this family

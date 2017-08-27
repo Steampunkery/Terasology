@@ -16,8 +16,12 @@
 
 package org.terasology.world.block.family;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Locale;
 import java.util.Set;
@@ -29,13 +33,18 @@ public abstract class AbstractBlockFamily implements BlockFamily {
     private BlockUri uri;
     private Set<String> categories = Sets.newHashSet();
 
-//    BlockUri uri, Iterable<String> categories
-    public AbstractBlockFamily() {
-//        this.uri = uri;
-//        for (String category : categories) {
-//            this.categories.add(category.toLowerCase(Locale.ENGLISH));
-//        }
+
+    protected void setCategory(Iterable<String> categories) {
+        for (String category : categories) {
+            this.categories.add(category.toLowerCase(Locale.ENGLISH));
+        }
     }
+
+    protected void setBlockUri(BlockUri uri)
+    {
+        this.uri = uri;
+    }
+
 
     @Override
     public BlockUri getURI() {
@@ -59,6 +68,7 @@ public abstract class AbstractBlockFamily implements BlockFamily {
 
     @Override
     public String toString() {
-        return "BlockFamily[" + uri.toString() + "]";
+        return "BlockFamily[" + this.getClass().toString() + "]";
+//        return "BlockFamily[" + uri.toString() + "]";
     }
 }

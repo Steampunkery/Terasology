@@ -27,7 +27,6 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyRegistry {
 
 
     private Map<String, Class<?>> registryMap = Maps.newHashMap();
-    private AbstractBlockFamily defaultBlockFamilyFactory = new SymmetricFamily();
 
     public void setBlockFamily(String id, Class<?> blockFamily) {
         registryMap.put(id.toLowerCase(), blockFamily);
@@ -36,13 +35,13 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyRegistry {
     @Override
     public BlockFamily getBlockFamily(String blockFamilyId) {
         if (blockFamilyId == null || blockFamilyId.isEmpty()) {
-            return defaultBlockFamilyFactory;
+            return new SymmetricFamily();
         }
 
         try {
             AbstractBlockFamily family = (AbstractBlockFamily) registryMap.get(blockFamilyId.toLowerCase()).newInstance();
             if (family == null) {
-                return defaultBlockFamilyFactory;
+                return new SymmetricFamily();
             }
             return family;
         } catch (InstantiationException | IllegalAccessException e) {

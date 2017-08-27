@@ -15,6 +15,8 @@
  */
 package org.terasology.world.block.family;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -26,9 +28,11 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Block group for blocks that can be oriented around the vertical axis.
@@ -37,8 +41,15 @@ import java.util.Map;
 @RegisterBlockFamily("horizontal")
 public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
 
+    private static final ImmutableSet<String> BLOCK_NAMES = ImmutableSet.of("front", "left", "right", "back", "top", "bottom");
+    private static final ImmutableList<MultiSection> MULTI_SECTIONS = ImmutableList.of(
+            new MultiSection("all", "front", "left", "right", "back", "top", "bottom"),
+            new MultiSection("topBottom", "top", "bottom"),
+            new MultiSection("sides", "front", "left", "right", "back"));
+
+
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
-    private Side archetypeSide;
+
 
     /**
      * @param uri        The asset uri for the block group.
@@ -47,7 +58,77 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
      */
     public HorizontalBlockFamily(){
     }
-//    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
+
+    protected Side getArchetypeSide() {
+        return Side.FRONT;
+    }
+
+    @Override
+    public void registerFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        if (!definition.isFreeform()) {
+            throw new IllegalStateException("A shape cannot be provided when creating a family for a non-freeform block family definition");
+        }
+        BlockUri uri = null;
+        if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
+            uri = new BlockUri(definition.getUrn());
+        } else {
+            uri = new BlockUri(definition.getUrn(), shape.getUrn());
+        }
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Side side = rot.rotate(Side.FRONT);
+            Block block = blockBuilder.constructTransformedBlock(definition, shape, side.toString().toLowerCase(Locale.ENGLISH), rot);
+            if (block == null) {
+                throw new IllegalArgumentException("Missing block for side: " + side.toString());
+            }
+            block.setBlockFamily(this);
+            block.setUri(new BlockUri(uri,new Name(side.name())));
+            blocks.put(side, block);
+        }
+        this.setBlockUri(uri);
+        this.setCategory(definition.getCategories());
+    }
+
+
+    @Override
+    public void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        if (definition.isFreeform()) {
+            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
+        }
+        BlockUri uri = new BlockUri(definition.getUrn());
+        for (Rotation rot : Rotation.horizontalRotations()) {
+            Side side = rot.rotate(Side.FRONT);
+
+            Block block =  blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot);
+            if (block == null) {
+                throw new IllegalArgumentException("Missing block for side: " + side.toString());
+            }
+            block.setBlockFamily(this);
+            block.setUri(new BlockUri(uri,new Name(side.name())));
+            blocks.put(side,block);
+        }
+        this.setCategory(definition.getCategories());
+        this.setBlockUri(uri);
+
+    }
+
+    @Override
+    public Set<String> getSectionNames() {
+        return BLOCK_NAMES;
+    }
+
+    @Override
+    public ImmutableList<MultiSection> getMultiSections() {
+        return MULTI_SECTIONS;
+    }
+
+    @Override
+    public boolean isFreeformSupported() {
+        return false;
+    }
+
+
+
+    //    public HorizontalBlockFamily(BlockUri uri, Map<Side, Block> blocks, Iterable<String> categories) {
 //        this(uri, Side.FRONT, blocks, categories);
 //    }
 
@@ -79,19 +160,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
 
     @Override
     public Block getArchetypeBlock() {
-        return blocks.get(archetypeSide);
-    }
-
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        if (definition.isFreeform()) {
-            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
-        }
-        Map<Side, Block> blockMap = Maps.newHashMap();
-        for (Rotation rot : Rotation.horizontalRotations()) {
-            Side side = rot.rotate(Side.FRONT);
-            blockMap.put(side, blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot));
-        }
+        return blocks.get(this.getArchetypeSide());
     }
 
     @Override
@@ -126,4 +195,6 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
         }
         return null;
     }
+
+
 }

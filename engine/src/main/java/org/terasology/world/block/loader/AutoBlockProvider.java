@@ -22,7 +22,6 @@ import org.terasology.assets.management.AssetManager;
 import org.terasology.assets.module.annotations.RegisterAssetDataProducer;
 import org.terasology.naming.Name;
 import org.terasology.world.block.BlockPart;
-import org.terasology.world.block.family.FreeformBlockFamilyFactory;
 import org.terasology.world.block.family.FreeformFamily;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
@@ -37,11 +36,9 @@ import java.util.Set;
 public class AutoBlockProvider implements AssetDataProducer<BlockFamilyDefinitionData> {
 
     private AssetManager assetManager;
-    private FreeformBlockFamilyFactory freeformBlockFamilyFactory;
 
     public AutoBlockProvider(AssetManager assetManager) {
         this.assetManager = assetManager;
-        this.freeformBlockFamilyFactory = new FreeformBlockFamilyFactory();
     }
 
     @Override

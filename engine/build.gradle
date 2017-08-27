@@ -158,6 +158,7 @@ dependencies {
         println "*** Setting a CrashReporter binary dependency, not present as source"
         compile group: 'org.terasology.crashreporter', name: 'cr-terasology', version: '4.1.0'
     }
+    compile 'org.jetbrains:annotations:15.0'
 }
 
 // Instructions for packaging a jar file for the engine

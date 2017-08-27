@@ -252,7 +252,12 @@ public class BlockManagerImpl extends BlockManager {
                         block.setId(getNextId());
                     }
                     registerFamily(newFamily.get());
-                } finally {
+                }
+                catch (Exception ex){
+                    logger.error(ex.toString());
+                    logger.error(newFamily.toString());
+                }
+                finally {
                     lock.unlock();
                 }
                 return newFamily.get();

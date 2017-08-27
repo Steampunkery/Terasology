@@ -65,9 +65,6 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
     private static final ResourceUrn DEFAULT_SOUNDS = new ResourceUrn("engine", "default");
 
-    private final BlockFamilyFactory symmetricFamily = new SymmetricBlockFamilyFactory();
-    private final BlockFamilyFactory horizontalFamily = new HorizontalBlockFamilyFactory();
-    private final BlockFamilyFactory freeformFamily = new FreeformBlockFamilyFactory();
     private final AssetManager assetManager;
     private final Gson gson;
 
@@ -80,7 +77,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 .registerTypeAdapter(BlockFamilyDefinitionData.class, new BlockFamilyDefinitionDataHandler())
                 .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
                 .registerTypeAdapter(Vector4f.class, new Vector4fTypeAdapter())
-                .registerTypeAdapter(BlockFamilyFactory.class, new BlockFamilyHandler(blockFamilyRegistry))
+                .registerTypeAdapter(BlockFamily.class, new BlockFamilyHandler(blockFamilyRegistry))
                 .create();
     }
 
@@ -141,6 +138,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             setObject(result::setCategories, jsonObject, "categories", listOfStringType, context);
 
             deserializeSectionDefinitionData(result.getBaseSection(), jsonObject, context);
+
 
             if (result.getBlockFamily() != null) {
                 for (MultiSection multiSection : result.getBlockFamily().getMultiSections()) {
@@ -305,7 +303,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 Optional<BlockFamilyDefinition> baseDef = assetManager.getAsset(basedOn.getAsString(), BlockFamilyDefinition.class);
                 if (baseDef.isPresent()) {
                     BlockFamilyDefinitionData data = baseDef.get().getData();
-                    if (data.getBlockFamily() instanceof FreeformBlockFamilyFactory) {
+                    if (data.getBlockFamily() instanceof FreeformFamily) {
                         data.setBlockFamily(null);
                     }
                     return data;
