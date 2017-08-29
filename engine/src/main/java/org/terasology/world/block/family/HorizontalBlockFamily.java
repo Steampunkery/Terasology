@@ -52,19 +52,11 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
 
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
 
-
-    public HorizontalBlockFamily(){
-    }
-
-    protected Side getArchetypeSide() {
-        return Side.FRONT;
-    }
-
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        if (!definition.isFreeform()) {
-            throw new IllegalStateException("A shape cannot be provided when creating a family for a non-freeform block family definition");
-        }
+    public HorizontalBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
+        //        if (!definition.isFreeform()) {
+//            throw new IllegalStateException("A shape cannot be provided when creating a family for a non-freeform block family definition");
+//        }
         BlockUri uri = null;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
@@ -85,12 +77,11 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
         this.setCategory(definition.getCategories());
     }
 
-
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        if (definition.isFreeform()) {
-            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
-        }
+    public HorizontalBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
+        //        if (definition.isFreeform()) {
+//            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
+//        }
         BlockUri uri = new BlockUri(definition.getUrn());
         for (Rotation rot : Rotation.horizontalRotations()) {
             Side side = rot.rotate(Side.FRONT);
@@ -108,10 +99,8 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
 
     }
 
-
-    @Override
-    public boolean isFreeformSupported() {
-        return false;
+    protected Side getArchetypeSide() {
+        return Side.FRONT;
     }
 
     @Override

@@ -63,13 +63,6 @@ public interface BlockFamily {
      */
     Block getArchetypeBlock();
 
-    void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder);
-
-    default void registerFamily(BlockFamilyDefinition blockFamilyDefinition, BlockShape shape, BlockBuilderHelper blockBuilderHelper){
-        throw new UnsupportedOperationException("Freeform blocks not supported");
-    }
-
-
     /**
      * Resolves a block within this family
      *

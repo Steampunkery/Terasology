@@ -119,7 +119,7 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
     private Block createBlockWithPrefab(String urn, Prefab prefab, boolean keepActive, AssetManager assetManager, BlockManager blockManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setBlockFamily(new SymmetricFamily());
+        data.setBlockFamily(SymmetricFamily.class);
         data.getBaseSection().getEntity().setPrefab(prefab);
         data.getBaseSection().getEntity().setKeepActive(keepActive);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
@@ -134,14 +134,14 @@ public class EntityAwareWorldProviderTest extends TerasologyTestingEnvironment {
 
     private Block createBlock(String urn, AssetManager assetManager, BlockManager blockManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setBlockFamily(new SymmetricFamily());
+        data.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);
         return blockManager.getBlock(urn);
     }
 
     private BlockFamily createBlockFamily(String urn, Prefab prefab, AssetManager assetManager, BlockManager blockManager) {
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setBlockFamily(new HorizontalBlockFamily());
+        data.setBlockFamily(HorizontalBlockFamily.class);
         data.getBaseSection().getEntity().setKeepActive(true);
         data.getBaseSection().getEntity().setPrefab(prefab);
         assetManager.loadAsset(new ResourceUrn(urn), data, BlockFamilyDefinition.class);

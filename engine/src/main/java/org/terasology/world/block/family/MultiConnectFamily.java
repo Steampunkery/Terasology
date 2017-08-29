@@ -31,6 +31,7 @@ import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Collection;
 import java.util.Map;
@@ -59,12 +60,12 @@ public class MultiConnectFamily extends AbstractBlockFamily{
 
     protected Block archetypeBlock;
 
-    public MultiConnectFamily() {
-
+    public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
     }
 
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
         TByteObjectMap<String>[] basicBlocks = new TByteObjectMap[7];
         TByteObjectMap<Block> blocksForConnections = new TByteObjectHashMap<>();
 
@@ -96,8 +97,9 @@ public class MultiConnectFamily extends AbstractBlockFamily{
 
         archetypeBlock = blocksForConnections.get(SideBitFlag.getSides(Side.RIGHT, Side.LEFT));
 
-
     }
+
+
 
     private void addConnections(TByteObjectMap<String>[] basicBlocks, int index, String connections) {
         if (basicBlocks[index] == null) {

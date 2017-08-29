@@ -23,6 +23,7 @@ import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyRegistry;
+import org.terasology.world.block.family.DefaultBlockFamilyFactoryRegistry;
 import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Collections;
@@ -49,22 +50,18 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
         return Collections.unmodifiableList(data.getCategories());
     }
 
-    public boolean isFreeform(BlockFamilyRegistry registry) {
-        return getData().getBlockFamily().isFreeformSupported();
+    public boolean isFreeform() {
+        return DefaultBlockFamilyFactoryRegistry.isFreeformSupported(getData().getBlockFamily());
     }
 
-    public BlockFamily createFamily(BlockBuilderHelper blockBuilderHelper, BlockFamilyRegistry registry) {
+    public BlockFamily createFamily(BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(!isFreeform());
-        BlockFamily family = registry.createFamily(getData().getBlockFamily());
-        family.registerFamily(this, blockBuilderHelper);
-        return family;
+        return DefaultBlockFamilyFactoryRegistry.createFamily(getData().getBlockFamily(),this,blockBuilderHelper);
     }
 
-    public BlockFamily createFamily(BlockShape shape, BlockBuilderHelper blockBuilderHelper, BlockFamilyRegistry registry) {
+    public BlockFamily createFamily(BlockShape shape, BlockBuilderHelper blockBuilderHelper) {
         Preconditions.checkState(isFreeform());
-        BlockFamily family = registry.createFamily(getData().getBlockFamily());
-        family.registerFamily(this, shape, blockBuilderHelper);
-        return  family;
+        return DefaultBlockFamilyFactoryRegistry.createFamily(getData().getBlockFamily(),this,shape,blockBuilderHelper);
     }
 
 

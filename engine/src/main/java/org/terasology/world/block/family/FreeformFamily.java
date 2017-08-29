@@ -46,44 +46,8 @@ public class FreeformFamily extends AbstractBlockFamily{
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private  Block block = null;
 
-    public FreeformFamily() {
-    }
-
-
-    @Override
-    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        if(block == null) {
-            if (attachmentSide.isHorizontal()) {
-                return blocks.get(attachmentSide);
-            }
-            if (direction != null) {
-                return blocks.get(direction);
-            } else {
-                return blocks.get(Side.FRONT);
-            }
-        }
-        return block;
-    }
-
-    @Override
-    public Block getArchetypeBlock() {
-        if(block == null) {
-            return blocks.get(this.getArchetypeSide());
-        }
-        return block;
-    }
-
-    @Override
-    public void registerFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {
-        throw new UnsupportedOperationException("Shape expected");
-    }
-
-    protected Side getArchetypeSide() {
-        return Side.FRONT;
-    }
-
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+    public FreeformFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
         BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
@@ -111,6 +75,39 @@ public class FreeformFamily extends AbstractBlockFamily{
         this.setCategory(definition.getCategories());
     }
 
+    public FreeformFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {
+        super(blockFamilyDefinition, blockBuilderHelper);
+        throw new UnsupportedOperationException("Shape expected");
+    }
+
+
+    @Override
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
+        if(block == null) {
+            if (attachmentSide.isHorizontal()) {
+                return blocks.get(attachmentSide);
+            }
+            if (direction != null) {
+                return blocks.get(direction);
+            } else {
+                return blocks.get(Side.FRONT);
+            }
+        }
+        return block;
+    }
+
+    @Override
+    public Block getArchetypeBlock() {
+        if(block == null) {
+            return blocks.get(this.getArchetypeSide());
+        }
+        return block;
+    }
+
+    protected Side getArchetypeSide() {
+        return Side.FRONT;
+    }
+
     @Override
     public Block getBlockFor(BlockUri blockUri) {
         if(block == null) {
@@ -134,8 +131,4 @@ public class FreeformFamily extends AbstractBlockFamily{
         return Arrays.asList(block);
     }
 
-    @Override
-    public boolean isFreeformSupported() {
-        return true;
-    }
 }

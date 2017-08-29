@@ -15,14 +15,7 @@
  */
 package org.terasology.world.block.family;
 
+@FunctionalInterface
 public interface BlockFamilyRegistry {
-    BlockFamily createFamily(Class<? extends AbstractBlockFamily> blockFamily);
-
     Class<? extends AbstractBlockFamily> getBlockFamily(String blockFamilyId);
-
-    String[] getSections(Class<? extends AbstractBlockFamily> blockFamily);
-
-    MultiSection[] getMultiSections(Class<? extends AbstractBlockFamily> blockFamily);
-
-    boolean isFreeformSupported(Class<? extends AbstractBlockFamily> blockFamily);
 }

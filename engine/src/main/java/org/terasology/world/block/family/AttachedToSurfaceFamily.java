@@ -22,12 +22,14 @@ import org.terasology.math.Rotation;
 import org.terasology.math.Side;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
+import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
+import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Locale;
 import java.util.Map;
@@ -47,12 +49,13 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private Block archetype;
 
-    public AttachedToSurfaceFamily(WorldProvider worldProvider){
-        WorldProvider temp = worldProvider;
+    public AttachedToSurfaceFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
     }
 
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    public AttachedToSurfaceFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
+
         Map<Side, Block> blockMap = Maps.newEnumMap(Side.class);
         if (definition.getData().hasSection("top")) {
             Block block = blockBuilder.constructSimpleBlock(definition, "top");
@@ -87,7 +90,6 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
         this.setBlockUri(new BlockUri(definition.getUrn()));
         this.setCategory(definition.getCategories());
     }
-
 
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {

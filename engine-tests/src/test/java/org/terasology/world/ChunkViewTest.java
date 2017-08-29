@@ -29,6 +29,7 @@ import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
+import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.family.SymmetricFamily;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
@@ -67,7 +68,7 @@ public class ChunkViewTest extends TerasologyTestingEnvironment {
         solidData.getBaseSection().setDisplayName("Stone");
         solidData.getBaseSection().setShape(assetManager.getAsset("engine:cube", BlockShape.class).get());
         solidData.getBaseSection().setTranslucent(false);
-        solidData.setBlockFamily(new SymmetricFamily());
+        solidData.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("engine:stone"), solidData, BlockFamilyDefinition.class);
         solidBlock = blockManager.getBlock(new BlockUri(new ResourceUrn("engine:stone")));
     }

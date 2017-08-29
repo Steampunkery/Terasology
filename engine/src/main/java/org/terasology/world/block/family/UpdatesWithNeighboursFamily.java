@@ -25,6 +25,7 @@ import org.terasology.math.Side;
 import org.terasology.math.SideBitFlag;
 import org.terasology.math.geom.Vector3i;
 import org.terasology.naming.Name;
+import org.terasology.registry.In;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -51,37 +52,18 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     public static final String FIVE_CONNECTIONS = "five_connections";
     public static final String SIX_CONNECTIONS = "all";
 
-    WorldProvider worldProvider;
-    BlockEntityRegistry blockEntityRegistry;
+    @In
+    protected WorldProvider worldProvider;
 
-    UpdatesWithNeighboursFamily(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry) {
-        this.worldProvider = worldProvider;
-        this.blockEntityRegistry = blockEntityRegistry;
+    @In
+    protected BlockEntityRegistry blockEntityRegistry;
+
+    UpdatesWithNeighboursFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
     }
 
-    protected boolean horizontalOnly() {
-        return false;
-    }
-
-    private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING = ImmutableMap.<String, Byte>builder()
-            .put(NO_CONNECTIONS, (byte) 0)
-            .put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK))
-
-            .put(TWO_CONNECTIONS_LINE, SideBitFlag.getSides(Side.BACK, Side.FRONT))
-            .put(TWO_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK))
-
-            .put(THREE_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.TOP))
-            .put(THREE_CONNECTIONS_T, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT))
-
-            .put(FOUR_CONNECTIONS_CROSS, SideBitFlag.getSides(Side.RIGHT, Side.LEFT, Side.BACK, Side.FRONT))
-            .put(FOUR_CONNECTIONS_SIDE, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP))
-
-            .put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM))
-            .put(SIX_CONNECTIONS, (byte) 63)
-            .build();
-
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+    UpdatesWithNeighboursFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
         TByteObjectMap<String>[] basicBlocks = new TByteObjectMap[7];
         blocks = new TByteObjectHashMap<>();
 
@@ -115,6 +97,29 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
         this.setBlockUri(blockUri);
         this.setCategory(definition.getCategories());
     }
+
+
+    protected boolean horizontalOnly() {
+        return false;
+    }
+
+    private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING = ImmutableMap.<String, Byte>builder()
+            .put(NO_CONNECTIONS, (byte) 0)
+            .put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK))
+
+            .put(TWO_CONNECTIONS_LINE, SideBitFlag.getSides(Side.BACK, Side.FRONT))
+            .put(TWO_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK))
+
+            .put(THREE_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.TOP))
+            .put(THREE_CONNECTIONS_T, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT))
+
+            .put(FOUR_CONNECTIONS_CROSS, SideBitFlag.getSides(Side.RIGHT, Side.LEFT, Side.BACK, Side.FRONT))
+            .put(FOUR_CONNECTIONS_SIDE, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP))
+
+            .put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM))
+            .put(SIX_CONNECTIONS, (byte) 63)
+            .build();
+
 
     public Map<String, Byte> getShapeMapping() {
         return DEFAULT_SHAPE_MAPPING;
@@ -169,10 +174,7 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     }
 
 
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilderHelper) {
-        super.registerFamily(definition, shape, blockBuilderHelper);
-    }
+
 
 
     @Override
@@ -194,7 +196,7 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
-            if (this.connectionCondition(location, connectSide, worldProvider, blockEntityRegistry)) {
+            if (this.connectionCondition(location, connectSide)) {
                 connections += SideBitFlag.getSide(connectSide);
             }
         }
@@ -204,14 +206,14 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     public Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
-            if (this.connectionCondition(location, connectSide, worldProvider, blockEntityRegistry)) {
+            if (this.connectionCondition(location, connectSide)) {
                 connections += SideBitFlag.getSide(connectSide);
             }
         }
         return blocks.get(connections);
     }
 
-    public boolean connectionCondition(Vector3i blockLocation, Side connectSide, WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry) {
+    public boolean connectionCondition(Vector3i blockLocation, Side connectSide) {
         return false;
     }
 

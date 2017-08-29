@@ -36,30 +36,13 @@ public class SymmetricFamily extends AbstractBlockFamily {
 
     private Block block;
 
-    public SymmetricFamily() {
-    }
+    public SymmetricFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
+        super(definition, shape, blockBuilder);
 
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        if (definition.isFreeform()) {
-            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
-        }
+        //        if (!definition.isFreeform()) {
+//            throw new IllegalStateException("A shape cannot be provided when creating a family for a non-freeform block family definition");
+//        }
 
-        BlockUri uri = new BlockUri(definition.getUrn());
-
-        block = blockBuilder.constructSimpleBlock(definition);
-        block.setBlockFamily(this);
-        block.setUri(uri);
-        this.setBlockUri(uri);
-        this.setCategory(definition.getCategories());
-
-    }
-
-    @Override
-    public void registerFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        if (!definition.isFreeform()) {
-            throw new IllegalStateException("A shape cannot be provided when creating a family for a non-freeform block family definition");
-        }
         block = blockBuilder.constructSimpleBlock(definition, shape);
         BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
@@ -74,6 +57,23 @@ public class SymmetricFamily extends AbstractBlockFamily {
         this.setBlockUri(uri);
         this.setCategory(definition.getCategories());
     }
+
+    public SymmetricFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
+        super(definition, blockBuilder);
+        //        if (definition.isFreeform()) {
+//            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
+//        }
+
+        BlockUri uri = new BlockUri(definition.getUrn());
+
+        block = blockBuilder.constructSimpleBlock(definition);
+        block.setBlockFamily(this);
+        block.setUri(uri);
+        this.setBlockUri(uri);
+        this.setCategory(definition.getCategories());
+    }
+
+
 
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {

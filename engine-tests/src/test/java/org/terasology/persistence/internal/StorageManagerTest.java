@@ -120,7 +120,7 @@ public class StorageManagerTest extends TerasologyTestingEnvironment {
 
         AssetManager assetManager = context.get(AssetManager.class);
         BlockFamilyDefinitionData data = new BlockFamilyDefinitionData();
-        data.setBlockFamily(new SymmetricFamily());
+        data.setBlockFamily(SymmetricFamily.class);
         assetManager.loadAsset(new ResourceUrn("test:testblock"), data, BlockFamilyDefinition.class);
         assetManager.loadAsset(new ResourceUrn("test:testblock2"), data, BlockFamilyDefinition.class);
         testBlock = context.get(BlockManager.class).getBlock("test:testblock");
