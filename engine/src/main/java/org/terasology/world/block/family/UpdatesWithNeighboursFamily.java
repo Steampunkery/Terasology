@@ -37,7 +37,7 @@ import org.terasology.world.block.shapes.BlockShape;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@BlockSections({"no_connections","one_connection","line_connection","2d_corner","3d_corner","2d_t","cross","3d_side","five_connections","all"})
+@BlockSections({"no_connections", "one_connection", "line_connection", "2d_corner", "3d_corner", "2d_t", "cross", "3d_side", "five_connections", "all"})
 public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     private Block archetypeBlock;
     private TByteObjectMap<Block> blocks;

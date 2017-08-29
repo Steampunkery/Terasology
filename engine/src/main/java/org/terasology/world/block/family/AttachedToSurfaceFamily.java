@@ -38,11 +38,11 @@ import java.util.Set;
 /**
  */
 @RegisterBlockFamily("attachedToSurface")
-@BlockSections({"front","left","right","back","top","bottom"})
+@BlockSections({"front", "left", "right", "back", "top", "bottom"})
 @MultiSections({
-        @MultiSection(name = "all", coversSection = "front", appliesToSections = {"front","left", "right", "back", "top", "bottom"}),
-        @MultiSection(name = "topBottom", coversSection = "top", appliesToSections = {"top","bottom"}),
-        @MultiSection(name = "sides", coversSection = "front", appliesToSections = {"front","left","right","back"})})
+        @MultiSection(name = "all", coversSection = "front", appliesToSections = {"front", "left", "right", "back", "top", "bottom"}),
+        @MultiSection(name = "topBottom", coversSection = "top", appliesToSections = {"top", "bottom"}),
+        @MultiSection(name = "sides", coversSection = "front", appliesToSections = {"front", "left", "right", "back"})})
 public class AttachedToSurfaceFamily extends AbstractBlockFamily {
 
 

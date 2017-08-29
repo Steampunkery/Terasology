@@ -37,14 +37,13 @@ import java.util.Map;
 /**
  * A freeform family is a pseudo block family that can be combined with any block shape to produce an actual block
  * family.
- *
  */
 @RegisterBlockFamily("freeform")
 @FreeFormSupported()
-public class FreeformFamily extends AbstractBlockFamily{
+public class FreeformFamily extends AbstractBlockFamily {
     public BlockUri uri;
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
-    private  Block block = null;
+    private Block block = null;
 
     public FreeformFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
@@ -83,7 +82,7 @@ public class FreeformFamily extends AbstractBlockFamily{
 
     @Override
     public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
-        if(block == null) {
+        if (block == null) {
             if (attachmentSide.isHorizontal()) {
                 return blocks.get(attachmentSide);
             }
@@ -98,7 +97,7 @@ public class FreeformFamily extends AbstractBlockFamily{
 
     @Override
     public Block getArchetypeBlock() {
-        if(block == null) {
+        if (block == null) {
             return blocks.get(this.getArchetypeSide());
         }
         return block;
@@ -110,7 +109,7 @@ public class FreeformFamily extends AbstractBlockFamily{
 
     @Override
     public Block getBlockFor(BlockUri blockUri) {
-        if(block == null) {
+        if (block == null) {
             if (getURI().equals(blockUri.getFamilyUri())) {
                 try {
                     Side side = Side.valueOf(blockUri.getIdentifier().toString().toUpperCase(Locale.ENGLISH));
@@ -125,7 +124,7 @@ public class FreeformFamily extends AbstractBlockFamily{
 
     @Override
     public Iterable<Block> getBlocks() {
-        if(block == null) {
+        if (block == null) {
             return blocks.values();
         }
         return Arrays.asList(block);

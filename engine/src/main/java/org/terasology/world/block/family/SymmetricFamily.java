@@ -29,7 +29,6 @@ import java.util.Arrays;
 
 /**
  * The standard block group consisting of a single symmetrical block that doesn't need rotations
- *
  */
 @RegisterBlockFamily("symmetric")
 public class SymmetricFamily extends AbstractBlockFamily {
@@ -54,7 +53,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     }
 
     public SymmetricFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        super(definition,blockBuilder);
+        super(definition, blockBuilder);
         BlockUri uri = new BlockUri(definition.getUrn());
 
         block = blockBuilder.constructSimpleBlock(definition);
@@ -63,7 +62,6 @@ public class SymmetricFamily extends AbstractBlockFamily {
         this.setBlockUri(uri);
         this.setCategory(definition.getCategories());
     }
-
 
 
     @Override
