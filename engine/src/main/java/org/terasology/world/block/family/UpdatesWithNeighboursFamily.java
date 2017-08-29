@@ -37,6 +37,7 @@ import org.terasology.world.block.shapes.BlockShape;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@BlockSections({"no_connections","one_connection","line_connection","2d_corner","3d_corner","2d_t","cross","3d_side","five_connections","all"})
 public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     private Block archetypeBlock;
     private TByteObjectMap<Block> blocks;
@@ -51,6 +52,24 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     public static final String FOUR_CONNECTIONS_SIDE = "3d_side";
     public static final String FIVE_CONNECTIONS = "five_connections";
     public static final String SIX_CONNECTIONS = "all";
+
+    private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING = ImmutableMap.<String, Byte>builder()
+            .put(NO_CONNECTIONS, (byte) 0)
+            .put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK))
+
+            .put(TWO_CONNECTIONS_LINE, SideBitFlag.getSides(Side.BACK, Side.FRONT))
+            .put(TWO_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK))
+
+            .put(THREE_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.TOP))
+            .put(THREE_CONNECTIONS_T, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT))
+
+            .put(FOUR_CONNECTIONS_CROSS, SideBitFlag.getSides(Side.RIGHT, Side.LEFT, Side.BACK, Side.FRONT))
+            .put(FOUR_CONNECTIONS_SIDE, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP))
+
+            .put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM))
+            .put(SIX_CONNECTIONS, (byte) 63)
+            .build();
+
 
     @In
     protected WorldProvider worldProvider;
@@ -102,23 +121,6 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     protected boolean horizontalOnly() {
         return false;
     }
-
-    private static final Map<String, Byte> DEFAULT_SHAPE_MAPPING = ImmutableMap.<String, Byte>builder()
-            .put(NO_CONNECTIONS, (byte) 0)
-            .put(ONE_CONNECTION, SideBitFlag.getSides(Side.BACK))
-
-            .put(TWO_CONNECTIONS_LINE, SideBitFlag.getSides(Side.BACK, Side.FRONT))
-            .put(TWO_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK))
-
-            .put(THREE_CONNECTIONS_CORNER, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.TOP))
-            .put(THREE_CONNECTIONS_T, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT))
-
-            .put(FOUR_CONNECTIONS_CROSS, SideBitFlag.getSides(Side.RIGHT, Side.LEFT, Side.BACK, Side.FRONT))
-            .put(FOUR_CONNECTIONS_SIDE, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP))
-
-            .put(FIVE_CONNECTIONS, SideBitFlag.getSides(Side.LEFT, Side.BACK, Side.FRONT, Side.TOP, Side.BOTTOM))
-            .put(SIX_CONNECTIONS, (byte) 63)
-            .build();
 
 
     public Map<String, Byte> getShapeMapping() {
@@ -172,9 +174,6 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
         }
         return null;
     }
-
-
-
 
 
     @Override

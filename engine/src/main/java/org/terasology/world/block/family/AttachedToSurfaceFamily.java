@@ -51,6 +51,7 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
 
     public AttachedToSurfaceFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
+        throw new UnsupportedOperationException("Freeform blocks not supported");
     }
 
     public AttachedToSurfaceFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {

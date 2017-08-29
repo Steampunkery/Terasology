@@ -58,6 +58,9 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyRegistry {
             });
             BlockFamily result = simpleClassFactory.instantiateClass(blockFamily).get();
             InjectionHelper.inject(result);
+            if(result.getURI() == null)
+                throw new Exception("Family Is missng a BlockUri");
+
             return result;
         } catch (Exception e) {
             logger.error("Failed to load blockFamily {}", blockFamily, e);
@@ -83,6 +86,10 @@ public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyRegistry {
             });
             BlockFamily result = simpleClassFactory.instantiateClass(blockFamily).get();
             InjectionHelper.inject(result);
+
+            if(result.getURI() == null)
+                throw new Exception("Family Is missng a BlockUri");
+
             return result;
         } catch (Exception e) {
             logger.error("Failed to load blockFamily {}", blockFamily, e);

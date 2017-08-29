@@ -37,26 +37,18 @@ import java.util.Set;
 
 /**
  * Block group for blocks that can be oriented around the vertical axis.
- *
  */
 @RegisterBlockFamily("horizontal")
-@BlockSections({"front","left","right","back","top","bottom"})
+@BlockSections({"front", "left", "right", "back", "top", "bottom"})
 @MultiSections({
-        @MultiSection(name = "all", coversSection = "front", appliesToSections = {"front","left", "right", "back", "top", "bottom"}),
-        @MultiSection(name = "topBottom", coversSection = "top", appliesToSections = {"top","bottom"}),
-        @MultiSection(name = "sides", coversSection = "front", appliesToSections = {"front","left","right","back"})})
+        @MultiSection(name = "all", coversSection = "front", appliesToSections = {"front", "left", "right", "back", "top", "bottom"}),
+        @MultiSection(name = "topBottom", coversSection = "top", appliesToSections = {"top", "bottom"}),
+        @MultiSection(name = "sides", coversSection = "front", appliesToSections = {"front", "left", "right", "back"})})
 public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDefinedBlockFamily {
-
-    private static final ImmutableSet<String> BLOCK_NAMES = ImmutableSet.of("front", "left", "right", "back", "top", "bottom");
-
-
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
 
     public HorizontalBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
-        //        if (!definition.isFreeform()) {
-//            throw new IllegalStateException("A shape cannot be provided when creating a family for a non-freeform block family definition");
-//        }
         BlockUri uri = null;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
@@ -70,7 +62,7 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
                 throw new IllegalArgumentException("Missing block for side: " + side.toString());
             }
             block.setBlockFamily(this);
-            block.setUri(new BlockUri(uri,new Name(side.name())));
+            block.setUri(new BlockUri(uri, new Name(side.name())));
             blocks.put(side, block);
         }
         this.setBlockUri(uri);
@@ -79,20 +71,17 @@ public class HorizontalBlockFamily extends AbstractBlockFamily implements SideDe
 
     public HorizontalBlockFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);
-        //        if (definition.isFreeform()) {
-//            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
-//        }
         BlockUri uri = new BlockUri(definition.getUrn());
         for (Rotation rot : Rotation.horizontalRotations()) {
             Side side = rot.rotate(Side.FRONT);
 
-            Block block =  blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot);
+            Block block = blockBuilder.constructTransformedBlock(definition, side.toString().toLowerCase(Locale.ENGLISH), rot);
             if (block == null) {
                 throw new IllegalArgumentException("Missing block for side: " + side.toString());
             }
             block.setBlockFamily(this);
-            block.setUri(new BlockUri(uri,new Name(side.name())));
-            blocks.put(side,block);
+            block.setUri(new BlockUri(uri, new Name(side.name())));
+            blocks.put(side, block);
         }
         this.setCategory(definition.getCategories());
         this.setBlockUri(uri);

@@ -38,11 +38,6 @@ public class SymmetricFamily extends AbstractBlockFamily {
 
     public SymmetricFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
-
-        //        if (!definition.isFreeform()) {
-//            throw new IllegalStateException("A shape cannot be provided when creating a family for a non-freeform block family definition");
-//        }
-
         block = blockBuilder.constructSimpleBlock(definition, shape);
         BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
@@ -59,11 +54,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     }
 
     public SymmetricFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
-        super(definition, blockBuilder);
-        //        if (definition.isFreeform()) {
-//            throw new IllegalStateException("A shape must be provided when creating a family for a freeform block family definition");
-//        }
-
+        super(definition,blockBuilder);
         BlockUri uri = new BlockUri(definition.getUrn());
 
         block = blockBuilder.constructSimpleBlock(definition);
