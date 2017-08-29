@@ -35,6 +35,7 @@ import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.BlockUriParseException;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.tiles.WorldAtlas;
@@ -69,6 +70,8 @@ public class BlockManagerImpl extends BlockManager {
 
     private Set<BlockRegistrationListener> listeners = Sets.newLinkedHashSet();
 
+    private BlockFamilyRegistry blockFamilyRegistry;
+
     private boolean generateNewIds;
     private AtomicInteger nextId = new AtomicInteger(1);
 
@@ -76,16 +79,18 @@ public class BlockManagerImpl extends BlockManager {
     // This causes performance problems eventually down the line when it then uses the ResourceUrn's hashcode to do a lookup into the block map.
     private Block airBlock;
 
-    public BlockManagerImpl(WorldAtlas atlas, AssetManager assetManager) {
-        this(atlas, assetManager, true);
+    public BlockManagerImpl(WorldAtlas atlas, AssetManager assetManager,BlockFamilyRegistry blockFamilyRegistry) {
+        this(atlas, assetManager, true,blockFamilyRegistry);
     }
 
     public BlockManagerImpl(WorldAtlas atlas,
-            AssetManager assetManager,
-            boolean generateNewIds) {
+                            AssetManager assetManager,
+                            boolean generateNewIds,
+                            BlockFamilyRegistry blockFamilyRegistry) {
         this.generateNewIds = generateNewIds;
         this.assetManager = assetManager;
         this.blockBuilder = new BlockBuilder(atlas);
+        this.blockFamilyRegistry = blockFamilyRegistry;
     }
 
     public void initialise(List<String> registeredBlockFamilies,

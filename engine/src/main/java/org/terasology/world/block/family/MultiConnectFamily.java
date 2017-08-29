@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RegisterBlockFamily("multiconnect")
+@BlockSections({"no_connections","one_connection","line_connection","2d_corner","3d_corner","2d_t","cross","3d_side","five_connections", "all"})
 public class MultiConnectFamily extends AbstractBlockFamily{
     public static final String NO_CONNECTIONS = "no_connections";
     public static final String ONE_CONNECTION = "one_connection";
@@ -49,18 +50,6 @@ public class MultiConnectFamily extends AbstractBlockFamily{
     public static final String FOUR_CONNECTIONS_SIDE = "3d_side";
     public static final String FIVE_CONNECTIONS = "five_connections";
     public static final String SIX_CONNECTIONS = "all";
-
-    private static final ImmutableSet<String> BLOCK_NAMES = ImmutableSet.of(
-            NO_CONNECTIONS,
-            ONE_CONNECTION,
-            TWO_CONNECTIONS_LINE,
-            TWO_CONNECTIONS_CORNER,
-            THREE_CONNECTIONS_CORNER,
-            THREE_CONNECTIONS_T,
-            FOUR_CONNECTIONS_CROSS,
-            FOUR_CONNECTIONS_SIDE,
-            FIVE_CONNECTIONS,
-            SIX_CONNECTIONS);
 
 
     private ConnectionCondition connectionCondition;
@@ -154,7 +143,7 @@ public class MultiConnectFamily extends AbstractBlockFamily{
     }
 
     @Override
-    public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         return null;
     }
 
@@ -173,8 +162,4 @@ public class MultiConnectFamily extends AbstractBlockFamily{
         return null;
     }
 
-    @Override
-    public Set<String> getSectionNames() {
-        return BLOCK_NAMES;
-    }
 }

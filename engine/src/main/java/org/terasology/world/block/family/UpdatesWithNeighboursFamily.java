@@ -51,6 +51,14 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     public static final String FIVE_CONNECTIONS = "five_connections";
     public static final String SIX_CONNECTIONS = "all";
 
+    WorldProvider worldProvider;
+    BlockEntityRegistry blockEntityRegistry;
+
+    UpdatesWithNeighboursFamily(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry) {
+        this.worldProvider = worldProvider;
+        this.blockEntityRegistry = blockEntityRegistry;
+    }
+
     protected boolean horizontalOnly() {
         return false;
     }
@@ -183,7 +191,7 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
             if (this.connectionCondition(location, connectSide, worldProvider, blockEntityRegistry)) {
@@ -193,7 +201,7 @@ public class UpdatesWithNeighboursFamily extends AbstractBlockFamily {
         return blocks.get(connections);
     }
 
-    public Block getBlockForNeighborUpdate(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Block oldBlock) {
+    public Block getBlockForNeighborUpdate(Vector3i location, Block oldBlock) {
         byte connections = 0;
         for (Side connectSide : SideBitFlag.getSides(getConnectionSides())) {
             if (this.connectionCondition(location, connectSide, worldProvider, blockEntityRegistry)) {

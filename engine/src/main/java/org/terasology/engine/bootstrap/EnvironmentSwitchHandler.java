@@ -178,7 +178,7 @@ public final class EnvironmentSwitchHandler {
             logger.debug("Registering blockFamily {}", id);
 //            try {
 //                BlockFamily newBlockFamilyFactory = (AbstractBlockFamily) blockFamily.newInstance();
-            registry.setBlockFamily(id, blockFamily);
+            registry.setBlockFamily(id, (Class<? extends AbstractBlockFamily>) blockFamily);
 //            logger.debug("Loaded blockFamilyFactory {}", id);
 //            } catch (InstantiationException | IllegalAccessException e) {
 //                logger.error("Failed to load blockFamilyFactory {}", id, e);

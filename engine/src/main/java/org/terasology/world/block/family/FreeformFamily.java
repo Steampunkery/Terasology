@@ -16,7 +16,6 @@
 
 package org.terasology.world.block.family;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
@@ -30,7 +29,10 @@ import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * A freeform family is a pseudo block family that can be combined with any block shape to produce an actual block
@@ -38,9 +40,9 @@ import java.util.*;
  *
  */
 @RegisterBlockFamily("freeform")
+@FreeFormSupported()
 public class FreeformFamily extends AbstractBlockFamily{
     public BlockUri uri;
-    public List<String> categories;
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private  Block block = null;
 
@@ -49,7 +51,7 @@ public class FreeformFamily extends AbstractBlockFamily{
 
 
     @Override
-    public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         if(block == null) {
             if (attachmentSide.isHorizontal()) {
                 return blocks.get(attachmentSide);
@@ -82,7 +84,7 @@ public class FreeformFamily extends AbstractBlockFamily{
 
     @Override
     public void registerFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
-        BlockUri uri = null;
+        BlockUri uri;
         if (CUBE_SHAPE_URN.equals(shape.getUrn())) {
             uri = new BlockUri(definition.getUrn());
         } else {

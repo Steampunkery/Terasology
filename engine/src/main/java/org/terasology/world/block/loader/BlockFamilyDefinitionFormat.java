@@ -67,17 +67,19 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
     private final AssetManager assetManager;
     private final Gson gson;
+    private final BlockFamilyRegistry blockFamilyRegistry;
 
     public BlockFamilyDefinitionFormat(AssetManager assetManager, BlockFamilyRegistry blockFamilyRegistry) {
         super("block");
         this.assetManager = assetManager;
+        this.blockFamilyRegistry = blockFamilyRegistry;
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new CaseInsensitiveEnumTypeAdapterFactory())
                 .registerTypeAdapterFactory(new AssetTypeAdapterFactory(assetManager))
                 .registerTypeAdapter(BlockFamilyDefinitionData.class, new BlockFamilyDefinitionDataHandler())
                 .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
                 .registerTypeAdapter(Vector4f.class, new Vector4fTypeAdapter())
-                .registerTypeAdapter(BlockFamily.class, new BlockFamilyHandler(blockFamilyRegistry))
+//                .registerTypeAdapter(BlockFamily.class, new BlockFamilyHandler(blockFamilyRegistry))
                 .create();
     }
 
@@ -91,12 +93,12 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             if (!data.isTemplate()) {
                 if (data.getBlockFamily() == null && data.getBaseSection().getShape() != null) {
                     if (data.getBaseSection().getShape().isCollisionYawSymmetric()) {
-                        data.setBlockFamily(new SymmetricFamily());
+                        data.setBlockFamily(SymmetricFamily.class);
                     } else {
-                        data.setBlockFamily(new HorizontalBlockFamily());
+                        data.setBlockFamily(HorizontalBlockFamily.class);
                     }
                 } else if (data.getBlockFamily() == null) {
-                    data.setBlockFamily(new FreeformFamily());
+                    data.setBlockFamily(FreeformFamily.class);
                 }
             }
 
@@ -134,17 +136,17 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             BlockFamilyDefinitionData result = new BlockFamilyDefinitionData(base);
             setBoolean(result::setTemplate, jsonObject, "template");
 //            setObject(result::setFamilyFactory, jsonObject, "rotation", BlockFamilyFactory.class, context);
-            setObject(result::setBlockFamily,jsonObject,"family", BlockFamily.class, context);
+            setObject(result::setBlockFamily,jsonObject,"family", String.class, context);
             setObject(result::setCategories, jsonObject, "categories", listOfStringType, context);
 
             deserializeSectionDefinitionData(result.getBaseSection(), jsonObject, context);
 
 
             if (result.getBlockFamily() != null) {
-                for (MultiSection multiSection : result.getBlockFamily().getMultiSections()) {
-                    if (jsonObject.has(multiSection.getName()) && jsonObject.get(multiSection.getName()).isJsonObject()) {
-                        JsonObject jsonMultiSection = jsonObject.getAsJsonObject(multiSection.getName());
-                        for (String section : multiSection.getAppliesToSections()) {
+                for (MultiSection multiSection : blockFamilyRegistry.getMultiSections(result.getBlockFamily())) {
+                    if (jsonObject.has(multiSection.name()) && jsonObject.get(multiSection.name()).isJsonObject()) {
+                        JsonObject jsonMultiSection = jsonObject.getAsJsonObject(multiSection.name());
+                        for (String section : multiSection.appliesToSections()) {
                             SectionDefinitionData sectionData = result.getSections().get(section);
                             if (sectionData == null) {
                                 sectionData = new SectionDefinitionData(base.getSection(section));
@@ -155,8 +157,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                         }
                     }
                 }
-
-                for (String section : result.getBlockFamily().getSectionNames()) {
+                for (String section : blockFamilyRegistry.getSections(result.getBlockFamily())) {
                     if (jsonObject.has(section) && jsonObject.get(section).isJsonObject()) {
                         SectionDefinitionData sectionData = result.getSections().get(section);
                         if (sectionData == null) {
@@ -303,7 +304,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
                 Optional<BlockFamilyDefinition> baseDef = assetManager.getAsset(basedOn.getAsString(), BlockFamilyDefinition.class);
                 if (baseDef.isPresent()) {
                     BlockFamilyDefinitionData data = baseDef.get().getData();
-                    if (data.getBlockFamily() instanceof FreeformFamily) {
+                    if (data.getBlockFamily() == FreeformFamily.class) {
                         data.setBlockFamily(null);
                     }
                     return data;
@@ -317,19 +318,19 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
         }
     }
 
-    private static class BlockFamilyHandler implements JsonDeserializer<BlockFamily> {
-
-        private final BlockFamilyRegistry blockFamilyRegistry;
-
-        BlockFamilyHandler(BlockFamilyRegistry blockFamilyRegistry) {
-            this.blockFamilyRegistry = blockFamilyRegistry;
-        }
-
-        @Override
-        public BlockFamily deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return blockFamilyRegistry.getBlockFamily(json.getAsString());
-        }
-    }
+//    private static class BlockFamilyHandler implements JsonDeserializer<BlockFamily> {
+//
+//        private final BlockFamilyRegistry blockFamilyRegistry;
+//
+//        BlockFamilyHandler(BlockFamilyRegistry blockFamilyRegistry) {
+//            this.blockFamilyRegistry = blockFamilyRegistry;
+//        }
+//
+//        @Override
+//        public BlockFamily deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+//            return blockFamilyRegistry.getBlockFamily(json.getAsString());
+//        }
+//    }
 
     private static class AssetTypeAdapterFactory implements TypeAdapterFactory {
 

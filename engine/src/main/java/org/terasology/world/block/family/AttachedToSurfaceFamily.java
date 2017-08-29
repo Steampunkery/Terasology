@@ -36,17 +36,20 @@ import java.util.Set;
 /**
  */
 @RegisterBlockFamily("attachedToSurface")
+@BlockSections({"front","left","right","back","top","bottom"})
+@MultiSections({
+        @MultiSection(name = "all", coversSection = "front", appliesToSections = {"front","left", "right", "back", "top", "bottom"}),
+        @MultiSection(name = "topBottom", coversSection = "top", appliesToSections = {"top","bottom"}),
+        @MultiSection(name = "sides", coversSection = "front", appliesToSections = {"front","left","right","back"})})
 public class AttachedToSurfaceFamily extends AbstractBlockFamily {
 
 
-    private static final ImmutableSet<String> BLOCK_NAMES = ImmutableSet.of("front", "left", "right", "back", "top", "bottom");
-    private static final ImmutableList<MultiSection> MULTI_SECTIONS = ImmutableList.of(
-            new MultiSection("all", "front", "left", "right", "back", "top", "bottom"),
-            new MultiSection("topBottom", "top", "bottom"),
-            new MultiSection("sides", "front", "left", "right", "back"));
-
     private Map<Side, Block> blocks = Maps.newEnumMap(Side.class);
     private Block archetype;
+
+    public AttachedToSurfaceFamily(WorldProvider worldProvider){
+        WorldProvider temp = worldProvider;
+    }
 
     @Override
     public void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
@@ -85,18 +88,9 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
         this.setCategory(definition.getCategories());
     }
 
-    @Override
-    public Set<String> getSectionNames() {
-        return BLOCK_NAMES;
-    }
 
     @Override
-    public ImmutableList<MultiSection> getMultiSections() {
-        return MULTI_SECTIONS;
-    }
-
-    @Override
-    public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         return blocks.get(attachmentSide);
     }
 

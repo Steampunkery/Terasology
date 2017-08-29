@@ -52,33 +52,16 @@ public interface BlockFamily {
     /**
      * Get the block that is appropriate for placement in the given situation
      *
-     * @param worldProvider
-     * @param blockEntityRegistry
      * @param location
      * @param attachmentSide      The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
      * @param direction           A secondary direction after the attachment side that determines the facing of the block.   @return The appropriate block
      */
-    Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction);
+    Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction);
 
     /**
      * @return The base block defining the block group. Can be used for orientation-irrelevant behaviours
      */
     Block getArchetypeBlock();
-
-    /**
-     * @return The set of block names this family contains. A block definition will be loaded for each one.
-     */
-    default Set<String> getSectionNames() {
-        return Collections.emptySet();
-    }
-
-    /**
-     * @return The multi-sections that should be applied to the final main sections.
-     */
-    default List<MultiSection> getMultiSections() {
-        return Collections.emptyList();
-    }
-
 
     void registerFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder);
 
@@ -86,7 +69,6 @@ public interface BlockFamily {
         throw new UnsupportedOperationException("Freeform blocks not supported");
     }
 
-    default boolean isFreeformSupported(){return false;}
 
     /**
      * Resolves a block within this family

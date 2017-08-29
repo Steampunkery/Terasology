@@ -26,7 +26,6 @@ import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * The standard block group consisting of a single symmetrical block that doesn't need rotations
@@ -77,7 +76,7 @@ public class SymmetricFamily extends AbstractBlockFamily {
     }
 
     @Override
-    public Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction) {
+    public Block getBlockForPlacement(Vector3i location, Side attachmentSide, Side direction) {
         return block;
     }
 

@@ -16,12 +16,8 @@
 
 package org.terasology.world.block.family;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
-import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
-import org.terasology.world.block.loader.BlockFamilyDefinition;
-import org.terasology.world.block.shapes.BlockShape;
 
 import java.util.Locale;
 import java.util.Set;

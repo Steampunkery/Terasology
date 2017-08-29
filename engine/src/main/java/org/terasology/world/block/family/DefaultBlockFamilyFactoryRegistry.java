@@ -18,37 +18,75 @@ package org.terasology.world.block.family;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.engine.bootstrap.EnvironmentSwitchHandler;
+import org.terasology.context.Context;
+import org.terasology.registry.InjectionHelper;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class DefaultBlockFamilyFactoryRegistry implements BlockFamilyRegistry {
     private static final Logger logger = LoggerFactory.getLogger(DefaultBlockFamilyFactoryRegistry.class);
+    private Context context;
 
 
-    private Map<String, Class<?>> registryMap = Maps.newHashMap();
+    private Map<String, Class<? extends AbstractBlockFamily>> registryMap = Maps.newHashMap();
 
-    public void setBlockFamily(String id, Class<?> blockFamily) {
+    public void setBlockFamily(String id, Class<? extends AbstractBlockFamily> blockFamily) {
         registryMap.put(id.toLowerCase(), blockFamily);
     }
 
-    @Override
-    public BlockFamily getBlockFamily(String blockFamilyId) {
-        if (blockFamilyId == null || blockFamilyId.isEmpty()) {
-            return new SymmetricFamily();
-        }
+    public DefaultBlockFamilyFactoryRegistry(Context context) {
+        this.context = context;
+    }
 
+
+    @Override
+    public BlockFamily createFamily(Class<? extends AbstractBlockFamily> blockFamily) {
         try {
-            AbstractBlockFamily family = (AbstractBlockFamily) registryMap.get(blockFamilyId.toLowerCase()).newInstance();
-            if (family == null) {
-                return new SymmetricFamily();
-            }
-            return family;
-        } catch (InstantiationException | IllegalAccessException e) {
-            logger.error("Failed to load blockFamily {}", blockFamilyId, e);
+            return (AbstractBlockFamily) InjectionHelper.createWithConstructorInjection(blockFamily,context);
+        } catch (NoSuchElementException e) {
+            logger.error("Failed to load blockFamily {}", blockFamily, e);
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public Class<? extends AbstractBlockFamily> getBlockFamily(String blockFamilyId)
+    {
+        if (blockFamilyId == null || blockFamilyId.isEmpty()) {
+            return SymmetricFamily.class;
+        }
+        return registryMap.get(blockFamilyId.toLowerCase());
+    }
+
+
+    @Override
+    public String[] getSections(Class<? extends AbstractBlockFamily> blockFamily) {
+        if(blockFamily == null)
+            return new String[]{};
+        BlockSections sections =  blockFamily.getAnnotation(BlockSections.class);
+        if(sections == null)
+            return new String[]{};
+        return sections.value();
+    }
+
+    @Override
+    public MultiSection[] getMultiSections(Class<? extends AbstractBlockFamily> blockFamily) {
+        if (blockFamily == null)
+            return new MultiSection[]{};
+        MultiSections sections = blockFamily.getAnnotation(MultiSections.class);
+        return sections.value();
+
+    }
+
+    @Override
+    public boolean isFreeformSupported(Class<? extends AbstractBlockFamily> blockFamily) {
+        if (blockFamily == null)
+            return false;
+        FreeFormSupported freeFormSupported = blockFamily.getAnnotation(FreeFormSupported.class);
+
+        return freeFormSupported != null;
     }
 
 

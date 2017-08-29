@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.assets.AssetData;
 import org.terasology.module.sandbox.API;
+import org.terasology.world.block.family.AbstractBlockFamily;
 import org.terasology.world.block.family.BlockFamily;
 import org.terasology.world.block.family.BlockFamilyFactory;
 
@@ -31,7 +32,7 @@ public class BlockFamilyDefinitionData implements AssetData {
 
     private SectionDefinitionData baseSection = new SectionDefinitionData();
     private Map<String, SectionDefinitionData> sections = Maps.newLinkedHashMap();
-    private BlockFamily family;
+    private Class<? extends AbstractBlockFamily> family;
 
     private List<String> categories = Lists.newArrayList();
 
@@ -84,11 +85,11 @@ public class BlockFamilyDefinitionData implements AssetData {
         return result;
     }
 
-    public BlockFamily getBlockFamily() {
+    public Class<? extends AbstractBlockFamily> getBlockFamily() {
         return family;
     }
 
-    public void setBlockFamily(BlockFamily family) {
+    public void setBlockFamily(Class<? extends AbstractBlockFamily> family) {
         this.family = family;
     }
 

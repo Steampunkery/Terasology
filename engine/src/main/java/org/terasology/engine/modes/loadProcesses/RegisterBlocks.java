@@ -27,6 +27,7 @@ import org.terasology.persistence.typeHandling.extensionTypes.BlockTypeHandler;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockManager;
 import org.terasology.world.block.family.BlockFamily;
+import org.terasology.world.block.family.BlockFamilyRegistry;
 import org.terasology.world.block.internal.BlockManagerImpl;
 import org.terasology.world.block.tiles.WorldAtlas;
 import org.terasology.world.block.tiles.WorldAtlasImpl;
@@ -55,10 +56,10 @@ public class RegisterBlocks extends SingleStepLoadProcess {
 
         BlockManagerImpl blockManager;
         if (networkSystem.getMode().isAuthority()) {
-            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), true);
+            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), true,context.get(BlockFamilyRegistry.class));
             blockManager.subscribe(context.get(NetworkSystem.class));
         } else {
-            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), false);
+            blockManager = new BlockManagerImpl(atlas, context.get(AssetManager.class), false,context.get(BlockFamilyRegistry.class));
         }
         context.put(BlockManager.class, blockManager);
         context.get(TypeSerializationLibrary.class).add(Block.class, new BlockTypeHandler(blockManager));
