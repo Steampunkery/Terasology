@@ -42,7 +42,6 @@ import org.terasology.assets.format.AbstractAssetFileFormat;
 import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rotation;
-import org.terasology.math.VecMath;
 import org.terasology.utilities.gson.Vector2fTypeAdapter;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
@@ -215,7 +214,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             } else {
                 //CUBE_SHAPE
                 shape.setCollisionShape(new btBoxShape(new Vector3(.5f,.5f,.5f)));
-                shape.setCollisionOffset(new Vector3f(0, 0, 0));
+                shape.setCollisionOffset(new Vector3(0, 0, 0));
                 shape.setCollisionSymmetric(true);
             }
         }
@@ -225,7 +224,7 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
 
             for (ColliderInfo collider : colliders) {
 
-                collisionShape.addChildShape(new Matrix4(VecMath.to(collider.offset),VecMath.to(Rotation.none().getQuat4f()),new Vector3(1,1,1)),collider.collisionShape);
+                collisionShape.addChildShape(new Matrix4(collider.offset,Rotation.none().getQuat4f(),new Vector3(1,1,1)),collider.collisionShape);
                // Transform transform = new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), VecMath.to(collider.offset), 1.0f));
                // collisionShape.addChildShape(transform, collider.collisionShape);
             }
@@ -244,11 +243,11 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             extent.set(Math.abs(extent.x),Math.abs(extent.y),Math.abs(extent.z));
 
 
-            return new ColliderInfo(offset, new btBoxShape(VecMath.to(extent)));//new BoxShape(VecMath.to(extent)));
+            return new ColliderInfo(offset, new btBoxShape(extent));//new BoxShape(VecMath.to(extent)));
         }
 
         private ColliderInfo processSphereShape(JsonDeserializationContext context, JsonObject colliderDef) {
-            Vector3f offset = context.deserialize(colliderDef.get(POSITION), Vector3f.class);
+            Vector3 offset = context.deserialize(colliderDef.get(POSITION), Vector3.class);
             float radius = colliderDef.get(RADIUS).getAsFloat();
             if (offset == null) {
                 throw new JsonParseException("Sphere Collider missing position");
@@ -258,10 +257,10 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
         }
 
         private static class ColliderInfo {
-            public Vector3f offset;
+            public Vector3 offset;
             public btCollisionShape collisionShape;
 
-            ColliderInfo(Vector3f offset, btCollisionShape shape) {
+            ColliderInfo(Vector3 offset, btCollisionShape shape) {
                 this.offset = offset;
                 this.collisionShape = shape;
             }
@@ -273,9 +272,9 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
         @Override
         public BlockMeshPart deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             final JsonObject meshObj = json.getAsJsonObject();
-            final Vector3f[] vertices = context.deserialize(meshObj.get("vertices"), Vector3f[].class);
-            final Vector3f[] normals = context.deserialize(meshObj.get("normals"), Vector3f[].class);
-            final Vector2f[] texCoords = context.deserialize(meshObj.get("texcoords"), Vector2f[].class);
+            final Vector3[] vertices = context.deserialize(meshObj.get("vertices"), Vector3[].class);
+            final Vector3[] normals = context.deserialize(meshObj.get("normals"), Vector3[].class);
+            final Vector2[] texCoords = context.deserialize(meshObj.get("texcoords"), Vector2[].class);
 
             if (vertices == null) {
                 throw new JsonParseException("Vertices missing");
@@ -295,8 +294,8 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
             }
 
             // Normalise the normals for safety
-            for (Vector3f norm : normals) {
-                norm.normalize();
+            for (Vector3 norm : normals) {
+                norm.nor();
             }
 
             int[][] faces = context.deserialize(meshObj.get("faces"), int[][].class);

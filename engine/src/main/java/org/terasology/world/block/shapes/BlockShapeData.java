@@ -15,12 +15,11 @@
  */
 package org.terasology.world.block.shapes;
 
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
 import com.google.common.collect.Maps;
 import org.terasology.assets.AssetData;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.block.BlockPart;
 
@@ -33,7 +32,7 @@ public class BlockShapeData implements AssetData {
     private EnumMap<BlockPart, BlockMeshPart> meshParts = Maps.newEnumMap(BlockPart.class);
     private EnumBooleanMap<Side> fullSide = new EnumBooleanMap<>(Side.class);
     private btCollisionShape collisionShape;
-    private Vector3f collisionOffset = new Vector3f();
+    private Vector3 collisionOffset = new Vector3();
     private boolean yawSymmetric;
     private boolean pitchSymmetric;
     private boolean rollSymmetric;
@@ -77,11 +76,11 @@ public class BlockShapeData implements AssetData {
         fullSide.put(side, blocking);
     }
 
-    public Vector3f getCollisionOffset() {
+    public Vector3 getCollisionOffset() {
         return collisionOffset;
     }
 
-    public void setCollisionOffset(Vector3f offset) {
+    public void setCollisionOffset(Vector3 offset) {
         collisionOffset.set(offset);
     }
 

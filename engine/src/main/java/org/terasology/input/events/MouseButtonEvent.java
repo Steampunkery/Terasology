@@ -16,15 +16,15 @@
 package org.terasology.input.events;
 
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.input.ButtonState;
 import org.terasology.input.MouseInput;
-import org.terasology.math.geom.Vector2i;
 
 public class MouseButtonEvent extends ButtonEvent {
 
     private MouseInput button;
     private ButtonState state;
-    private Vector2i mousePosition = new Vector2i();
+    private GridPoint2 mousePosition = new GridPoint2();
 
     public MouseButtonEvent(MouseInput button, ButtonState state, float delta) {
         super(delta);
@@ -49,15 +49,15 @@ public class MouseButtonEvent extends ButtonEvent {
         return "mouse:" + getMouseButtonName();
     }
 
-    public Vector2i getMousePosition() {
-        return new Vector2i(mousePosition);
+    public GridPoint2 getMousePosition() {
+        return new GridPoint2(mousePosition);
     }
 
     protected void setButton(MouseInput button) {
         this.button = button;
     }
 
-    protected void setMousePosition(Vector2i mousePosition) {
+    protected void setMousePosition(GridPoint2 mousePosition) {
         this.mousePosition.set(mousePosition);
     }
 

@@ -15,10 +15,9 @@
  */
 package org.terasology.world.block;
 
+import com.badlogic.gdx.math.Vector2;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-
-import org.terasology.math.geom.Vector2f;
 import org.terasology.world.block.shapes.BlockMeshPart;
 
 import java.util.EnumMap;
@@ -31,17 +30,17 @@ import java.util.Map;
 public class BlockAppearance {
 
     private Map<BlockPart, BlockMeshPart> blockParts;
-    private Map<BlockPart, Vector2f> textureAtlasPos = new EnumMap<>(BlockPart.class);
+    private Map<BlockPart, Vector2> textureAtlasPos = new EnumMap<>(BlockPart.class);
 
     public BlockAppearance() {
         blockParts = Maps.newEnumMap(BlockPart.class);
         textureAtlasPos = Maps.newEnumMap(BlockPart.class);
         for (BlockPart part : BlockPart.values()) {
-            textureAtlasPos.put(part, new Vector2f());
+            textureAtlasPos.put(part, new Vector2());
         }
     }
 
-    public BlockAppearance(Map<BlockPart, BlockMeshPart> blockParts, Map<BlockPart, Vector2f> textureAtlasPos) {
+    public BlockAppearance(Map<BlockPart, BlockMeshPart> blockParts, Map<BlockPart, Vector2> textureAtlasPos) {
         Preconditions.checkNotNull(blockParts);
         Preconditions.checkNotNull(textureAtlasPos);
         this.blockParts = blockParts;
@@ -55,8 +54,8 @@ public class BlockAppearance {
         return blockParts.get(part);
     }
 
-    public Vector2f getTextureAtlasPos(BlockPart part) {
-        return new Vector2f(textureAtlasPos.get(part));
+    public Vector2 getTextureAtlasPos(BlockPart part) {
+        return new Vector2(textureAtlasPos.get(part));
     }
 
 }

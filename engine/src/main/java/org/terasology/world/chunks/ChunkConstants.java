@@ -19,7 +19,6 @@ package org.terasology.world.chunks;
 import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 MovingBlocks
+ * Copyright 2017 MovingBlocks
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.terasology.world.block;
+package org.terasology.math;
 
-import org.terasology.math.Vector4;
-import org.terasology.world.biomes.Biome;
-
-/**
- * Used to determine a multiplicative color for certain blocks based on the biome the block is in.
- */
-@FunctionalInterface
-public interface BlockColorSource {
-
-    Vector4 calcColor(Biome biome);
-
+public class Region2i {
 }

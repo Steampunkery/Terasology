@@ -15,6 +15,8 @@
  */
 package org.terasology.world.generation;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Rectangle;
 import com.google.common.base.Preconditions;
 import org.terasology.math.geom.Rect2i;
 import org.terasology.math.Region3i;
@@ -75,7 +77,7 @@ public class Border3D {
      * @param size The size used.
      * @return The 2D representation with the additional space added to it with the additional space added to it in the 3 dimensions.
      */
-    public Rect2i expandTo2D(Vector3i size) {
+    public Rect2i expandTo2D(GridPoint3 size) {
         return Rect2i.createFromMinAndMax(-getSides(), -getSides(), size.x + getSides() - 1, size.z + getSides() - 1);
     }
 
@@ -85,8 +87,8 @@ public class Border3D {
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
     public Region3i expandTo3D(Region3i region) {
-        return Region3i.createFromMinMax(new Vector3i(region.minX() - sides, region.minY() - bottom, region.minZ() - sides),
-                new Vector3i(region.maxX() + sides, region.maxY() + top, region.maxZ() + sides));
+        return Region3i.createFromMinMax(new GridPoint3(region.minX() - sides, region.minY() - bottom, region.minZ() - sides),
+                new GridPoint3(region.maxX() + sides, region.maxY() + top, region.maxZ() + sides));
     }
 
     /**
@@ -94,9 +96,9 @@ public class Border3D {
      * @param size The size to be used.
      * @return The 3D world representation with the additional space added to it in the 3 dimensions.
      */
-    public Region3i expandTo3D(Vector3i size) {
-        return Region3i.createFromMinMax(new Vector3i(-sides, -bottom, -sides),
-                new Vector3i(size.x + sides - 1, size.y + top - 1, size.z + sides - 1));
+    public Region3i expandTo3D(GridPoint3 size) {
+        return Region3i.createFromMinMax(new GridPoint3(-sides, -bottom, -sides),
+                new GridPoint3(size.x + sides - 1, size.y + top - 1, size.z + sides - 1));
     }
 
     /**

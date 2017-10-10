@@ -17,16 +17,16 @@
 package org.terasology.input.events;
 
 
-import org.terasology.math.geom.Vector2i;
+import com.badlogic.gdx.math.GridPoint2;
 
 /**
  */
 public class MouseWheelEvent extends InputEvent {
 
     private int wheelTurns;
-    private Vector2i mousePosition = new Vector2i();
+    private GridPoint2 mousePosition = new GridPoint2();
 
-    public MouseWheelEvent(Vector2i mousePosition, int wheelTurns, float delta) {
+    public MouseWheelEvent(GridPoint2 mousePosition, int wheelTurns, float delta) {
         super(delta);
         this.wheelTurns = wheelTurns;
         this.mousePosition.set(mousePosition);
@@ -36,7 +36,7 @@ public class MouseWheelEvent extends InputEvent {
         return wheelTurns;
     }
 
-    public Vector2i getMousePosition() {
+    public GridPoint2 getMousePosition() {
         return mousePosition;
     }
 }

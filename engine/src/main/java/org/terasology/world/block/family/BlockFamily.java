@@ -15,8 +15,8 @@
  */
 package org.terasology.world.block.family;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.BlockEntityRegistry;
 import org.terasology.world.WorldProvider;
 import org.terasology.world.block.Block;
@@ -49,7 +49,7 @@ public interface BlockFamily {
      * @param attachmentSide      The side of the block which this block is being attached to, e.g. Top if the block is being placed on the ground
      * @param direction           A secondary direction after the attachment side that determines the facing of the block.   @return The appropriate block
      */
-    Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, Vector3i location, Side attachmentSide, Side direction);
+    Block getBlockForPlacement(WorldProvider worldProvider, BlockEntityRegistry blockEntityRegistry, GridPoint3 location, Side attachmentSide, Side direction);
 
     /**
      * @return The base block defining the block group. Can be used for orientation-irrelevant behaviours

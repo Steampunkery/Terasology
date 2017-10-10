@@ -15,8 +15,8 @@
  */
 package org.terasology.world.block;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Replicate;
 
 /**
@@ -25,23 +25,23 @@ import org.terasology.network.Replicate;
  */
 public final class BlockComponent implements Component {
     @Replicate
-    Vector3i position = new Vector3i();
+    GridPoint3 position = new GridPoint3();
     @Replicate
     Block block;
 
     public BlockComponent() {
     }
 
-    public BlockComponent(Block block, Vector3i pos) {
+    public BlockComponent(Block block, GridPoint3 pos) {
         this.block = block;
         this.position.set(pos);
     }
 
-    public Vector3i getPosition() {
+    public GridPoint3 getPosition() {
         return position;
     }
 
-    public void setPosition(Vector3i pos) {
+    public void setPosition(GridPoint3 pos) {
         position.set(pos);
     }
 

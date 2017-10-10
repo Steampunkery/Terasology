@@ -20,12 +20,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btAABB;
-import com.bulletphysics.linearmath.AabbUtil2;
 import com.google.common.base.Objects;
 import gnu.trove.list.TFloatList;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3d;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -115,14 +111,14 @@ public final class AABB {
     public Vector3 getExtents() {
         Vector3 dimensions = new Vector3(max);
         dimensions.sub(min);
-        dimensions.scale(0.5f);
+        dimensions.scl(0.5f);
         return dimensions;
     }
 
     public Vector3 getCenter() {
         Vector3 dimensions = new Vector3(max);
         dimensions.add(min);
-        dimensions.scale(0.5f);
+        dimensions.scl(0.5f);
         return dimensions;
     }
 

@@ -15,31 +15,27 @@
  */
 package org.terasology.world.block;
 
+import com.badlogic.gdx.math.GridPoint3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.linearmath.Transform;
 import com.google.common.collect.Maps;
-
-import org.terasology.utilities.Assets;
+import com.google.common.math.DoubleMath;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.math.AABB;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.VecMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.math.Vector4;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.assets.mesh.Mesh;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.primitives.BlockMeshGenerator;
 import org.terasology.rendering.primitives.BlockMeshGeneratorSingleShape;
 import org.terasology.rendering.primitives.Tessellator;
+import org.terasology.utilities.Assets;
 import org.terasology.utilities.collection.EnumBooleanMap;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.family.BlockFamily;
@@ -104,9 +100,9 @@ public final class Block {
     private boolean shadowCasting = true;
     private boolean waving;
     private byte luminance;
-    private Vector3f tint = new Vector3f(0, 0, 0);
+    private Vector3 tint = new Vector3(0, 0, 0);
     private Map<BlockPart, BlockColorSource> colorSource = Maps.newEnumMap(BlockPart.class);
-    private Map<BlockPart, Vector4f> colorOffsets = Maps.newEnumMap(BlockPart.class);
+    private Map<BlockPart, Vector4> colorOffsets = Maps.newEnumMap(BlockPart.class);
 
     // Collision related
     private boolean penetrable;
@@ -133,7 +129,7 @@ public final class Block {
 
     /* Collision */
     private btCollisionShape collisionShape;
-    private Vector3f collisionOffset;
+    private Vector3 collisionOffset;
     private AABB bounds = AABB.createEmpty();
 
     /**
@@ -142,7 +138,7 @@ public final class Block {
     public Block() {
         for (BlockPart part : BlockPart.values()) {
             colorSource.put(part, DefaultColorSource.DEFAULT);
-            colorOffsets.put(part, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+            colorOffsets.put(part, new Vector4(1.0f, 1.0f, 1.0f, 1.0f));
         }
     }
 
@@ -498,11 +494,11 @@ public final class Block {
         this.luminance = (byte) TeraMath.clamp(luminance, 0, ChunkConstants.MAX_LIGHT);
     }
 
-    public Vector3f getTint() {
+    public Vector3 getTint() {
         return tint;
     }
 
-    public void setTint(Vector3f tint) {
+    public void setTint(Vector3 tint) {
         this.tint.set(tint);
     }
 
@@ -539,15 +535,15 @@ public final class Block {
         this.colorSource.put(part, value);
     }
 
-    public Vector4f getColorOffset(BlockPart part) {
+    public Vector4 getColorOffset(BlockPart part) {
         return colorOffsets.get(part);
     }
 
-    public void setColorOffset(BlockPart part, Vector4f color) {
+    public void setColorOffset(BlockPart part, Vector4 color) {
         colorOffsets.put(part, color);
     }
 
-    public void setColorOffsets(Vector4f color) {
+    public void setColorOffsets(Vector4 color) {
         for (BlockPart part : BlockPart.values()) {
             colorOffsets.put(part, color);
         }
@@ -606,11 +602,11 @@ public final class Block {
      * @param biome The block's biome
      * @return The color offset
      */
-    public Vector4f calcColorOffsetFor(BlockPart part, Biome biome) {
+    public Vector4 calcColorOffsetFor(BlockPart part, Biome biome) {
         BlockColorSource source = getColorSource(part);
-        Vector4f color = source.calcColor(biome);
+        Vector4 color = source.calcColor(biome);
 
-        Vector4f colorOffset = colorOffsets.get(part);
+        Vector4 colorOffset = colorOffsets.get(part);
         color.x *= colorOffset.x;
         color.y *= colorOffset.y;
         color.z *= colorOffset.z;
@@ -624,35 +620,44 @@ public final class Block {
      * @param offset The offset to the block's center
      * @param shape The shape of collision box
      */
-    public void setCollision(Vector3f offset, btCollisionShape shape) {
+    public void setCollision(Vector3 offset, btCollisionShape shape) {
         collisionShape = shape;
         collisionOffset = offset;
 
-        Matrix4 t =  new Matrix4(VecMath.to(offset),new Quaternion(0,0,0,1),new Vector3(1,1,1));
+        Matrix4 t =  new Matrix4(offset,new Quaternion(0,0,0,1),new Vector3(1,1,1));
 
         Vector3 min = new Vector3();
         Vector3 max = new Vector3();
         shape.getAabb(t, min, max);
 
 
-        bounds = AABB.createMinMax(VecMath.from(min), VecMath.from(max));
+        bounds = AABB.createMinMax(min, max);
     }
 
     public btCollisionShape getCollisionShape() {
         return collisionShape;
     }
 
-    public Vector3f getCollisionOffset() {
+    public Vector3 getCollisionOffset() {
         return collisionOffset;
     }
 
-    public AABB getBounds(Vector3i pos) {
-        return bounds.move(pos.toVector3f());
+    public AABB getBounds(GridPoint3 pos) {
+        return getBounds(pos.x,pos.y,pos.z);
     }
 
-    public AABB getBounds(Vector3f floatPos) {
-        return getBounds(new Vector3i(floatPos, RoundingMode.HALF_UP));
+    public AABB getBounds(Vector3 pos) {
+        return getBounds(pos.x,pos.y,pos.z);
     }
+
+    public AABB getBounds(float x, float y, float z) {
+        return bounds.move(new Vector3(
+                DoubleMath.roundToInt(x,RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(y,RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(z,RoundingMode.HALF_UP)
+        ));
+    }
+
 
     public void renderWithLightValue(float sunlight, float blockLight) {
         if (meshGenerator == null) {

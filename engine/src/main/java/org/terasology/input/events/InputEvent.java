@@ -15,10 +15,10 @@
  */
 package org.terasology.input.events;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.ConsumableEvent;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 
 public abstract class InputEvent implements ConsumableEvent {
@@ -26,9 +26,9 @@ public abstract class InputEvent implements ConsumableEvent {
     private boolean consumed;
 
     private EntityRef target = EntityRef.NULL;
-    private Vector3i targetBlockPosition;
-    private Vector3f hitPosition;
-    private Vector3f hitNormal;
+    private GridPoint3 targetBlockPosition;
+    private Vector3 hitPosition;
+    private Vector3 hitNormal;
 
     public InputEvent(float delta) {
         this.delta = delta;
@@ -42,7 +42,7 @@ public abstract class InputEvent implements ConsumableEvent {
      *
      * @return This event's target world position.
      */
-    public Vector3f getHitPosition() {
+    public Vector3 getHitPosition() {
         return hitPosition;
     }
 
@@ -50,11 +50,11 @@ public abstract class InputEvent implements ConsumableEvent {
      *
      * @return The hit normal/direction of this event (usually from player camera).
      */
-    public Vector3f getHitNormal() {
+    public Vector3 getHitNormal() {
         return hitNormal;
     }
 
-    public Vector3i getTargetBlockPosition() {
+    public GridPoint3 getTargetBlockPosition() {
         return targetBlockPosition;
     }
 
@@ -83,7 +83,7 @@ public abstract class InputEvent implements ConsumableEvent {
      * @param targetHitPosition This event's target world position.
      * @param targetHitNormal The hit normal/direction of this event (usually from player camera).
      */
-    public void setTargetInfo(EntityRef newTarget, Vector3i targetBlockPos, Vector3f targetHitPosition, Vector3f targetHitNormal) {
+    public void setTargetInfo(EntityRef newTarget, GridPoint3 targetBlockPos, Vector3 targetHitPosition, Vector3 targetHitNormal) {
         this.target = newTarget;
         this.targetBlockPosition = targetBlockPos;
         this.hitPosition = targetHitPosition;

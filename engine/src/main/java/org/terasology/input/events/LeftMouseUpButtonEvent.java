@@ -16,8 +16,8 @@
 package org.terasology.input.events;
 
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.input.MouseInput;
-import org.terasology.math.geom.Vector2i;
 
 public final class LeftMouseUpButtonEvent extends MouseUpButtonEvent {
 
@@ -27,7 +27,7 @@ public final class LeftMouseUpButtonEvent extends MouseUpButtonEvent {
         super(MouseInput.MOUSE_LEFT, delta);
     }
 
-    public static LeftMouseUpButtonEvent create(Vector2i mousePos, float delta) {
+    public static LeftMouseUpButtonEvent create(GridPoint2 mousePos, float delta) {
         event.reset(delta);
         event.setMousePosition(mousePos);
         return event;
