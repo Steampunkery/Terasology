@@ -38,30 +38,30 @@ import java.util.List;
  */
 public final class AABB {
 
-    private final Vector3f min;
-    private final Vector3f max;
+    private final Vector3 min;
+    private final Vector3 max;
 
-    private Vector3f[] vertices;
+    private Vector3[] vertices;
 
-    private AABB(Vector3f min, Vector3f max) {
+    private AABB(Vector3 min, Vector3 max) {
         this.min = min;
         this.max = max;
     }
 
-    public static AABB createMinMax(Vector3f min, Vector3f max) {
-        return new AABB(new Vector3f(min), new Vector3f(max));
+    public static AABB createMinMax(Vector3 min, Vector3 max) {
+        return new AABB(new Vector3(min), new Vector3(max));
     }
 
-    public static AABB createCenterExtent(Vector3f center, Vector3f extent) {
-        Vector3f min = new Vector3f(center);
+    public static AABB createCenterExtent(Vector3 center, Vector3 extent) {
+        Vector3 min = new Vector3(center);
         min.sub(extent);
-        Vector3f max = new Vector3f(center);
+        Vector3 max = new Vector3(center);
         max.add(extent);
         return new AABB(min, max);
     }
 
     public static AABB createEmpty() {
-        return new AABB(new Vector3f(), new Vector3f());
+        return new AABB(new Vector3(), new Vector3());
     }
 
     /**
@@ -70,8 +70,8 @@ public final class AABB {
      * @param others
      */
     public static AABB createEncompassing(Iterable<AABB> others) {
-        Vector3f min;
-        Vector3f max;
+        Vector3 min;
+        Vector3 max;
         Iterator<AABB> i = others.iterator();
         if (i.hasNext()) {
             AABB next = i.next();
@@ -82,8 +82,8 @@ public final class AABB {
         }
         while (i.hasNext()) {
             AABB next = i.next();
-            Vector3f otherMin = next.getMin();
-            Vector3f otherMax = next.getMax();
+            Vector3 otherMin = next.getMin();
+            Vector3 otherMax = next.getMax();
             Vector3fUtil.min(min, otherMin, min);
             Vector3fUtil.max(max, otherMax, max);
         }
@@ -96,8 +96,8 @@ public final class AABB {
             return AABB.createEmpty();
         }
 
-        Vector3f min = new Vector3f(vertices.get(0), vertices.get(1), vertices.get(2));
-        Vector3f max = new Vector3f(vertices.get(0), vertices.get(1), vertices.get(2));
+        Vector3 min = new Vector3(vertices.get(0), vertices.get(1), vertices.get(2));
+        Vector3 max = new Vector3(vertices.get(0), vertices.get(1), vertices.get(2));
         for (int index = 1; index < vertexCount; ++index) {
             min.x = Math.min(min.x, vertices.get(3 * index));
             max.x = Math.max(max.x, vertices.get(3 * index));
@@ -112,26 +112,26 @@ public final class AABB {
     /**
      * @return The distance from the center to the max node
      */
-    public Vector3f getExtents() {
-        Vector3f dimensions = new Vector3f(max);
+    public Vector3 getExtents() {
+        Vector3 dimensions = new Vector3(max);
         dimensions.sub(min);
         dimensions.scale(0.5f);
         return dimensions;
     }
 
-    public Vector3f getCenter() {
-        Vector3f dimensions = new Vector3f(max);
+    public Vector3 getCenter() {
+        Vector3 dimensions = new Vector3(max);
         dimensions.add(min);
         dimensions.scale(0.5f);
         return dimensions;
     }
 
-    public Vector3f getMin() {
-        return new Vector3f(min);
+    public Vector3 getMin() {
+        return new Vector3(min);
     }
 
-    public Vector3f getMax() {
-        return new Vector3f(max);
+    public Vector3 getMax() {
+        return new Vector3(max);
     }
 
     /**
@@ -139,24 +139,24 @@ public final class AABB {
      * @param offset The offset between the current AABB and the new AABB
      * @return the new AABB
      */
-    public AABB move(Vector3f offset) {
-        Vector3f newMin = new Vector3f(min);
+    public AABB move(Vector3 offset) {
+        Vector3 newMin = new Vector3(min);
         newMin.add(offset);
-        Vector3f newMax = new Vector3f(max);
+        Vector3 newMax = new Vector3(max);
         newMax.add(offset);
         return new AABB(newMin, newMax);
     }
 
-    public AABB transform(Quat4f rotation, Vector3f offset, float scale) {
-        Matrix4 transform = new Matrix4(VecMath.to(offset),VecMath.to(rotation),new Vector3(scale,scale,scale));
+    public AABB transform(Quaternion rotation, Vector3 offset, float scale) {
+        Matrix4 transform = new Matrix4(offset,rotation,new Vector3(scale,scale,scale));
         //Transform transform = new Transform(new Matrix4f(VecMath.to(rotation), VecMath.to(offset), scale));
         return transform(transform);
     }
 
     public AABB transform(Matrix4 transform) {
-        btAABB aabb =  new btAABB(VecMath.to(min),VecMath.to(max),new Vector3(),.01f);
+        btAABB aabb =  new btAABB(min,max,new Vector3(),.01f);
         aabb.appy_transform(transform);
-        return new AABB(new Vector3f(aabb.getMin().x(),aabb.getMin().y(),aabb.getMin().z()), new Vector3f(aabb.getMax().x(),aabb.getMax().y(),aabb.getMax().z()));
+        return new AABB(new Vector3(aabb.getMin().x(),aabb.getMin().y(),aabb.getMin().z()), new Vector3(aabb.getMax().x(),aabb.getMax().y(),aabb.getMax().z()));
     }
 
     /**
@@ -177,23 +177,12 @@ public final class AABB {
      * @param point The point to check for inclusion
      * @return True if containing
      */
-    public boolean contains(Vector3d point) {
+    public boolean contains(Vector3 point) {
         return !(max.x < point.x || min.x >= point.x)
                 && !(max.y < point.y || min.y >= point.y)
                 && !(max.z < point.z || min.z >= point.z);
     }
 
-    /**
-     * Returns true if the AABB contains the given point.
-     *
-     * @param point The point to check for inclusion
-     * @return True if containing
-     */
-    public boolean contains(Vector3f point) {
-        return !(max.x < point.x || min.x >= point.x)
-                && !(max.y < point.y || min.y >= point.y)
-                && !(max.z < point.z || min.z >= point.z);
-    }
 
     /**
      * Returns the closest point on the AABB to a given point.
@@ -201,8 +190,8 @@ public final class AABB {
      * @param p The point
      * @return The point on the AABB closest to the given point
      */
-    public Vector3f closestPointOnAABBToPoint(Vector3f p) {
-        Vector3f r = new Vector3f(p);
+    public Vector3 closestPointOnAABBToPoint(Vector3 p) {
+        Vector3 r = new Vector3(p);
 
         if (p.x < min.x) {
             r.x = min.x;
@@ -226,8 +215,8 @@ public final class AABB {
         return r;
     }
 
-    public Vector3f getFirstHitPlane(Vector3f direction, Vector3f pos, Vector3f dimensions, boolean testX, boolean testY, boolean testZ) {
-        Vector3f hitNormal = new Vector3f();
+    public Vector3 getFirstHitPlane(Vector3 direction, Vector3 pos, Vector3 dimensions, boolean testX, boolean testY, boolean testZ) {
+        Vector3 hitNormal = new Vector3();
 
         float dist = Float.POSITIVE_INFINITY;
 
@@ -278,36 +267,36 @@ public final class AABB {
      * @param testZ       True if the z-axis should be tested
      * @return The normal
      */
-    public Vector3f normalForPlaneClosestToOrigin(Vector3f pointOnAABB, Vector3f origin, boolean testX, boolean testY, boolean testZ) {
-        List<Vector3f> normals = new ArrayList<>();
+    public Vector3 normalForPlaneClosestToOrigin(Vector3 pointOnAABB, Vector3 origin, boolean testX, boolean testY, boolean testZ) {
+        List<Vector3> normals = new ArrayList<>();
 
         if (pointOnAABB.z == min.z && testZ) {
-            normals.add(new Vector3f(0, 0, -1));
+            normals.add(new Vector3(0, 0, -1));
         }
         if (pointOnAABB.z == max.z && testZ) {
-            normals.add(new Vector3f(0, 0, 1));
+            normals.add(new Vector3(0, 0, 1));
         }
         if (pointOnAABB.x == min.x && testX) {
-            normals.add(new Vector3f(-1, 0, 0));
+            normals.add(new Vector3(-1, 0, 0));
         }
         if (pointOnAABB.x == max.x && testX) {
-            normals.add(new Vector3f(1, 0, 0));
+            normals.add(new Vector3(1, 0, 0));
         }
         if (pointOnAABB.y == min.y && testY) {
-            normals.add(new Vector3f(0, -1, 0));
+            normals.add(new Vector3(0, -1, 0));
         }
         if (pointOnAABB.y == max.y && testY) {
-            normals.add(new Vector3f(0, 1, 0));
+            normals.add(new Vector3(0, 1, 0));
         }
 
         float minDistance = Float.MAX_VALUE;
-        Vector3f closestNormal = new Vector3f();
+        Vector3 closestNormal = new Vector3();
 
-        for (Vector3f n : normals) {
-            Vector3f diff = new Vector3f(centerPointForNormal(n));
+        for (Vector3 n : normals) {
+            Vector3 diff = new Vector3(centerPointForNormal(n));
             diff.sub(origin);
 
-            float distance = diff.length();
+            float distance = diff.len();
 
             if (distance < minDistance) {
                 minDistance = distance;
@@ -324,27 +313,27 @@ public final class AABB {
      * @param normal The normal
      * @return The center point
      */
-    public Vector3f centerPointForNormal(Vector3f normal) {
+    public Vector3 centerPointForNormal(Vector3 normal) {
         if (normal.x == 1 && normal.y == 0 && normal.z == 0) {
-            return new Vector3f(max.x, getCenter().y, getCenter().z);
+            return new Vector3(max.x, getCenter().y, getCenter().z);
         }
         if (normal.x == -1 && normal.y == 0 && normal.z == 0) {
-            return new Vector3f(min.x, getCenter().y, getCenter().z);
+            return new Vector3(min.x, getCenter().y, getCenter().z);
         }
         if (normal.x == 0 && normal.y == 0 && normal.z == 1) {
-            return new Vector3f(getCenter().x, getCenter().y, max.z);
+            return new Vector3(getCenter().x, getCenter().y, max.z);
         }
         if (normal.x == 0 && normal.y == 0 && normal.z == -1) {
-            return new Vector3f(getCenter().x, getCenter().y, min.z);
+            return new Vector3(getCenter().x, getCenter().y, min.z);
         }
         if (normal.x == 0 && normal.y == 1 && normal.z == 0) {
-            return new Vector3f(getCenter().x, max.y, getCenter().z);
+            return new Vector3(getCenter().x, max.y, getCenter().z);
         }
         if (normal.x == 0 && normal.y == -1 && normal.z == 0) {
-            return new Vector3f(getCenter().x, min.y, getCenter().z);
+            return new Vector3(getCenter().x, min.y, getCenter().z);
         }
 
-        return new Vector3f();
+        return new Vector3();
     }
 
     public float minX() {
@@ -376,20 +365,20 @@ public final class AABB {
      *
      * @return The vertices
      */
-    public Vector3f[] getVertices() {
+    public Vector3[] getVertices() {
         if (vertices == null) {
-            vertices = new Vector3f[8];
+            vertices = new Vector3[8];
 
             // Front
-            vertices[0] = new Vector3f(min.x, min.y, max.z);
-            vertices[1] = new Vector3f(max.x, min.y, max.z);
-            vertices[2] = new Vector3f(max.x, max.y, max.z);
-            vertices[3] = new Vector3f(min.x, max.y, max.z);
+            vertices[0] = new Vector3(min.x, min.y, max.z);
+            vertices[1] = new Vector3(max.x, min.y, max.z);
+            vertices[2] = new Vector3(max.x, max.y, max.z);
+            vertices[3] = new Vector3(min.x, max.y, max.z);
             // Back
-            vertices[4] = new Vector3f(min.x, min.y, min.z);
-            vertices[5] = new Vector3f(max.x, min.y, min.z);
-            vertices[6] = new Vector3f(max.x, max.y, min.z);
-            vertices[7] = new Vector3f(min.x, max.y, min.z);
+            vertices[4] = new Vector3(min.x, min.y, min.z);
+            vertices[5] = new Vector3(max.x, min.y, min.z);
+            vertices[6] = new Vector3(max.x, max.y, min.z);
+            vertices[7] = new Vector3(min.x, max.y, min.z);
         }
 
         return vertices;
@@ -412,8 +401,8 @@ public final class AABB {
         return Objects.hashCode(min, max);
     }
 
-    public boolean intersectRectangle(Vector3f from, Vector3f direction) {
-        Vector3f dirfrac = new Vector3f();
+    public boolean intersectRectangle(Vector3 from, Vector3 direction) {
+        Vector3 dirfrac = new Vector3();
 
         dirfrac.x = 1.0f / direction.x;
         dirfrac.y = 1.0f / direction.y;

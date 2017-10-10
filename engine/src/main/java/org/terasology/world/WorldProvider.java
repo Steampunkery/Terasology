@@ -15,8 +15,8 @@
  */
 package org.terasology.world;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.world.block.Block;
 import org.terasology.world.internal.WorldProviderCore;
 import org.terasology.world.liquid.LiquidData;
@@ -33,9 +33,9 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos
      * @return Whether the given block is active
      */
-    boolean isBlockRelevant(Vector3i pos);
+    boolean isBlockRelevant(GridPoint3 pos);
 
-    boolean isBlockRelevant(Vector3f pos);
+    boolean isBlockRelevant(Vector3 pos);
 
     /**
      * @param pos
@@ -43,7 +43,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @param oldState The expected previous value of the liquid state
      * @return Whether the liquid change was made successfully. Will fail of oldState != the current state, or if the underlying chunk is not available
      */
-    boolean setLiquid(Vector3i pos, LiquidData state, LiquidData oldState);
+    boolean setLiquid(GridPoint3 pos, LiquidData state, LiquidData oldState);
 
     /**
      * Returns the liquid state at the given position.
@@ -51,7 +51,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @param blockPos
      * @return The state of the block
      */
-    LiquidData getLiquid(Vector3i blockPos);
+    LiquidData getLiquid(GridPoint3 blockPos);
 
     /**
      * Returns the block value at the given position.
@@ -59,7 +59,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
-    Block getBlock(Vector3f pos);
+    Block getBlock(Vector3 pos);
 
     /**
      * Returns the block value at the given position.
@@ -67,7 +67,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
-    Block getBlock(Vector3i pos);
+    Block getBlock(GridPoint3 pos);
 
     /**
      * Returns the light value at the given position.
@@ -75,7 +75,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
-    byte getLight(Vector3f pos);
+    byte getLight(Vector3 pos);
 
     /**
      * Returns the sunlight value at the given position.
@@ -83,9 +83,9 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
-    byte getSunlight(Vector3f pos);
+    byte getSunlight(Vector3 pos);
 
-    byte getTotalLight(Vector3f pos);
+    byte getTotalLight(Vector3 pos);
 
     /**
      * Returns the light value at the given position.
@@ -93,7 +93,7 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
-    byte getLight(Vector3i pos);
+    byte getLight(GridPoint3 pos);
 
     /**
      * Returns the sunlight value at the given position.
@@ -101,8 +101,8 @@ public interface WorldProvider extends WorldProviderCore {
      * @param pos The position
      * @return The block value at the given position
      */
-    byte getSunlight(Vector3i pos);
+    byte getSunlight(GridPoint3 pos);
 
-    byte getTotalLight(Vector3i pos);
+    byte getTotalLight(GridPoint3 pos);
 
 }

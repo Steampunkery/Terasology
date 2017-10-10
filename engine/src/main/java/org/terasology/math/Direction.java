@@ -16,9 +16,9 @@
 
 package org.terasology.math;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.EnumMap;
 
@@ -27,18 +27,18 @@ import java.util.EnumMap;
  *
  */
 public enum Direction {
-    UP(Vector3i.up(), new Vector3f(0, 1, 0)),
-    RIGHT(new Vector3i(-1, 0, 0), new Vector3f(-1, 0, 0)),
-    LEFT(new Vector3i(1, 0, 0), new Vector3f(1, 0, 0)),
-    BACKWARD(new Vector3i(0, 0, -1), new Vector3f(0, 0, -1)),
-    FORWARD(new Vector3i(0, 0, 1), new Vector3f(0, 0, 1)),
-    DOWN(Vector3i.down(), new Vector3f(0, -1, 0));
+    UP(new GridPoint3(0,1,0), new Vector3(0, 1, 0)),
+    RIGHT(new GridPoint3(-1, 0, 0), new Vector3(-1, 0, 0)),
+    LEFT(new GridPoint3(1, 0, 0), new Vector3(1, 0, 0)),
+    BACKWARD(new GridPoint3(0, 0, -1), new Vector3(0, 0, -1)),
+    FORWARD(new GridPoint3(0, 0, 1), new Vector3(0, 0, 1)),
+    DOWN(new GridPoint3(0,-1,0), new Vector3(0, -1, 0));
 
     private static EnumMap<Direction, Direction> reverseMap;
     private static EnumMap<Direction, Side> conversionMap;
 
-    private Vector3i vector3iDir;
-    private Vector3f vector3fDir;
+    private GridPoint3 vector3iDir;
+    private Vector3 vector3fDir;
 
     static {
         reverseMap = new EnumMap<>(Direction.class);
@@ -57,7 +57,7 @@ public enum Direction {
         conversionMap.put(RIGHT, Side.LEFT);
     }
 
-    Direction(Vector3i vector3i, Vector3f vector3f) {
+    Direction(GridPoint3 vector3i, Vector3 vector3f) {
         this.vector3iDir = vector3i;
         this.vector3fDir = vector3f;
     }
@@ -73,7 +73,7 @@ public enum Direction {
         return (z > 0) ? FORWARD : BACKWARD;
     }
 
-    public static Direction inDirection(Vector3f dir) {
+    public static Direction inDirection(Vector3 dir) {
         return inDirection(dir.x, dir.y, dir.z);
     }
 
@@ -117,12 +117,12 @@ public enum Direction {
     /**
      * @return The vector3i in the direction of the side. Do not modify.
      */
-    public Vector3i getVector3i() {
-        return new Vector3i(vector3iDir);
+    public GridPoint3 getVector3i() {
+        return new GridPoint3(vector3iDir);
     }
 
-    public Vector3f getVector3f() {
-        return new Vector3f(vector3fDir);
+    public Vector3 getVector3f() {
+        return new Vector3(vector3fDir);
     }
 
     /**

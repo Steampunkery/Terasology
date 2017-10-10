@@ -16,8 +16,8 @@
 
 package org.terasology.math;
 
+import com.badlogic.gdx.math.Vector3;
 import com.bulletphysics.BulletGlobals;
-import org.terasology.math.geom.Vector3f;
 
 /**
  */
@@ -29,9 +29,9 @@ public final class Vector3fUtil {
     /**
      * @return The reflection of direction against normal
      */
-    public static Vector3f reflect(Vector3f direction, Vector3f normal, Vector3f out) {
+    public static Vector3 reflect(Vector3 direction, Vector3 normal, Vector3 out) {
         out.set(normal);
-        out.scale(-2.0f * direction.dot(normal));
+        out.scl(-2.0f * direction.dot(normal));
         out.add(direction);
         return out;
     }
@@ -39,39 +39,39 @@ public final class Vector3fUtil {
     /**
      * @return the portion of direction that is parallel to normal
      */
-    public static Vector3f getParallelComponent(Vector3f direction, Vector3f normal, Vector3f out) {
+    public static Vector3 getParallelComponent(Vector3 direction, Vector3 normal, Vector3 out) {
         out.set(normal);
-        out.scale(direction.dot(normal));
+        out.scl(direction.dot(normal));
         return out;
     }
 
     /**
      * @return the portion of direction that is perpendicular to normal
      */
-    public static Vector3f getPerpendicularComponent(Vector3f direction, Vector3f normal, Vector3f out) {
-        Vector3f perpendicular = getParallelComponent(direction, normal, out);
-        perpendicular.scale(-1);
+    public static Vector3 getPerpendicularComponent(Vector3 direction, Vector3 normal, Vector3 out) {
+        Vector3 perpendicular = getParallelComponent(direction, normal, out);
+        perpendicular.scl(-1);
         perpendicular.add(direction);
         return perpendicular;
     }
 
-    public static Vector3f safeNormalize(Vector3f v, Vector3f out) {
+    public static Vector3 safeNormalize(Vector3 v, Vector3 out) {
         out.set(v);
-        out.normalize();
-        if (out.length() < BulletGlobals.SIMD_EPSILON) {
+        out.nor();
+        if (out.len() < BulletGlobals.SIMD_EPSILON) {
             out.set(0, 0, 0);
         }
         return out;
     }
 
-    public static Vector3f min(Vector3f a, Vector3f b, Vector3f out) {
+    public static Vector3 min(Vector3 a, Vector3 b, Vector3 out) {
         out.x = Math.min(a.x, b.x);
         out.y = Math.min(a.y, b.y);
         out.z = Math.min(a.z, b.z);
         return out;
     }
 
-    public static Vector3f max(Vector3f a, Vector3f b, Vector3f out) {
+    public static Vector3 max(Vector3 a, Vector3 b, Vector3 out) {
         out.x = Math.max(a.x, b.x);
         out.y = Math.max(a.y, b.y);
         out.z = Math.max(a.z, b.z);

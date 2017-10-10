@@ -15,10 +15,10 @@
  */
 package org.terasology.world.internal;
 
+import com.badlogic.gdx.math.GridPoint3;
 import com.google.common.collect.Maps;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.WorldChangeListener;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
@@ -75,13 +75,13 @@ public interface WorldProviderCore {
      * @param chunkPos
      * @return A world view centered on the desired chunk, with the surrounding chunks present.
      */
-    ChunkViewCore getLocalView(Vector3i chunkPos);
+    ChunkViewCore getLocalView(GridPoint3 chunkPos);
 
     /**
      * @param chunk
      * @return A world view of the chunks around the desired chunk, uncentered.
      */
-    ChunkViewCore getWorldViewAround(Vector3i chunk);
+    ChunkViewCore getWorldViewAround(GridPoint3 chunk);
 
 
     /**
@@ -103,7 +103,7 @@ public interface WorldProviderCore {
      * @param type The type of the block to set
      * @return The previous block type. Null if the change failed (because the necessary chunk was not loaded)
      */
-    Block setBlock(Vector3i pos, Block type);
+    Block setBlock(GridPoint3 pos, Block type);
 
     /**
      * Places all given blocks of specific types at their corresponding positions
@@ -114,9 +114,9 @@ public interface WorldProviderCore {
      * @return A mapping from world position to previous block type.
      * The value of a map entry is Null if the change failed (because the necessary chunk was not loaded)
      */
-    default Map<Vector3i, Block> setBlocks(Map<Vector3i, Block> blocks) {
-        Map<Vector3i, Block> resultMap = Maps.newHashMap();
-        for (Map.Entry<Vector3i, Block> entry: blocks.entrySet()) {
+    default Map<GridPoint3, Block> setBlocks(Map<GridPoint3, Block> blocks) {
+        Map<GridPoint3, Block> resultMap = Maps.newHashMap();
+        for (Map.Entry<GridPoint3, Block> entry: blocks.entrySet()) {
             Block oldBlock = setBlock(entry.getKey(), entry.getValue());
             resultMap.put(entry.getKey(), oldBlock);
         }
@@ -132,7 +132,7 @@ public interface WorldProviderCore {
      * @param biome The biome to set
      * @return The previous biome type at the position. Null if the change failed (because the necessary chunk was not loaded)
      */
-    Biome setBiome(Vector3i pos, Biome biome);
+    Biome setBiome(GridPoint3 pos, Biome biome);
 
     /**
      * Returns the biome at a specific world position.
@@ -140,7 +140,7 @@ public interface WorldProviderCore {
      * @param pos The position
      * @return The biome at the given position.
      */
-    Biome getBiome(Vector3i pos);
+    Biome getBiome(GridPoint3 pos);
 
     /**
      * @param x

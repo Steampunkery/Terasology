@@ -15,12 +15,12 @@
  */
 package org.terasology.math;
 
+import com.badlogic.gdx.math.Quaternion;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import org.terasology.math.geom.Quat4f;
 
 import java.util.HashMap;
 import java.util.List;
@@ -178,9 +178,10 @@ public final class Rotation {
         return roll;
     }
 
-    public Quat4f getQuat4f() {
-        Quat4f rotation = new Quat4f(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
-        rotation.normalize();
+    public Quaternion getQuat4f() {
+        Quaternion rotation = new Quaternion();
+        rotation.setEulerAngles(yaw.getRadians(), pitch.getRadians(), roll.getRadians());
+        rotation.nor();
         return rotation;
     }
 

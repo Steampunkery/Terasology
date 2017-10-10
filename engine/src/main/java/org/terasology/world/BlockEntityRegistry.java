@@ -15,10 +15,10 @@
  */
 package org.terasology.world;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 
 /**
@@ -34,7 +34,7 @@ public interface BlockEntityRegistry {
      * @param blockPosition
      * @return The block entity for the location if it exists, or the null entity
      */
-    EntityRef getExistingBlockEntityAt(Vector3i blockPosition);
+    EntityRef getExistingBlockEntityAt(GridPoint3 blockPosition);
 
     /**
      * This method is the same as setBlock, except if the old and new block types are part of the same family the
@@ -44,7 +44,7 @@ public interface BlockEntityRegistry {
      * @param type
      * @return The previous block type, or null if the change failed due to the chunk not being available
      */
-    Block setBlockForceUpdateEntity(Vector3i position, Block type);
+    Block setBlockForceUpdateEntity(GridPoint3 position, Block type);
 
     /**
      * This method is the same as setBlock, except the specified components are not altered during the update
@@ -54,35 +54,35 @@ public interface BlockEntityRegistry {
      * @param components
      * @return The previous block type, or null if the change failed due to the chunk not being available
      */
-    Block setBlockRetainComponent(Vector3i position, Block type, Class<? extends Component>... components);
+    Block setBlockRetainComponent(GridPoint3 position, Block type, Class<? extends Component>... components);
 
     /**
      * @param position
      * @return The block entity for the location, creating it if it doesn't exist
      */
-    EntityRef getBlockEntityAt(Vector3f position);
+    EntityRef getBlockEntityAt(Vector3 position);
 
     /**
      * @param blockPosition
      * @return The block entity for the location, creating it if it doesn't exist
      */
-    EntityRef getBlockEntityAt(Vector3i blockPosition);
+    EntityRef getBlockEntityAt(GridPoint3 blockPosition);
 
     /**
      * @param blockPosition
      * @return The block controller entity for this location, or block entity if it exists.
      */
-    EntityRef getExistingEntityAt(Vector3i blockPosition);
+    EntityRef getExistingEntityAt(GridPoint3 blockPosition);
 
     /**
      * @param blockPosition
      * @return The block controller entity for this location, or block entity.
      */
-    EntityRef getEntityAt(Vector3i blockPosition);
+    EntityRef getEntityAt(GridPoint3 blockPosition);
 
     /**
      * @param blockPos
      * @return Whether the entity at this position is permanent
      */
-    boolean hasPermanentBlockEntity(Vector3i blockPos);
+    boolean hasPermanentBlockEntity(GridPoint3 blockPos);
 }

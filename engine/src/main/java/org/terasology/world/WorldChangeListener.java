@@ -16,7 +16,7 @@
 
 package org.terasology.world;
 
-import org.terasology.math.geom.Vector3i;
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 
@@ -24,8 +24,8 @@ import org.terasology.world.block.Block;
  */
 public interface WorldChangeListener {
 
-    void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock);
+    void onBlockChanged(GridPoint3 pos, Block newBlock, Block originalBlock);
 
-    void onBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome);
+    void onBiomeChanged(GridPoint3 pos, Biome newBiome, Biome originalBiome);
 
 }

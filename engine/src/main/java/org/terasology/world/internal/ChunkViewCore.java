@@ -16,7 +16,7 @@
 
 package org.terasology.world.internal;
 
-import org.terasology.math.geom.Vector3i;
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.world.ChunkView;
 
 public interface ChunkViewCore extends ChunkView {
@@ -27,7 +27,7 @@ public interface ChunkViewCore extends ChunkView {
      * @param pos
      * @param light
      */
-    void setLight(Vector3i pos, byte light);
+    void setLight(GridPoint3 pos, byte light);
 
     /**
      * Sets the light level at the given coordinates
@@ -45,7 +45,7 @@ public interface ChunkViewCore extends ChunkView {
      * @param pos
      * @param light
      */
-    void setSunlight(Vector3i pos, byte light);
+    void setSunlight(GridPoint3 pos, byte light);
 
     /**
      * Sets the sunlight level at the given coordinates

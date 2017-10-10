@@ -15,10 +15,10 @@
  */
 package org.terasology.math;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.EnumMap;
 
@@ -30,12 +30,12 @@ import java.util.EnumMap;
  *
  */
 public enum Side {
-    TOP(Vector3i.up(), true, false, true),
-    BOTTOM(Vector3i.down(), true, false, true),
-    LEFT(new Vector3i(-1, 0, 0), false, true, true),
-    RIGHT(new Vector3i(1, 0, 0), false, true, true),
-    FRONT(new Vector3i(0, 0, -1), true, true, false),
-    BACK(new Vector3i(0, 0, 1), true, true, false);
+    TOP(new GridPoint3(0,1,0), true, false, true),
+    BOTTOM(new GridPoint3(0,-1,0), true, false, true),
+    LEFT(new GridPoint3(-1, 0, 0), false, true, true),
+    RIGHT(new GridPoint3(1, 0, 0), false, true, true),
+    FRONT(new GridPoint3(0, 0, -1), true, true, false),
+    BACK(new GridPoint3(0, 0, 1), true, true, false);
 
     private static EnumMap<Side, Side> reverseMap;
     private static ImmutableList<Side> horizontalSides;
@@ -111,12 +111,12 @@ public enum Side {
         verticalSides = ImmutableList.of(TOP, BOTTOM);
     }
 
-    private Vector3i vector3iDir;
+    private GridPoint3 vector3iDir;
     private boolean canYaw;
     private boolean canPitch;
     private boolean canRoll;
 
-     Side(Vector3i vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
+     Side(GridPoint3 vector3i, boolean canPitch, boolean canYaw, boolean canRoll) {
         this.vector3iDir = vector3i;
         this.canPitch = canPitch;
         this.canYaw = canYaw;
@@ -148,7 +148,7 @@ public enum Side {
         return (z > 0) ? BACK : FRONT;
     }
 
-    public static Side inDirection(Vector3f dir) {
+    public static Side inDirection(Vector3 dir) {
         return inDirection(dir.x, dir.y, dir.z);
     }
 
@@ -188,7 +188,7 @@ public enum Side {
     /**
      * @return The vector3i in the direction of the side. Do not modify.
      */
-    public Vector3i getVector3i() {
+    public GridPoint3 getVector3i() {
         return vector3iDir;
     }
 
@@ -273,8 +273,8 @@ public enum Side {
         }
     }
 
-    public Vector3i getAdjacentPos(Vector3i position) {
-        Vector3i result = new Vector3i(position);
+    public GridPoint3 getAdjacentPos(GridPoint3 position) {
+        GridPoint3 result = new GridPoint3(position);
         result.add(vector3iDir);
         return result;
     }

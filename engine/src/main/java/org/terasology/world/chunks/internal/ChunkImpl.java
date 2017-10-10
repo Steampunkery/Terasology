@@ -15,6 +15,7 @@
  */
 package org.terasology.world.chunks.internal;
 
+import com.badlogic.gdx.math.GridPoint3;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -60,7 +61,7 @@ public class ChunkImpl implements Chunk {
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final DecimalFormat SIZE_FORMAT = new DecimalFormat("#,###");
 
-    private final Vector3i chunkPos = new Vector3i();
+    private final GridPoint3 chunkPos = new GridPoint3();
 
     private BlockManager blockManager;
     private BiomeManager biomeManager;

@@ -17,17 +17,14 @@
 package org.terasology.world.block.shapes;
 
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.collision.*;
+import com.badlogic.gdx.physics.bullet.collision.btBoxShape;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btCompoundShape;
+import com.badlogic.gdx.physics.bullet.collision.btConvexHullShape;
+import com.badlogic.gdx.physics.bullet.collision.btSphereShape;
 import com.badlogic.gdx.utils.BufferUtils;
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.CompoundShape;
-import com.bulletphysics.collision.shapes.ConvexHullShape;
-import com.bulletphysics.collision.shapes.SphereShape;
-import com.bulletphysics.linearmath.Transform;
-import com.bulletphysics.util.ObjectArrayList;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
@@ -46,8 +43,6 @@ import org.terasology.assets.format.AssetDataFile;
 import org.terasology.assets.module.annotations.RegisterAssetFileFormat;
 import org.terasology.math.Rotation;
 import org.terasology.math.VecMath;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.utilities.gson.Vector2fTypeAdapter;
 import org.terasology.utilities.gson.Vector3fTypeAdapter;
 import org.terasology.world.block.BlockPart;
@@ -55,7 +50,6 @@ import org.terasology.world.block.BlockPart;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.List;
 import java.util.Locale;
@@ -73,8 +67,8 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                 .setPrettyPrinting()
                 .registerTypeAdapter(BlockShapeData.class, new BlockShapeHandler())
                 .registerTypeAdapter(BlockMeshPart.class, new BlockMeshPartHandler())
-                .registerTypeAdapter(Vector3f.class, new Vector3fTypeAdapter())
-                .registerTypeAdapter(Vector2f.class, new Vector2fTypeAdapter())
+                .registerTypeAdapter(Vector3.class, new Vector3fTypeAdapter())
+                .registerTypeAdapter(Vector2.class, new Vector2fTypeAdapter())
                 .create();
     }
 
@@ -235,19 +229,19 @@ public class JsonBlockShapeLoader extends AbstractAssetFileFormat<BlockShapeData
                // Transform transform = new Transform(new javax.vecmath.Matrix4f(VecMath.to(Rotation.none().getQuat4f()), VecMath.to(collider.offset), 1.0f));
                // collisionShape.addChildShape(transform, collider.collisionShape);
             }
-            return new ColliderInfo(new Vector3f(), collisionShape);
+            return new ColliderInfo(new Vector3(), collisionShape);
         }
 
         private ColliderInfo processAABBShape(JsonDeserializationContext context, JsonObject colliderDef) {
-            Vector3f offset = context.deserialize(colliderDef.get(POSITION), Vector3f.class);
-            Vector3f extent = context.deserialize(colliderDef.get(EXTENTS), Vector3f.class);
+            Vector3 offset = context.deserialize(colliderDef.get(POSITION), Vector3.class);
+            Vector3 extent = context.deserialize(colliderDef.get(EXTENTS), Vector3.class);
             if (offset == null) {
                 throw new JsonParseException("AABB Collider missing position");
             }
             if (extent == null) {
                 throw new JsonParseException("AABB Collider missing extents");
             }
-            extent.absolute();
+            extent.set(Math.abs(extent.x),Math.abs(extent.y),Math.abs(extent.z));
 
 
             return new ColliderInfo(offset, new btBoxShape(VecMath.to(extent)));//new BoxShape(VecMath.to(extent)));

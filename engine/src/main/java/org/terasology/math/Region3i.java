@@ -16,6 +16,8 @@
 
 package org.terasology.math;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.math.geom.BaseVector3f;
 import org.terasology.math.geom.BaseVector3i;
 import org.terasology.math.geom.Vector3f;
@@ -27,11 +29,11 @@ import java.util.Iterator;
  * Describes an axis-aligned bounded space in 3D integer.
  *
  */
-public final class Region3i implements Iterable<Vector3i> {
+public final class Region3i implements Iterable<GridPoint3> {
     public static final Region3i EMPTY = new Region3i();
 
-    private final Vector3i min = new Vector3i();
-    private final Vector3i size = new Vector3i();
+    private final GridPoint3 min = new GridPoint3();
+    private final GridPoint3 size = new GridPoint3();
 
     /**
      * Constructs an empty Region with size (0,0,0).
@@ -39,7 +41,7 @@ public final class Region3i implements Iterable<Vector3i> {
     private Region3i() {
     }
 
-    private Region3i(BaseVector3i min, BaseVector3i size) {
+    private Region3i(GridPoint3 min, GridPoint3 size) {
         this.min.set(min);
         this.size.set(size);
     }
@@ -49,7 +51,7 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param size the size of the region
      * @return a new region base on the min point and region size, empty if the size is negative
      */
-    public static Region3i createFromMinAndSize(BaseVector3i min, BaseVector3i size) {
+    public static Region3i createFromMinAndSize(GridPoint3 min, GridPoint3 size) {
         if (size.x() <= 0 || size.y() <= 0 || size.z() <= 0) {
             return EMPTY;
         }
@@ -62,13 +64,13 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param extents the extents size of each side of region
      * @return a new region base on the center point and extents size
      */
-    public static Region3i createFromCenterExtents(BaseVector3f center, BaseVector3f extents) {
-        Vector3f min = new Vector3f(center.x() - extents.x(), center.y() - extents.y(), center.z() - extents.z());
-        Vector3f max = new Vector3f(center.x() + extents.x(), center.y() + extents.y(), center.z() + extents.z());
+    public static Region3i createFromCenterExtents(Vector3 center, Vector3 extents) {
+        Vector3 min = new Vector3(center.x - extents.x, center.y - extents.y, center.z - extents.z);
+        Vector3 max = new Vector3(center.x + extents.x, center.y + extents.y, center.z + extents.z);
         max.x = max.x - Math.ulp(max.x);
         max.y = max.y - Math.ulp(max.y);
         max.z = max.z - Math.ulp(max.z);
-        return createFromMinMax(new Vector3i(min), new Vector3i(max));
+        return createFromMinMax(VecMath.ToGridPointFloor(min), VecMath.ToGridPointFloor(max));
     }
 
     /**
@@ -77,9 +79,9 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param extents the extents size of each side of region
      * @return a new region base on the center point and extents size
      */
-    public static Region3i createFromCenterExtents(BaseVector3i center, BaseVector3i extents) {
-        Vector3i min = new Vector3i(center.x() - extents.x(), center.y() - extents.y(), center.z() - extents.z());
-        Vector3i max = new Vector3i(center.x() + extents.x(), center.y() + extents.y(), center.z() + extents.z());
+    public static Region3i createFromCenterExtents(GridPoint3 center, GridPoint3 extents) {
+        GridPoint3 min = new GridPoint3(center.x - extents.x, center.y - extents.y, center.z - extents.z);
+        GridPoint3 max = new GridPoint3(center.x + extents.x, center.y + extents.y, center.z + extents.z);
         return createFromMinMax(min, max);
     }
 
@@ -89,9 +91,9 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param extents the extents size of region
      * @return a new region base on the center point and extents size
      */
-    public static Region3i createFromCenterExtents(BaseVector3i center, int extent) {
-        Vector3i min = new Vector3i(center.x() - extent, center.y() - extent, center.z() - extent);
-        Vector3i max = new Vector3i(center.x() + extent, center.y() + extent, center.z() + extent);
+    public static Region3i createFromCenterExtents(GridPoint3 center, int extent) {
+        GridPoint3 min = new GridPoint3(center.x - extent, center.y - extent, center.z - extent);
+        GridPoint3 max = new GridPoint3(center.x + extent, center.y + extent, center.z + extent);
         return createFromMinMax(min, max);
     }
 
@@ -101,12 +103,16 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param b the diagonal vertex of a
      * @return a new region base on vertex a and b
      */
-    public static Region3i createBounded(BaseVector3i a, BaseVector3i b) {
-        Vector3i min = new Vector3i(a);
-        min.min(b);
-        Vector3i max = new Vector3i(a);
-        max.max(b);
-        return createFromMinMax(min, max);
+    public static Region3i createBounded(GridPoint3 a, GridPoint3 b) {
+        return createFromMinMax(new GridPoint3(
+                Math.min(a.x,b.x),
+                Math.min(a.y,b.y),
+                Math.min(a.z,b.z)
+        ), new GridPoint3(
+                Math.max(a.x,b.x),
+                Math.max(a.y,b.y),
+                Math.max(a.z,b.z)
+        ));
     }
 
     /**
@@ -115,8 +121,8 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param max the max point of the region
      * @return a new region base on min and max point
      */
-    public static Region3i createFromMinMax(BaseVector3i min, BaseVector3i max) {
-        Vector3i size = new Vector3i(max.x() - min.x() + 1, max.y() - min.y() + 1, max.z() - min.z() + 1);
+    public static Region3i createFromMinMax(GridPoint3 min, GridPoint3 max) {
+        GridPoint3 size = new GridPoint3(max.x - min.x + 1, max.y - min.y + 1, max.z - min.z + 1);
         if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
             return EMPTY;
         }
@@ -144,8 +150,8 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * @return The smallest vector in the region
      */
-    public Vector3i min() {
-        return new Vector3i(min);
+    public GridPoint3 min() {
+        return new GridPoint3(min);
     }
 
     public int minX() {
@@ -163,8 +169,8 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * @return The size of the region
      */
-    public Vector3i size() {
-        return new Vector3i(size);
+    public GridPoint3 size() {
+        return new GridPoint3(size);
     }
 
     public int sizeX() {
@@ -182,8 +188,8 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * @return The largest vector in the region
      */
-    public Vector3i max() {
-        Vector3i max = new Vector3i(min);
+    public GridPoint3 max() {
+        GridPoint3 max = new GridPoint3(min);
         max.add(size);
         max.sub(1, 1, 1);
         return max;
@@ -219,7 +225,7 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param other
      * @return An iterator over the positions in this region that aren't in other
      */
-    public Iterator<Vector3i> subtract(Region3i other) {
+    public Iterator<GridPoint3> subtract(Region3i other) {
         return new SubtractiveIterator(other);
     }
 
@@ -230,17 +236,17 @@ public final class Region3i implements Iterable<Vector3i> {
      * @return A new region
      */
     public Region3i expand(int amount) {
-        Vector3i expandedMin = min();
+        GridPoint3 expandedMin = min();
         expandedMin.sub(amount, amount, amount);
-        Vector3i expandedMax = max();
+        GridPoint3 expandedMax = max();
         expandedMax.add(amount, amount, amount);
         return createFromMinMax(expandedMin, expandedMax);
     }
 
-    public Region3i expand(BaseVector3i amount) {
-        Vector3i expandedMin = min();
+    public Region3i expand(GridPoint3 amount) {
+        GridPoint3 expandedMin = min();
         expandedMin.sub(amount);
-        Vector3i expandedMax = max();
+        GridPoint3 expandedMax = max();
         expandedMax.add(amount);
         return createFromMinMax(expandedMin, expandedMax);
     }
@@ -256,10 +262,10 @@ public final class Region3i implements Iterable<Vector3i> {
     /**
      * @return The position at the center of the region
      */
-    public Vector3f center() {
-        Vector3f result = min.toVector3f();
-        Vector3f halfSize = size.toVector3f();
-        halfSize.scale(0.5f);
+    public Vector3 center() {
+        Vector3 result = new Vector3(min.x,min.y,min.z);
+        Vector3 halfSize = new Vector3(size.x,size.y,size.z);
+        halfSize.scl(0.5f);
         result.add(halfSize);
         return result;
     }
@@ -268,8 +274,8 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param offset
      * @return A copy of the region offset by the given value
      */
-    public Region3i move(BaseVector3i offset) {
-        Vector3i newMin = min();
+    public Region3i move(GridPoint3 offset) {
+        GridPoint3 newMin = min();
         newMin.add(offset);
         return Region3i.createFromMinAndSize(newMin, size);
     }
@@ -278,8 +284,8 @@ public final class Region3i implements Iterable<Vector3i> {
      * @param pos
      * @return Whether this region includes pos
      */
-    public boolean encompasses(BaseVector3i pos) {
-        return encompasses(pos.getX(), pos.getY(), pos.getZ());
+    public boolean encompasses(GridPoint3 pos) {
+        return encompasses(pos.x, pos.y, pos.z);
     }
 
     public boolean encompasses(int x, int y, int z) {
@@ -298,7 +304,7 @@ public final class Region3i implements Iterable<Vector3i> {
     }
 
     @Override
-    public Iterator<Vector3i> iterator() {
+    public Iterator<GridPoint3> iterator() {
         return new Region3iIterator();
     }
 
@@ -327,11 +333,11 @@ public final class Region3i implements Iterable<Vector3i> {
         return hash;
     }
 
-    private class Region3iIterator implements Iterator<Vector3i> {
-        Vector3i pos;
+    private class Region3iIterator implements Iterator<GridPoint3> {
+        GridPoint3 pos;
 
          Region3iIterator() {
-            this.pos = new Vector3i();
+            this.pos = new GridPoint3();
         }
 
         @Override
@@ -340,8 +346,8 @@ public final class Region3i implements Iterable<Vector3i> {
         }
 
         @Override
-        public Vector3i next() {
-            Vector3i result = new Vector3i(pos.x + min.x, pos.y + min.y, pos.z + min.z);
+        public GridPoint3 next() {
+            GridPoint3 result = new Vector3i(pos.x + min.x, pos.y + min.y, pos.z + min.z);
             pos.z++;
             if (pos.z >= size.z) {
                 pos.z = 0;

@@ -15,8 +15,8 @@
  */
 package org.terasology.world;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
 import org.terasology.world.liquid.LiquidData;
@@ -42,7 +42,7 @@ public interface ChunkView {
      * @param pos
      * @return The block at the given position. If this is outside of the view then the air block is returned
      */
-    Block getBlock(Vector3i pos);
+    Block getBlock(GridPoint3 pos);
 
     /**
      * @param x
@@ -64,7 +64,7 @@ public interface ChunkView {
      * @param pos
      * @return The biome at the given coordinates. If this is outside of the view then the default biome is returned
      */
-    Biome getBiome(Vector3i pos);
+    Biome getBiome(GridPoint3 pos);
 
     /**
      * @param x
@@ -86,7 +86,7 @@ public interface ChunkView {
      * @param pos
      * @return The value of sunlight at the given position, or 0 if outside the view.
      */
-    byte getSunlight(Vector3i pos);
+    byte getSunlight(GridPoint3 pos);
 
     /**
      * @param x
@@ -108,7 +108,7 @@ public interface ChunkView {
      * @param pos
      * @return The value of light at the given position, or 0 if outside the view.
      */
-    byte getLight(Vector3i pos);
+    byte getLight(GridPoint3 pos);
 
     /**
      * @param x
@@ -124,7 +124,7 @@ public interface ChunkView {
      * @param pos
      * @param type
      */
-    void setBlock(Vector3i pos, Block type);
+    void setBlock(GridPoint3 pos, Block type);
 
     /**
      * Sets the block at the given coordinates, if it is within the view.
@@ -142,7 +142,7 @@ public interface ChunkView {
      * @param pos
      * @param biome
      */
-    void setBiome(Vector3i pos, Biome biome);
+    void setBiome(GridPoint3 pos, Biome biome);
 
     /**
      * Sets the biome at the given coordinates, if it is within the view.
@@ -158,7 +158,7 @@ public interface ChunkView {
      * @param pos
      * @return The state of liquid at the given position. This will be no liquid outside the view.
      */
-    LiquidData getLiquid(Vector3i pos);
+    LiquidData getLiquid(GridPoint3 pos);
 
     /**
      * @param x
@@ -174,7 +174,7 @@ public interface ChunkView {
      * @param pos
      * @param newState
      */
-    void setLiquid(Vector3i pos, LiquidData newState);
+    void setLiquid(GridPoint3 pos, LiquidData newState);
 
     /**
      * Sets the liquid state at the given position, if it is within the view
@@ -192,7 +192,7 @@ public interface ChunkView {
      * @param localPos
      * @return The equivalent world-space coordinate for the given view coord.
      */
-    Vector3i toWorldPos(Vector3i localPos);
+    GridPoint3 toWorldPos(GridPoint3 localPos);
 
     /**
      * @return The region of the world which this view is over
@@ -210,7 +210,7 @@ public interface ChunkView {
      *
      * @param blockPos
      */
-    void setDirtyAround(Vector3i blockPos);
+    void setDirtyAround(GridPoint3 blockPos);
 
     /**
      * Sets ths chunks contained or adjacent to blockRegion, which are contained in the chunk view, to dirty. This causes
