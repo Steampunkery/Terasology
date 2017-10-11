@@ -16,9 +16,10 @@
 
 package org.terasology.physics;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
+import com.google.common.math.DoubleMath;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.math.RoundingMode;
 
@@ -29,9 +30,9 @@ import java.math.RoundingMode;
 public class HitResult {
     private boolean hit;
     private EntityRef entity;
-    private Vector3f hitPoint;
-    private Vector3f hitNormal;
-    private Vector3i blockPosition;
+    private Vector3 hitPoint;
+    private Vector3 hitNormal;
+    private GridPoint3 blockPosition;
     private final boolean worldHit;
 
     public HitResult() {
@@ -47,13 +48,16 @@ public class HitResult {
      * @param hitPoint
      * @param hitNormal
      */
-    public HitResult(EntityRef entity, Vector3f hitPoint, Vector3f hitNormal) {
+    public HitResult(EntityRef entity, Vector3 hitPoint, Vector3 hitNormal) {
         this.hit = true;
         this.entity = entity;
         this.hitPoint = hitPoint;
         this.hitNormal = hitNormal;
         //This is the block were the hitPoint is inside:
-        this.blockPosition = new Vector3i(hitPoint, RoundingMode.HALF_UP);
+        this.blockPosition = new GridPoint3(
+                DoubleMath.roundToInt(hitPoint.x, RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(hitPoint.y, RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(hitPoint.z, RoundingMode.HALF_UP));
         this.worldHit = false;
     }
 
@@ -65,7 +69,7 @@ public class HitResult {
      * @param hitNormal
      * @param blockPos
      */
-    public HitResult(EntityRef entity, Vector3f hitPoint, Vector3f hitNormal, Vector3i blockPos) {
+    public HitResult(EntityRef entity, Vector3 hitPoint, Vector3 hitNormal, GridPoint3 blockPos) {
         this.hit = true;
         this.entity = entity;
         this.hitPoint = hitPoint;
@@ -94,7 +98,7 @@ public class HitResult {
      * @return null if isHit() == false, otherwise the point where the hit took
      * place.
      */
-    public Vector3f getHitPoint() {
+    public Vector3 getHitPoint() {
         return hitPoint;
     }
 
@@ -104,7 +108,7 @@ public class HitResult {
      * @return null if isHit() == false, otherwise the normal of surface on
      * which the hit took place.
      */
-    public Vector3f getHitNormal() {
+    public Vector3 getHitNormal() {
         return hitNormal;
     }
 
@@ -114,7 +118,7 @@ public class HitResult {
      * block location inside which the hit took place. This is different from
      * the block position of the entity that got hit!
      */
-    public Vector3i getBlockPosition() {
+    public GridPoint3 getBlockPosition() {
         return blockPosition;
     }
 

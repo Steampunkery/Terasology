@@ -15,6 +15,7 @@
  */
 package org.terasology.logic.console.commands;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.config.Config;
@@ -31,7 +32,6 @@ import org.terasology.logic.console.commandSystem.annotations.Sender;
 import org.terasology.logic.console.suggesters.UsernameSuggester;
 import org.terasology.logic.permission.PermissionManager;
 import org.terasology.logic.players.PlayerUtil;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ClientInfoComponent;
@@ -191,7 +191,7 @@ public class ServerCommands extends BaseComponentSystem {
 
     @Command(shortDescription = "Invalidates the specified chunk and recreates it (requires storage manager disabled)", runOnServer = true)
     public String reloadChunk(@CommandParam("x") int x, @CommandParam("y") int y, @CommandParam("z") int z) {
-        Vector3i pos = new Vector3i(x, y, z);
+        GridPoint3 pos = new GridPoint3(x, y, z);
         if (config.getSystem().isWriteSaveGamesEnabled()) {
             return "Writing save games is enabled! Invalidating chunk has no effect";
         }

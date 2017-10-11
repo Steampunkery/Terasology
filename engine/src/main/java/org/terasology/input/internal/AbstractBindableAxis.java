@@ -16,14 +16,14 @@
 
 package org.terasology.input.internal;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Lists;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.input.BindAxisEvent;
 import org.terasology.input.BindAxisSubscriber;
 import org.terasology.input.BindableAxis;
 import org.terasology.input.SendEventMode;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.List;
 
@@ -74,7 +74,7 @@ public abstract class AbstractBindableAxis implements BindableAxis {
         return value;
     }
 
-    public void update(EntityRef[] inputEntities, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
+    public void update(EntityRef[] inputEntities, float delta, EntityRef target, GridPoint3 targetBlockPos, Vector3 hitPosition, Vector3 hitNormal) {
 
         // TODO: Interpolate, based on some settings (immediate, linear, lerp?)
 

@@ -15,13 +15,14 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.backdrop.BackdropProvider;
 import org.terasology.rendering.cameras.Camera;
@@ -149,7 +150,7 @@ public class ShadowMapNode extends ConditionDependentNode {
             int numberOfRenderedTriangles = 0;
             int numberOfChunksThatAreNotReadyYet = 0;
 
-            final Vector3f cameraPosition = shadowMapCamera.getPosition();
+            final Vector3 cameraPosition = shadowMapCamera.getPosition();
 
             shadowMapCamera.lookThrough();
 
@@ -159,7 +160,8 @@ public class ShadowMapNode extends ConditionDependentNode {
 
                 if (chunk.hasMesh()) {
                     final ChunkMesh chunkMesh = chunk.getMesh();
-                    final Vector3f chunkPosition = chunk.getPosition().toVector3f();
+                    GridPoint3 pos = chunk.getPosition();
+                    final Vector3 chunkPosition = new Vector3(pos.x,pos.y,pos.z);
 
                     numberOfRenderedTriangles += chunkMesh.render(OPAQUE, chunkPosition, cameraPosition);
 
@@ -177,41 +179,41 @@ public class ShadowMapNode extends ConditionDependentNode {
 
     private void positionShadowMapCamera() {
         // We begin by setting our light coordinates at the player coordinates, ignoring the player's altitude
-        Vector3f mainLightPosition = new Vector3f(activeCamera.getPosition().x, 0.0f, activeCamera.getPosition().z); // world-space coordinates
+        Vector3 mainLightPosition = new Vector3(activeCamera.getPosition().x, 0.0f, activeCamera.getPosition().z); // world-space coordinates
 
         // The shadow projected onto the ground must move in in light-space texel-steps, to avoid causing flickering.
         // That's why we first convert it to the previous frame's light-space coordinates and then back to world-space.
-        shadowMapCamera.getViewProjectionMatrix().transformPoint(mainLightPosition); // to light-space
+        mainLightPosition.mul( shadowMapCamera.getViewProjectionMatrix());// to light-space
         mainLightPosition.set(TeraMath.fastFloor(mainLightPosition.x / texelSize) * texelSize, 0.0f,
                               TeraMath.fastFloor(mainLightPosition.z / texelSize) * texelSize);
-        shadowMapCamera.getInverseViewProjectionMatrix().transformPoint(mainLightPosition); // back to world-space
+        mainLightPosition.mul(shadowMapCamera.getInverseViewProjectionMatrix()); // back to world-space
 
         // This is what causes the shadow map to change infrequently, to prevent flickering.
         // Notice that this is different from what is done above, which is about spatial steps
         // and is related to the player's position and texels.
-        Vector3f quantizedMainLightDirection = getQuantizedMainLightDirection(STEP_SIZE);
+        Vector3 quantizedMainLightDirection = getQuantizedMainLightDirection(STEP_SIZE);
 
         // The shadow map camera is placed away from the player, in the direction of the main light.
-        Vector3f offsetFromPlayer = new Vector3f(quantizedMainLightDirection);
-        offsetFromPlayer.scale(256.0f + 64.0f); // these hardcoded numbers are another mystery.
+        Vector3 offsetFromPlayer = new Vector3(quantizedMainLightDirection);
+        offsetFromPlayer.scl(256.0f + 64.0f); // these hardcoded numbers are another mystery.
         mainLightPosition.add(offsetFromPlayer);
         shadowMapCamera.getPosition().set(mainLightPosition);
 
         // Finally, we adjust the shadow map camera to look toward the player
-        Vector3f fromLightToPlayerDirection = new Vector3f(quantizedMainLightDirection);
-        fromLightToPlayerDirection.scale(-1.0f);
+        Vector3 fromLightToPlayerDirection = new Vector3(quantizedMainLightDirection);
+        fromLightToPlayerDirection.scl(-1.0f);
         shadowMapCamera.getViewingDirection().set(fromLightToPlayerDirection);
 
         shadowMapCamera.update(worldRenderer.getSecondsSinceLastFrame());
     }
 
-    private Vector3f getQuantizedMainLightDirection(float stepSize) {
+    private Vector3 getQuantizedMainLightDirection(float stepSize) {
         float mainLightAngle = (float) Math.floor(backdropProvider.getSunPositionAngle() * stepSize) / stepSize + 0.0001f;
-        Vector3f mainLightDirection = new Vector3f(0.0f, (float) Math.cos(mainLightAngle), (float) Math.sin(mainLightAngle));
+        Vector3 mainLightDirection = new Vector3(0.0f, (float) Math.cos(mainLightAngle), (float) Math.sin(mainLightAngle));
 
         // When the sun goes under the horizon we flip the vector, to provide the moon direction, and viceversa.
         if (mainLightDirection.y < 0.0f) {
-            mainLightDirection.scale(-1.0f);
+            mainLightDirection.scl(-1.0f);
         }
 
         return mainLightDirection;

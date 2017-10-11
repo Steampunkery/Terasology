@@ -15,8 +15,8 @@
  */
 package org.terasology.persistence.typeHandling.mathTypes;
 
+import com.badlogic.gdx.math.GridPoint3;
 import gnu.trove.list.TIntList;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
@@ -25,10 +25,10 @@ import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 /**
  */
-public class Vector3iTypeHandler extends SimpleTypeHandler<Vector3i> {
+public class Vector3iTypeHandler extends SimpleTypeHandler<GridPoint3> {
 
     @Override
-    public PersistedData serialize(Vector3i value, SerializationContext context) {
+    public PersistedData serialize(GridPoint3 value, SerializationContext context) {
         if (value == null) {
             return context.createNull();
         } else {
@@ -37,12 +37,12 @@ public class Vector3iTypeHandler extends SimpleTypeHandler<Vector3i> {
     }
 
     @Override
-    public Vector3i deserialize(PersistedData data, DeserializationContext context) {
+    public GridPoint3 deserialize(PersistedData data, DeserializationContext context) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 2) {
                 TIntList ints = dataArray.getAsIntegerArray();
-                return new Vector3i(ints.get(0), ints.get(1), ints.get(2));
+                return new GridPoint3(ints.get(0), ints.get(1), ints.get(2));
             }
         }
         return null;

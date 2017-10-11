@@ -15,8 +15,8 @@
  */
 package org.terasology.world.propagation.light;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 import org.terasology.world.chunks.LitChunk;
 
@@ -25,7 +25,7 @@ import org.terasology.world.chunks.LitChunk;
 public class LightPropagationRules extends CommonLightPropagationRules {
 
     @Override
-    public byte getFixedValue(Block block, Vector3i pos) {
+    public byte getFixedValue(Block block, GridPoint3 pos) {
         return block.getLuminance();
     }
 
@@ -40,7 +40,7 @@ public class LightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public byte getValue(LitChunk chunk, Vector3i pos) {
+    public byte getValue(LitChunk chunk, GridPoint3 pos) {
         return getValue(chunk, pos.x, pos.y, pos.z);
     }
 
@@ -50,7 +50,7 @@ public class LightPropagationRules extends CommonLightPropagationRules {
     }
 
     @Override
-    public void setValue(LitChunk chunk, Vector3i pos, byte value) {
+    public void setValue(LitChunk chunk, GridPoint3 pos, byte value) {
         chunk.setLight(pos, value);
     }
 

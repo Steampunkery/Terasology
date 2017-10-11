@@ -15,13 +15,13 @@
  */
 package org.terasology.entitySystem.entity;
 
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.entitySystem.Component;
 import org.terasology.entitySystem.event.internal.EventSystem;
 import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Map;
 
@@ -84,14 +84,14 @@ public interface EntityManager {
      * @param position
      * @return A new entity, based on the given prefab, at the desired position
      */
-    EntityRef create(String prefab, Vector3f position);
+    EntityRef create(String prefab, Vector3 position);
 
     /**
      * @param prefab
      * @param position
      * @return A new entity, based on the given prefab, at the desired position
      */
-    EntityRef create(Prefab prefab, Vector3f position);
+    EntityRef create(Prefab prefab, Vector3 position);
 
     /**
      * @param prefab
@@ -99,7 +99,7 @@ public interface EntityManager {
      * @param rotation
      * @return
      */
-    EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation);
+    EntityRef create(Prefab prefab, Vector3 position, Quaternion rotation);
 
     /**
      * @param id

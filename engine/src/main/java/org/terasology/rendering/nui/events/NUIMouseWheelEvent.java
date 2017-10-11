@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.events;
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.math.geom.Vector2i;
 
 /**
  * See {@link NUIInputEvent}
@@ -25,7 +25,7 @@ import org.terasology.math.geom.Vector2i;
 public final class NUIMouseWheelEvent extends NUIMouseEvent {
     private final int wheelTurns;
 
-    public NUIMouseWheelEvent(MouseDevice mouse, KeyboardDevice keyboard, Vector2i relativeMousePosition,
+    public NUIMouseWheelEvent(MouseDevice mouse, KeyboardDevice keyboard, GridPoint2 relativeMousePosition,
                               int wheelTurns) {
         super(mouse, keyboard, relativeMousePosition);
         this.wheelTurns = wheelTurns;

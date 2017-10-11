@@ -16,7 +16,8 @@
 
 package org.terasology.rendering.nui.animation;
 
-import org.terasology.math.geom.Rect2i;
+
+import org.terasology.math.Region2i;
 
 /**
  * Controls animations to and from different screens
@@ -59,7 +60,7 @@ public interface MenuAnimationSystem {
      * @param rc the rect to transform
      * @return the transformed rectangle
      */
-    Rect2i animateRegion(Rect2i rc);
+    Region2i animateRegion(Region2i rc);
 
     /**
      * Stops the current animation by skipping straight to the end

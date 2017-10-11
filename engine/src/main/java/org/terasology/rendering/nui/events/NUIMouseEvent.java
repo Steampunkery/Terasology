@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering.nui.events;
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.math.geom.Vector2i;
 
 
 /**
@@ -25,9 +25,9 @@ import org.terasology.math.geom.Vector2i;
  * See also: {@link NUIInputEvent}
  */
 public abstract class NUIMouseEvent extends NUIInputEvent {
-    private Vector2i relativeMousePosition;
+    private GridPoint2 relativeMousePosition;
 
-    public NUIMouseEvent(MouseDevice mouse, KeyboardDevice keyboard, Vector2i relativeMousePosition) {
+    public NUIMouseEvent(MouseDevice mouse, KeyboardDevice keyboard, GridPoint2 relativeMousePosition) {
         super(mouse, keyboard);
         this.relativeMousePosition = relativeMousePosition;
     }
@@ -36,7 +36,7 @@ public abstract class NUIMouseEvent extends NUIInputEvent {
      *
      * @return The mouse position relative to the mouse interaction region.
      */
-    public Vector2i getRelativeMousePosition() {
+    public GridPoint2 getRelativeMousePosition() {
         return relativeMousePosition;
     }
 }

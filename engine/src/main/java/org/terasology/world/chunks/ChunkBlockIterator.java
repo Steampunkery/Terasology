@@ -15,7 +15,7 @@
  */
 package org.terasology.world.chunks;
 
-import org.terasology.math.geom.Vector3i;
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.Block;
 
@@ -39,5 +39,5 @@ public interface ChunkBlockIterator {
     /**
      * @return The world coords of the current block
      */
-    Vector3i getBlockPos();
+    GridPoint3 getBlockPos();
 }

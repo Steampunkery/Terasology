@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.world;
 
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.cameras.Camera;
 import org.terasology.rendering.cameras.SubmersibleCamera;
@@ -49,14 +49,14 @@ public interface WorldRenderer {
      *
      * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been loaded.
      */
-    void onChunkLoaded(Vector3i chunkPos);
+    void onChunkLoaded(GridPoint3 chunkPos);
 
     /**
      * This method is triggered when a chunk has been unloaded.
      *
      * @param chunkPos a Vector3i providing the coordinates of the chunk that has just been unloaded.
      */
-    void onChunkUnloaded(Vector3i chunkPos);
+    void onChunkUnloaded(GridPoint3 chunkPos);
 
     /**
      * Lists the stages the rendering engine may go through on a given frame.
@@ -166,7 +166,7 @@ public interface WorldRenderer {
      * @param coordinates a Vector3f providing the coordinates of the block to calculate the light intensity from.
      * @return a float value representing the intensity of the main light and in-scene lights combined
      */
-    float getRenderingLightIntensityAt(Vector3f coordinates);
+    float getRenderingLightIntensityAt(Vector3 coordinates);
 
     /**
      * Returns the intensity of the main light (sun or moon) at the given location
@@ -174,7 +174,7 @@ public interface WorldRenderer {
      * @param coordinates a vector3f providing the coordinates of the block to sample the intensity of the main light from
      * @return a float value representing the intensity of the main light at the given coordinates
      */
-    float getMainLightIntensityAt(Vector3f coordinates);
+    float getMainLightIntensityAt(Vector3 coordinates);
 
     /**
      * Returns the intensity of the light at the given location due to in-scene sources,
@@ -182,7 +182,7 @@ public interface WorldRenderer {
      * @param coordinates a vector3f providing the coordinates of the block to sample the intensity of in-scene sources from
      * @return a float value representing the total light intensity of the in-scene sources, at the given coordinates
      */
-    float getBlockLightIntensityAt(Vector3f coordinates);
+    float getBlockLightIntensityAt(Vector3 coordinates);
 
     /**
      * Returns the time-smoothed intensity of the main light (sun or moon) at the camera's location

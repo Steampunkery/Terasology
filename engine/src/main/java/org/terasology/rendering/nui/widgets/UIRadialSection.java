@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import com.badlogic.gdx.math.GridPoint2;
+import org.terasology.math.Region2i;
 import org.terasology.rendering.assets.texture.TextureRegion;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -34,9 +34,9 @@ import java.util.List;
  */
 public class UIRadialSection extends CoreWidget {
 
-    private Rect2i infoRegion;
-    private Rect2i innerRegion;
-    private Rect2i sectionRegion;
+    private Region2i infoRegion;
+    private Region2i innerRegion;
+    private Region2i sectionRegion;
     private TextureRegion sectionTexture = Assets.getTextureRegion("engine:radialUnit").get();
     private TextureRegion selectedTexture = Assets.getTextureRegion("engine:radialUnitSelected").get();
     private Boolean isSelected = false;
@@ -74,8 +74,8 @@ public class UIRadialSection extends CoreWidget {
     }
 
     @Override
-    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return sectionRegion == null ? Vector2i.zero() : sectionRegion.size();
+    public GridPoint2 getPreferredContentSize(Canvas canvas, GridPoint2 sizeHint) {
+        return sectionRegion == null ? new GridPoint2() : new GridPoint2(sectionRegion.width,sectionRegion.height);
     }
 
     /**
@@ -155,21 +155,21 @@ public class UIRadialSection extends CoreWidget {
     /**
      * Sets the region in which to draw the info widget
      */
-    public void setInfoRegion(Rect2i newRegion) {
+    public void setInfoRegion(Region2i newRegion) {
         infoRegion = newRegion;
     }
 
     /**
      * Sets the draw region of the widget itself
      */
-    public void setDrawRegion(Rect2i region) {
+    public void setDrawRegion(Region2i region) {
         sectionRegion = region;
     }
 
     /**
      * Sets the draw region of the items inside the widget.
      */
-    public void setInnerRegion(Rect2i region) {
+    public void setInnerRegion(Region2i region) {
         innerRegion = region;
     }
 }

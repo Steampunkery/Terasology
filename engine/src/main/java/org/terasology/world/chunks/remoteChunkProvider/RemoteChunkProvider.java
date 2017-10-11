@@ -16,10 +16,12 @@
 
 package org.terasology.world.chunks.remoteChunkProvider;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-
+import com.google.common.math.DoubleMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.entity.EntityRef;
@@ -28,8 +30,6 @@ import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.Side;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.monitoring.chunk.ChunkMonitor;
 import org.terasology.world.block.BlockManager;
@@ -61,7 +61,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     private static final int LOAD_PER_FRAME = 1;
     private static final Logger logger = LoggerFactory.getLogger(RemoteChunkProvider.class);
-    private Map<Vector3i, Chunk> chunkCache = Maps.newHashMap();
+    private Map<GridPoint3, Chunk> chunkCache = Maps.newHashMap();
     private final BlockingQueue<Chunk> readyChunks = Queues.newLinkedBlockingQueue();
     private List<Chunk> sortedReadyChunks = Lists.newArrayList();
     private ChunkReadyListener listener;
@@ -102,7 +102,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         });
     }
 
-    public void invalidateChunks(Vector3i pos) {
+    public void invalidateChunks(GridPoint3 pos) {
         Chunk removed = chunkCache.remove(pos);
         if (removed != null && !removed.isReady()) {
             sortedReadyChunks.remove(removed);
@@ -142,7 +142,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     private boolean makeChunkAvailable(final Chunk chunk) {
-        for (Vector3i pos : Region3i.createFromCenterExtents(chunk.getPosition(), 1)) {
+        for (GridPoint3 pos : Region3i.createFromCenterExtents(chunk.getPosition(), 1)) {
             if (chunkCache.get(pos) == null) {
                 return false;
             }
@@ -155,11 +155,11 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
 
     @Override
     public Chunk getChunk(int x, int y, int z) {
-        return getChunk(new Vector3i(x, y, z));
+        return getChunk(new GridPoint3(x, y, z));
     }
 
     @Override
-    public Chunk getChunk(Vector3i chunkPos) {
+    public Chunk getChunk(GridPoint3 chunkPos) {
         Chunk chunk = chunkCache.get(chunkPos);
         if (chunk != null && chunk.isReady()) {
             return chunk;
@@ -168,7 +168,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public boolean isChunkReady(Vector3i pos) {
+    public boolean isChunkReady(GridPoint3 pos) {
         Chunk chunk = chunkCache.get(pos);
         return chunk != null && chunk.isReady();
     }
@@ -181,7 +181,7 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public boolean reloadChunk(Vector3i pos) {
+    public boolean reloadChunk(GridPoint3 pos) {
         return false;
     }
 
@@ -205,32 +205,32 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public ChunkViewCore getLocalView(Vector3i centerChunkPos) {
+    public ChunkViewCore getLocalView(GridPoint3 centerChunkPos) {
         Region3i region = Region3i.createFromCenterExtents(centerChunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(centerChunkPos) != null) {
-            return createWorldView(region, Vector3i.one());
+            return createWorldView(region, new GridPoint3(1,1,1));
         }
         return null;
     }
 
     @Override
-    public ChunkViewCore getSubviewAroundBlock(Vector3i blockPos, int extent) {
+    public ChunkViewCore getSubviewAroundBlock(GridPoint3 blockPos, int extent) {
         Region3i region = ChunkMath.getChunkRegionAroundWorldPos(blockPos, extent);
-        return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+        return createWorldView(region, new GridPoint3(-region.min().x, -region.min().y, -region.min().z));
     }
 
     @Override
-    public ChunkViewCore getSubviewAroundChunk(Vector3i chunkPos) {
+    public ChunkViewCore getSubviewAroundChunk(GridPoint3 chunkPos) {
         Region3i region = Region3i.createFromCenterExtents(chunkPos, ChunkConstants.LOCAL_REGION_EXTENTS);
         if (getChunk(chunkPos) != null) {
-            return createWorldView(region, new Vector3i(-region.min().x, -region.min().y, -region.min().z));
+            return createWorldView(region, new GridPoint3(-region.min().x, -region.min().y, -region.min().z));
         }
         return null;
     }
 
-    private ChunkViewCore createWorldView(Region3i region, Vector3i offset) {
+    private ChunkViewCore createWorldView(Region3i region, GridPoint3 offset) {
         Chunk[] chunks = new Chunk[region.size().x * region.size().y * region.size().z];
-        for (Vector3i chunkPos : region) {
+        for (GridPoint3 chunkPos : region) {
             Chunk chunk = chunkCache.get(chunkPos);
             if (chunk == null || !chunk.isReady()) {
                 return null;
@@ -242,21 +242,22 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
         return new ChunkViewCoreImpl(chunks, region, offset, blockManager.getBlock(BlockManager.AIR_ID));
     }
 
+
     @Override
     public void setWorldEntity(EntityRef entity) {
         this.worldEntity = entity;
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, Vector3i distance) {
+    public void addRelevanceEntity(EntityRef entity, GridPoint3 distance) {
     }
 
     @Override
-    public void addRelevanceEntity(EntityRef entity, Vector3i distance, ChunkRegionListener chunkRegionListener) {
+    public void addRelevanceEntity(EntityRef entity, GridPoint3 distance, ChunkRegionListener chunkRegionListener) {
     }
 
     @Override
-    public void updateRelevanceEntity(EntityRef entity, Vector3i distance) {
+    public void updateRelevanceEntity(EntityRef entity, GridPoint3 distance) {
     }
 
     @Override
@@ -285,14 +286,14 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     @Override
-    public Chunk getChunkUnready(Vector3i pos) {
+    public Chunk getChunkUnready(GridPoint3 pos) {
         return chunkCache.get(pos);
     }
 
     private boolean areAdjacentChunksReady(Chunk chunk) {
-        Vector3i centerChunkPos = chunk.getPosition();
+        GridPoint3 centerChunkPos = chunk.getPosition();
         for (Side side : Side.values()) {
-            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
+            GridPoint3 adjChunkPos = side.getAdjacentPos(centerChunkPos);
             Chunk adjChunk = chunkCache.get(adjChunkPos);
             boolean adjChunkReady = (adjChunk != null && adjChunk.isReady());
             if (!adjChunkReady) {
@@ -307,9 +308,9 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
     }
 
     private void updateAdjacentChunksReadyFieldOfAdjChunks(Chunk chunkInCenter) {
-        Vector3i centerChunkPos = chunkInCenter.getPosition();
+        GridPoint3 centerChunkPos = chunkInCenter.getPosition();
         for (Side side : Side.values()) {
-            Vector3i adjChunkPos = side.getAdjacentPos(centerChunkPos);
+            GridPoint3 adjChunkPos = side.getAdjacentPos(centerChunkPos);
             Chunk adjChunk = chunkCache.get(adjChunkPos);
             if (adjChunk != null) {
                 updateAdjacentChunksReadyFieldOf(adjChunk);
@@ -324,9 +325,13 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             return score(o1.getPosition()) - score(o2.getPosition());
         }
 
-        private int score(Vector3i chunk) {
-            Vector3i playerChunk = ChunkMath.calcChunkPos(new Vector3i(localPlayer.getPosition(), RoundingMode.HALF_UP));
-            return playerChunk.distanceSquared(chunk);
+        private int score(GridPoint3 chunk) {
+            Vector3 pos = localPlayer.getPosition();
+            GridPoint3 playerChunk = ChunkMath.calcChunkPos(new GridPoint3(
+                    DoubleMath.roundToInt(pos.x,RoundingMode.HALF_UP),
+                    DoubleMath.roundToInt(pos.y,RoundingMode.HALF_UP),
+                    DoubleMath.roundToInt(pos.z,RoundingMode.HALF_UP)));
+            return (int) playerChunk.dst2(chunk);
         }
     }
 
@@ -337,10 +342,10 @@ public class RemoteChunkProvider implements ChunkProvider, GeneratingChunkProvid
             return TeraMath.floorToInt(Math.signum(score(o2.getPosition())) - score(o1.getPosition()));
         }
 
-        private float score(Vector3i chunkPos) {
-            Vector3f vec = chunkPos.toVector3f();
+        private float score(GridPoint3 chunkPos) {
+            Vector3 vec = new Vector3(chunkPos.x,chunkPos.y,chunkPos.z);
             vec.sub(localPlayer.getPosition());
-            return vec.lengthSquared();
+            return vec.len2();
         }
     }
 }

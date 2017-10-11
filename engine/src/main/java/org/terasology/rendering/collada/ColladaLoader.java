@@ -15,6 +15,10 @@
  */
 package org.terasology.rendering.collada;
 
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
@@ -27,10 +31,6 @@ import org.eaxy.NonMatchingPathException;
 import org.eaxy.Xml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.skeletalmesh.Bone;
 import org.terasology.rendering.assets.skeletalmesh.BoneWeight;
 import org.terasology.rendering.assets.skeletalmesh.SkeletalMeshData;
@@ -182,7 +182,7 @@ public class ColladaLoader {
 
             String[] jointNameArray = null;
             float[] inverseBindMatrixArray;
-            Quat4f[] rotationArray;
+            Quaternion[] rotationArray;
             ElementSet jointsInputSet = joints.find("input");
             List<Input> inputList = parseInputs(jointsInputSet);
             for (Input jointsInput : inputList) {
@@ -265,7 +265,7 @@ public class ColladaLoader {
             for (int vertexWeightsIndex = 0; vertexWeightsIndex < vertexWeightsCount; vertexWeightsIndex++) {
 
                 MD5Weight md5Weight = new MD5Weight();
-                Vector3f vertexPosition = new Vector3f();
+                Vector3 vertexPosition = new Vector3();
                 vertexPosition.x = vertices.get(3 * vertexWeightsIndex + 0);
                 vertexPosition.y = vertices.get(3 * vertexWeightsIndex + 1);
                 vertexPosition.z = vertices.get(3 * vertexWeightsIndex + 2);
@@ -357,7 +357,7 @@ public class ColladaLoader {
                 skeletonBuilder.addWeight(new BoneWeight(weight.position, weight.bias, weight.jointIndex));
             }
 
-            List<Vector2f> uvs = Lists.newArrayList();
+            List<Vector2> uvs = Lists.newArrayList();
 
             TIntList vertexStartWeight = new TIntArrayList(vertices.size() / 3);
             TIntList vertexWeightCount = new TIntArrayList(vertices.size() / 3);
@@ -375,7 +375,7 @@ public class ColladaLoader {
             skeletonBuilder.setVertexWeights(vertexStartWeight, vertexWeightCount);
 
             for (int i = 0; i < normals.size() / 2; i++) {
-                uvs.add(new Vector2f(normals.get(i * 2 + 0), normals.get(i * 2 + 1)));
+                uvs.add(new Vector2(normals.get(i * 2 + 0), normals.get(i * 2 + 1)));
             }
             skeletonBuilder.setUvs(uvs);
             skeletonBuilder.setIndices(indices);
@@ -459,8 +459,8 @@ public class ColladaLoader {
                 matrixDataArray[i] = Float.parseFloat(floatString);
             }
 
-            Quat4f[] jointMatrix = quad4fArrayFromFloat16ArrayData(matrixDataArray);
-            Vector3f[] positionVectorArray = positionFromFloat16ArrayData(matrixDataArray);
+            Quaternion[] jointMatrix = quad4fArrayFromFloat16ArrayData(matrixDataArray);
+            Vector3[] positionVectorArray = positionFromFloat16ArrayData(matrixDataArray);
             md5Joint.position = positionVectorArray[0];
             md5Joint.orientation = jointMatrix[0];
         } else if (1 < matrixSet.size()) {
@@ -489,25 +489,25 @@ public class ColladaLoader {
         return md5Joint;
     }
 
-    private Quat4f[] quad4fArrayFromFloat16ArrayData(float[] inverseBindMatrixArray) {
-        Quat4f[] rotationArray = new Quat4f[inverseBindMatrixArray.length / 16];
+    private Quaternion[] quad4fArrayFromFloat16ArrayData(float[] inverseBindMatrixArray) {
+        Quaternion[] rotationArray = new Quaternion[inverseBindMatrixArray.length / 16];
         for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
             int offset = i * 16;
-            Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
-            Quat4f rotation = new Quat4f();
-            rotation.set(matrix4f);
+            Matrix4 matrix4f = new Matrix4(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
+            Quaternion rotation = new Quaternion();
+            matrix4f.getRotation(rotation);
             rotationArray[i] = rotation;
         }
 
         return rotationArray;
     }
 
-    private Vector3f[] positionFromFloat16ArrayData(float[] inverseBindMatrixArray) {
-        Vector3f[] translationVectorArray = new Vector3f[inverseBindMatrixArray.length / 16];
+    private Vector3[] positionFromFloat16ArrayData(float[] inverseBindMatrixArray) {
+        Vector3[] translationVectorArray = new Vector3[inverseBindMatrixArray.length / 16];
         for (int i = 0; i < inverseBindMatrixArray.length / 16; ++i) {
             int offset = i * 16;
-            Matrix4f matrix4f = new Matrix4f(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
-            Vector3f translationVector = matrix4f.getTranslation();
+            Matrix4 matrix4f = new Matrix4(Arrays.copyOfRange(inverseBindMatrixArray, offset, offset + 16));
+            Vector3 translationVector = matrix4f.getTranslation(new Vector3());
             translationVectorArray[i] = translationVector;
         }
 
@@ -990,8 +990,8 @@ public class ColladaLoader {
 
     private static class MD5Joint {
         private String name;
-        private Vector3f position;
-        private Quat4f orientation;
+        private Vector3 position;
+        private Quaternion orientation;
 
         private Element element;
         private MD5Joint parent;
@@ -1014,7 +1014,7 @@ public class ColladaLoader {
     private static class MD5Weight {
         int jointIndex;
         float bias;
-        Vector3f position;
+        Vector3 position;
 
         @Override
         public String toString() {

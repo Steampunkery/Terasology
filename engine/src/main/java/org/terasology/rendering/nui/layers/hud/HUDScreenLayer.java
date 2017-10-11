@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.nui.layers.hud;
 
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Rectangle;
 import com.google.common.collect.Maps;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.assets.management.AssetManager;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Region2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 import org.terasology.registry.InjectionHelper;
 import org.terasology.rendering.nui.Canvas;
@@ -47,10 +47,10 @@ public class HUDScreenLayer extends CoreScreenLayer {
     private NUIManager manager;
 
     public ControlWidget addHUDElement(String uri) {
-        return addHUDElement(uri, ControlWidget.class, Rect2f.createFromMinAndSize(0, 0, 1, 1));
+        return addHUDElement(uri, ControlWidget.class, new Rectangle(0,0,1,1));
     }
 
-    public <T extends ControlWidget> T addHUDElement(String urn, Class<T> type, Rect2f region) {
+    public <T extends ControlWidget> T addHUDElement(String urn, Class<T> type, Rectangle region) {
         Optional<? extends UIElement> data = assetManager.getAsset(urn, UIElement.class);
         if (data.isPresent() && type.isInstance(data.get().getRootWidget())) {
             return addHUDElement(data.get().getUrn(), type.cast(data.get().getRootWidget()), region);
@@ -58,7 +58,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
         return null;
     }
 
-    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, Class<T> type, Rect2f region) {
+    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, Class<T> type, Rectangle region) {
         Optional<? extends UIElement> data = assetManager.getAsset(urn, UIElement.class);
         if (data.isPresent() && type.isInstance(data.get().getRootWidget())) {
             return addHUDElement(urn, type.cast(data.get().getRootWidget()), region);
@@ -66,7 +66,7 @@ public class HUDScreenLayer extends CoreScreenLayer {
         return null;
     }
 
-    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, T widget, Rect2f region) {
+    public <T extends ControlWidget> T addHUDElement(ResourceUrn urn, T widget, Rectangle region) {
         InjectionHelper.inject(widget);
         widget.onOpened();
         elementsLookup.put(urn, new HUDElement(widget, region));
@@ -154,17 +154,17 @@ public class HUDScreenLayer extends CoreScreenLayer {
     @Override
     public void onDraw(Canvas canvas) {
         for (HUDElement element : elementsLookup.values()) {
-            int minX = TeraMath.floorToInt(element.region.minX() * canvas.size().x);
-            int minY = TeraMath.floorToInt(element.region.minY() * canvas.size().y);
-            int sizeX = TeraMath.floorToInt(element.region.width() * canvas.size().x);
-            int sizeY = TeraMath.floorToInt(element.region.height() * canvas.size().y);
-            Rect2i region = Rect2i.createFromMinAndSize(minX, minY, sizeX, sizeY);
+            int minX = TeraMath.floorToInt(element.region.x * canvas.size().x);
+            int minY = TeraMath.floorToInt(element.region.y * canvas.size().y);
+            int sizeX = TeraMath.floorToInt(element.region.width * canvas.size().x);
+            int sizeY = TeraMath.floorToInt(element.region.height * canvas.size().y);
+            Region2i region = new Region2i(minX, minY, (sizeX <= 0) ? 0 : sizeX, (sizeY <= 0) ? 0 : sizeY);
             canvas.drawWidget(element.widget, region);
         }
     }
 
     @Override
-    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
+    public GridPoint2 getPreferredContentSize(Canvas canvas, GridPoint2 sizeHint) {
         return sizeHint;
     }
 
@@ -205,9 +205,9 @@ public class HUDScreenLayer extends CoreScreenLayer {
 
     private static final class HUDElement {
         ControlWidget widget;
-        Rect2f region;
+        Rectangle region;
 
-        private HUDElement(ControlWidget widget, Rect2f region) {
+        private HUDElement(ControlWidget widget, Rectangle region) {
             this.widget = widget;
             this.region = region;
         }

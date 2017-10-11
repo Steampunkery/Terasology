@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.nui.events;
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.input.MouseInput;
 import org.terasology.input.device.KeyboardDevice;
 import org.terasology.input.device.MouseDevice;
-import org.terasology.math.geom.Vector2i;
 
 /**
  * See {@link NUIInputEvent}
@@ -26,7 +26,7 @@ import org.terasology.math.geom.Vector2i;
 public class NUIMouseReleaseEvent extends NUIMouseEvent {
     private final MouseInput mouseButton;
 
-    public NUIMouseReleaseEvent(MouseDevice mouse, KeyboardDevice keyboard, Vector2i relativeMousePosition,
+    public NUIMouseReleaseEvent(MouseDevice mouse, KeyboardDevice keyboard, GridPoint2 relativeMousePosition,
                                 MouseInput mouseButton) {
         super(mouse, keyboard, relativeMousePosition);
         this.mouseButton = mouseButton;

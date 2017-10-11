@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.cameras;
 
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.config.Config;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.math.MatrixUtils;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
 
 /**
  * Provides global access to fonts.
@@ -35,9 +35,9 @@ import org.terasology.math.geom.Vector3f;
 public abstract class Camera {
 
     /* CAMERA PARAMETERS */
-    protected final Vector3f position = new Vector3f(0, 0, 0);
-    protected final Vector3f up = new Vector3f(0, 1, 0);
-    protected Vector3f viewingDirection = new Vector3f(1, 0, 0);
+    protected final Vector3 position = new Vector3(0, 0, 0);
+    protected final Vector3 up = new Vector3(0, 1, 0);
+    protected Vector3 viewingDirection = new Vector3(1, 0, 0);
     protected float viewingAngle;
 
     protected float zNear = 0.1f;
@@ -52,21 +52,21 @@ public abstract class Camera {
     protected final ViewFrustum viewFrustumReflected = new ViewFrustum();
 
     /* MATRICES */
-    protected Matrix4f projectionMatrix = new Matrix4f();
-    protected Matrix4f inverseProjectionMatrix = new Matrix4f();
-    protected Matrix4f normViewMatrix = new Matrix4f();
-    protected Matrix4f viewMatrix = new Matrix4f();
-    protected Matrix4f viewProjectionMatrix = new Matrix4f();
-    protected Matrix4f inverseViewProjectionMatrix = new Matrix4f();
-    protected Matrix4f prevViewProjectionMatrix = new Matrix4f();
-    protected Matrix4f reflectionMatrix = new Matrix4f();
+    protected Matrix4 projectionMatrix = new Matrix4();
+    protected Matrix4 inverseProjectionMatrix = new Matrix4();
+    protected Matrix4 normViewMatrix = new Matrix4();
+    protected Matrix4 viewMatrix = new Matrix4();
+    protected Matrix4 viewProjectionMatrix = new Matrix4();
+    protected Matrix4 inverseViewProjectionMatrix = new Matrix4();
+    protected Matrix4 prevViewProjectionMatrix = new Matrix4();
+    protected Matrix4 reflectionMatrix = new Matrix4();
 
-    protected Matrix4f viewMatrixReflected = new Matrix4f();
-    protected Matrix4f normViewMatrixReflected = new Matrix4f();
+    protected Matrix4 viewMatrixReflected = new Matrix4();
+    protected Matrix4 normViewMatrixReflected = new Matrix4();
 
     /* USED FOR DIRTY CHECKS */
-    protected Vector3f cachedPosition = new Vector3f();
-    protected Vector3f cachedViewigDirection = new Vector3f();
+    protected Vector3 cachedPosition = new Vector3();
+    protected Vector3 cachedViewigDirection = new Vector3();
     protected float cachedFov;
     protected float cachedZNear;
     protected float cachedZFar;
@@ -162,7 +162,7 @@ public abstract class Camera {
         return reflectionHeight - 0.5f;
     }
 
-    public Matrix4f getViewMatrix() {
+    public Matrix4 getViewMatrix() {
         if (!reflected) {
             return viewMatrix;
         }
@@ -170,7 +170,7 @@ public abstract class Camera {
         return viewMatrixReflected;
     }
 
-    public Matrix4f getNormViewMatrix() {
+    public Matrix4 getNormViewMatrix() {
         if (!reflected) {
             return normViewMatrix;
         }
@@ -178,31 +178,31 @@ public abstract class Camera {
         return normViewMatrixReflected;
     }
 
-    public Matrix4f getProjectionMatrix() {
+    public Matrix4 getProjectionMatrix() {
         return projectionMatrix;
     }
 
-    public Matrix4f getViewProjectionMatrix() {
+    public Matrix4 getViewProjectionMatrix() {
         return viewProjectionMatrix;
     }
 
-    public Matrix4f getInverseProjectionMatrix() {
+    public Matrix4 getInverseProjectionMatrix() {
         return inverseProjectionMatrix;
     }
 
-    public Matrix4f getInverseViewProjectionMatrix() {
+    public Matrix4 getInverseViewProjectionMatrix() {
         return inverseViewProjectionMatrix;
     }
 
-    public Matrix4f getPrevViewProjectionMatrix() {
+    public Matrix4 getPrevViewProjectionMatrix() {
         return prevViewProjectionMatrix;
     }
 
-    public Vector3f getPosition() {
+    public Vector3 getPosition() {
         return position;
     }
 
-    public Vector3f getViewingDirection() {
+    public Vector3 getViewingDirection() {
         return viewingDirection;
     }
 
@@ -210,16 +210,16 @@ public abstract class Camera {
      * Get the orientation of the camera.
      * @return the orientation direction, a quaternion.
      */
-    public Quat4f getOrientation() {
-        return new Quat4f(viewingDirection,viewingAngle);
+    public Quaternion getOrientation() {
+        return new Quaternion(viewingDirection,viewingAngle);
     }
 
     /**
      Try to set the viewing direction.
      * @param direction
      */
-    public void setOrientation(Quat4f direction) {
-        viewingDirection = direction.getAxis();
+    public void setOrientation(Quaternion direction) {
+        viewingDirection = new Vector3(direction.x,direction.y,direction.z);
         viewingAngle = direction.getAngle();
     }
 

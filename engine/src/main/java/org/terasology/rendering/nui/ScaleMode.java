@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2f;
+import com.badlogic.gdx.math.Vector2;
+import org.terasology.math.Region2i;
 
 /**
  * Describes the possible methods drawing to a region of a different size to the image being drawn.
@@ -27,8 +27,8 @@ public enum ScaleMode {
      */
     STRETCH {
         @Override
-        public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
-            return new Vector2f(region.width(), region.height());
+        public Vector2 scaleForRegion(Region2i region, int actualWidth, int actualHeight) {
+            return new Vector2(region.width, region.height);
         }
 
         @Override
@@ -42,9 +42,9 @@ public enum ScaleMode {
      */
     SCALE_FIT {
         @Override
-        public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
-            float scale = Math.min((float) region.width() / actualWidth, (float) region.height() / actualHeight);
-            return new Vector2f(actualWidth * scale, actualHeight * scale);
+        public Vector2 scaleForRegion(Region2i region, int actualWidth, int actualHeight) {
+            float scale = Math.min((float) region.width / actualWidth, (float) region.height / actualHeight);
+            return new Vector2(actualWidth * scale, actualHeight * scale);
         }
 
         @Override
@@ -58,9 +58,9 @@ public enum ScaleMode {
      */
     SCALE_FILL {
         @Override
-        public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
-            float scale = Math.max((float) region.width() / actualWidth, (float) region.height() / actualHeight);
-            return new Vector2f(actualWidth * scale, actualHeight * scale);
+        public Vector2 scaleForRegion(Region2i region, int actualWidth, int actualHeight) {
+            float scale = Math.max((float) region.width / actualWidth, (float) region.height / actualHeight);
+            return new Vector2(actualWidth * scale, actualHeight * scale);
         }
 
         @Override
@@ -74,8 +74,8 @@ public enum ScaleMode {
      */
     TILED {
         @Override
-        public Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight) {
-            return new Vector2f(region.width(), region.height());
+        public Vector2 scaleForRegion(Region2i region, int actualWidth, int actualHeight) {
+            return new Vector2(region.width, region.height);
         }
 
         @Override
@@ -91,5 +91,5 @@ public enum ScaleMode {
      * @param actualHeight
      * @return The relative scale to draw the
      */
-    public abstract Vector2f scaleForRegion(Rect2i region, int actualWidth, int actualHeight);
+    public abstract Vector2 scaleForRegion(Region2i region, int actualWidth, int actualHeight);
 }

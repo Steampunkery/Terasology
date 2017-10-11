@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.dag.nodes;
 
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.config.Config;
 import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.SimpleUri;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.math.Vector4;
 import org.terasology.monitoring.PerformanceMonitor;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.rendering.backdrop.BackdropProvider;
@@ -75,11 +75,11 @@ public class LightShaftsNode extends ConditionDependentNode {
     private float decay = 0.95f;
 
     @SuppressWarnings("FieldCanBeLocal")
-    private Vector3f sunDirection;
+    private Vector3 sunDirection;
     @SuppressWarnings("FieldCanBeLocal")
-    private Vector4f sunPositionWorldSpace4 = new Vector4f();
+    private Vector4 sunPositionWorldSpace4 = new Vector4();
     @SuppressWarnings("FieldCanBeLocal")
-    private Vector4f sunPositionScreenSpace = new Vector4f();
+    private Vector4 sunPositionScreenSpace = new Vector4();
 
     public LightShaftsNode(Context context) {
         super(context);
@@ -123,7 +123,8 @@ public class LightShaftsNode extends ConditionDependentNode {
         sunDirection = backdropProvider.getSunDirection(false);
         sunPositionWorldSpace4.set(sunDirection.x * 10000.0f, sunDirection.y * 10000.0f, sunDirection.z * 10000.0f, 1.0f);
         sunPositionScreenSpace.set(sunPositionWorldSpace4);
-        activeCamera.getViewProjectionMatrix().transform(sunPositionScreenSpace);
+        activeCamera.getViewProjectionMatrix().rotate(sunPositionScreenSpace.x,sunPositionScreenSpace.y,sunPositionScreenSpace.z,sunPositionScreenSpace.w);
+        //activeCamera.getViewProjectionMatrix().transform(sunPositionScreenSpace);
 
         sunPositionScreenSpace.x /= sunPositionScreenSpace.w;
         sunPositionScreenSpace.y /= sunPositionScreenSpace.w;

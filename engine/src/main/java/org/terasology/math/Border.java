@@ -15,10 +15,9 @@
  */
 package org.terasology.math;
 
-import java.util.Objects;
+import com.badlogic.gdx.math.GridPoint2;
 
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Rect2i;
+import java.util.Objects;
 
 /**
  * The size of a border, supporting independent widths on each side.
@@ -87,27 +86,25 @@ public class Border {
         return Objects.hash(left, right, top, bottom);
     }
 
-    public Rect2i shrink(org.terasology.math.geom.Rect2i region) {
-        return Rect2i.createFromMinAndSize(region.minX() + getLeft(), region.minY() + getTop(),
-                region.width() - getTotalWidth(), region.height() - getTotalHeight());
+    public Region2i shrink(Region2i region) {
+        return new Region2i(region.x + getLeft(), region.y + getTop(),region.width - getTotalWidth(), region.height - getTotalHeight());
     }
 
-    public Vector2i shrink(org.terasology.math.geom.Vector2i size) {
-        return new Vector2i(size.x - getTotalWidth(), size.y - getTotalHeight());
+    public GridPoint2 shrink(GridPoint2 size) {
+        return new GridPoint2(size.x - getTotalWidth(), size.y - getTotalHeight());
     }
 
-    public Vector2i getTotals() {
-        return new Vector2i(getTotalWidth(), getTotalHeight());
+    public GridPoint2 getTotals() {
+        return new GridPoint2(getTotalWidth(), getTotalHeight());
     }
 
-    public Vector2i grow(org.terasology.math.geom.Vector2i size) {
+    public GridPoint2 grow(GridPoint2 size) {
         // Note protection against overflow
-        return new Vector2i(TeraMath.addClampAtMax(size.x, getTotalWidth()), TeraMath.addClampAtMax(size.y, getTotalHeight()));
+        return new GridPoint2(TeraMath.addClampAtMax(size.x, getTotalWidth()), TeraMath.addClampAtMax(size.y, getTotalHeight()));
     }
 
-    public Rect2i grow(org.terasology.math.geom.Rect2i region) {
+    public Region2i grow(Region2i region) {
         // Note protection against overflow of the size
-        return Rect2i.createFromMinAndSize(region.minX() - getLeft(), region.minY() - getTop(),
-                TeraMath.addClampAtMax(region.width(), getTotalWidth()), TeraMath.addClampAtMax(region.height(), getTotalHeight()));
+        return new Region2i(region.x - getLeft(), region.y - getTop(),TeraMath.addClampAtMax(region.width, getTotalWidth()), TeraMath.addClampAtMax(region.height, getTotalHeight()));
     }
 }

@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui;
 
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Region2i;
 
 /**
  * Possible vertical alignments. Provides support for determining where to position something vertically, given its size and the size of the space.
@@ -53,7 +53,7 @@ public enum VerticalAlign {
      * @param region
      * @return Where placement in the region begins for the alignment.
      */
-    public int getStart(Rect2i region) {
-        return region.minY() + getOffset(0, region.height());
+    public int getStart(Region2i region) {
+        return region.y + getOffset(0, region.height);
     }
 }

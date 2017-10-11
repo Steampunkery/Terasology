@@ -16,9 +16,9 @@
 
 package org.terasology.world.chunks.remoteChunkProvider;
 
-import org.terasology.math.geom.Vector3i;
+import com.badlogic.gdx.math.GridPoint3;
 
 @FunctionalInterface
 public interface ChunkReadyListener {
-    void onChunkReady(Vector3i pos);
+    void onChunkReady(GridPoint3 pos);
 }

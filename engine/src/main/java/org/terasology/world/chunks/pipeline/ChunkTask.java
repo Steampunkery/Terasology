@@ -16,13 +16,13 @@
 
 package org.terasology.world.chunks.pipeline;
 
-import org.terasology.math.geom.Vector3i;
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.utilities.concurrency.Task;
 
 /**
  */
 public interface ChunkTask extends Task {
 
-    Vector3i getPosition();
+    GridPoint3 getPosition();
 
 }

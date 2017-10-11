@@ -15,6 +15,9 @@
  */
 package org.terasology.rendering.assets.skeletalmesh;
 
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,9 +25,6 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.assets.AssetData;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,14 +37,14 @@ public class SkeletalMeshData implements AssetData {
     private Bone rootBone;
     private Map<String, Bone> boneLookup = Maps.newHashMap();
     private List<Bone> bones = Lists.newArrayList();
-    private List<Vector2f> uvs = ImmutableList.of();
+    private List<Vector2> uvs = ImmutableList.of();
     private List<BoneWeight> weights = Lists.newArrayList();
     private TIntList vertexStartWeights = new TIntArrayList();
     private TIntList vertexWeightCounts = new TIntArrayList();
     private TIntList indices = new TIntArrayList();
     private AABB staticAABB;
 
-    public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights, List<Vector2f> uvs, TIntList vertexStartWeights,
+    public SkeletalMeshData(List<Bone> bones, List<BoneWeight> weights, List<Vector2> uvs, TIntList vertexStartWeights,
                             TIntList vertexWeightCounts, TIntList indices, AABB staticAABB) {
         for (Bone bone : bones) {
             if (bone.getParent() == null) {
@@ -73,9 +73,9 @@ public class SkeletalMeshData implements AssetData {
         return rootBone;
     }
 
-    public List<Vector3f> getBindPoseVertexPositions() {
-        List<Vector3f> positions = Lists.newArrayListWithCapacity(bones.size());
-        List<Quat4f> rotations = Lists.newArrayListWithCapacity(getBones().size());
+    public List<Vector3> getBindPoseVertexPositions() {
+        List<Vector3> positions = Lists.newArrayListWithCapacity(bones.size());
+        List<Quaternion> rotations = Lists.newArrayListWithCapacity(getBones().size());
         for (Bone bone : bones) {
             positions.add(bone.getObjectPosition());
             rotations.add(bone.getObjectRotation());
@@ -83,9 +83,9 @@ public class SkeletalMeshData implements AssetData {
         return getVertexPositions(positions, rotations);
     }
 
-    public List<Vector3f> getBindPoseVertexNormals() {
-        List<Vector3f> positions = Lists.newArrayListWithCapacity(bones.size());
-        List<Quat4f> rotations = Lists.newArrayListWithCapacity(getBones().size());
+    public List<Vector3> getBindPoseVertexNormals() {
+        List<Vector3> positions = Lists.newArrayListWithCapacity(bones.size());
+        List<Quaternion> rotations = Lists.newArrayListWithCapacity(getBones().size());
         for (Bone bone : bones) {
             positions.add(bone.getObjectPosition());
             rotations.add(bone.getObjectRotation());
@@ -93,17 +93,17 @@ public class SkeletalMeshData implements AssetData {
         return getVertexNormals(positions, rotations);
     }
 
-    public List<Vector3f> getVertexPositions(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
-        List<Vector3f> results = Lists.newArrayListWithCapacity(getVertexCount());
+    public List<Vector3> getVertexPositions(List<Vector3> bonePositions, List<Quaternion> boneRotations) {
+        List<Vector3> results = Lists.newArrayListWithCapacity(getVertexCount());
         for (int i = 0; i < vertexStartWeights.size(); ++i) {
-            Vector3f vertexPos = new Vector3f();
+            Vector3 vertexPos = new Vector3();
             for (int weightIndexOffset = 0; weightIndexOffset < vertexWeightCounts.get(i); ++weightIndexOffset) {
                 int weightIndex = vertexStartWeights.get(i) + weightIndexOffset;
                 BoneWeight weight = weights.get(weightIndex);
 
-                Vector3f current = boneRotations.get(weight.getBoneIndex()).rotate(weight.getPosition(), new Vector3f());
+                Vector3 current = new Vector3(weight.getPosition()).mul(boneRotations.get(weight.getBoneIndex()));
                 current.add(bonePositions.get(weight.getBoneIndex()));
-                current.scale(weight.getBias());
+                current.scl(weight.getBias());
                 vertexPos.add(current);
             }
             results.add(vertexPos);
@@ -111,16 +111,16 @@ public class SkeletalMeshData implements AssetData {
         return results;
     }
 
-    public List<Vector3f> getVertexNormals(List<Vector3f> bonePositions, List<Quat4f> boneRotations) {
-        List<Vector3f> results = Lists.newArrayListWithCapacity(getVertexCount());
+    public List<Vector3> getVertexNormals(List<Vector3> bonePositions, List<Quaternion> boneRotations) {
+        List<Vector3> results = Lists.newArrayListWithCapacity(getVertexCount());
         for (int i = 0; i < vertexStartWeights.size(); ++i) {
-            Vector3f vertexNorm = new Vector3f();
+            Vector3 vertexNorm = new Vector3();
             for (int weightIndexOffset = 0; weightIndexOffset < vertexWeightCounts.get(i); ++weightIndexOffset) {
                 int weightIndex = vertexStartWeights.get(i) + weightIndexOffset;
                 BoneWeight weight = weights.get(weightIndex);
 
-                Vector3f current = boneRotations.get(weight.getBoneIndex()).rotate(weight.getNormal(), new Vector3f());
-                current.scale(weight.getBias());
+                Vector3 current = new Vector3(weight.getNormal()).mul(boneRotations.get(weight.getBoneIndex()));
+                current.scl(weight.getBias());
                 vertexNorm.add(current);
             }
             results.add(vertexNorm);
@@ -140,7 +140,7 @@ public class SkeletalMeshData implements AssetData {
         return indices;
     }
 
-    public List<Vector2f> getUVs() {
+    public List<Vector2> getUVs() {
         return uvs;
     }
 
@@ -150,35 +150,47 @@ public class SkeletalMeshData implements AssetData {
 
     private void calculateNormals() {
         // TODO: Better algorithm (take into account triangle size and angles
-        List<Vector3f> vertices = getBindPoseVertexPositions();
-        List<Vector3f> normals = Lists.newArrayListWithCapacity(vertices.size());
+        List<Vector3> vertices = getBindPoseVertexPositions();
+        List<Vector3> normals = Lists.newArrayListWithCapacity(vertices.size());
         for (int i = 0; i < vertices.size(); ++i) {
-            normals.add(new Vector3f());
+            normals.add(new Vector3());
         }
-        Vector3f v1 = new Vector3f();
-        Vector3f v2 = new Vector3f();
-        Vector3f norm = new Vector3f();
+        Vector3 v1 = new Vector3();
+        Vector3 v2 = new Vector3();
+        Vector3 norm = new Vector3();
         for (int i = 0; i < indices.size() / 3; ++i) {
-            Vector3f baseVert = vertices.get(indices.get(i * 3));
-            v1.sub(vertices.get(indices.get(i * 3 + 1)), baseVert);
-            v2.sub(vertices.get(indices.get(i * 3 + 2)), baseVert);
-            v1.normalize();
-            v2.normalize();
-            norm.cross(v1, v2);
+            Vector3 baseVert = vertices.get(indices.get(i * 3));
+            v1.set(vertices.get(indices.get(i * 3 + 1)));
+            v1.sub(baseVert);
+
+            v2.set(vertices.get(indices.get(i * 3 + 2)));
+            v2.sub(baseVert);
+
+            v1.nor();
+            v2.nor();
+
+            norm.set(v1);
+            norm.crs(v2);
+
             normals.get(indices.get(i * 3)).add(norm);
             normals.get(indices.get(i * 3 + 1)).add(norm);
             normals.get(indices.get(i * 3 + 2)).add(norm);
         }
 
-        normals.forEach(Vector3f::normalize);
+        normals.forEach(Vector3::nor);
 
-        Quat4f inverseRot = new Quat4f();
+        Quaternion inverseRot = new Quaternion();
         for (int vertIndex = 0; vertIndex < vertices.size(); ++vertIndex) {
-            Vector3f normal = normals.get(vertIndex);
+            Vector3 normal = normals.get(vertIndex);
             for (int weightIndex = 0; weightIndex < vertexWeightCounts.get(vertIndex); ++weightIndex) {
                 BoneWeight weight = weights.get(weightIndex + vertexStartWeights.get(vertIndex));
-                inverseRot.inverse(bones.get(weight.getBoneIndex()).getObjectRotation());
-                inverseRot.rotate(normal, norm);
+
+                inverseRot.set(bones.get(weight.getBoneIndex()).getObjectRotation());
+                inverseRot.mul(1,-1,-1,-1);
+                norm = inverseRot.transform(normal);
+
+                //inverseRot.inverse(bones.get(weight.getBoneIndex()).getObjectRotation());
+                //inverseRot.rotate(normal, norm);
                 weight.setNormal(norm);
             }
         }
@@ -201,8 +213,8 @@ public class SkeletalMeshData implements AssetData {
             sb.append(bone.getObjectPosition().x).append(" ");
             sb.append(bone.getObjectPosition().y).append(" ");
             sb.append(bone.getObjectPosition().z).append(" ) ( ");
-            Quat4f rot = new Quat4f(bone.getObjectRotation());
-            rot.normalize();
+            Quaternion rot = new Quaternion(bone.getObjectRotation());
+            rot.nor();
             if (rot.w > 0) {
                 rot.x = -rot.x;
                 rot.y = -rot.y;

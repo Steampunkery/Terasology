@@ -15,6 +15,8 @@
  */
 package org.terasology.logic.players;
 
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Sets;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.logic.characters.CharacterComponent;
@@ -24,8 +26,6 @@ import org.terasology.logic.characters.events.ActivationPredicted;
 import org.terasology.logic.characters.events.ActivationRequest;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.Direction;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.ClientComponent;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -90,11 +90,11 @@ public class LocalPlayer {
                && characterEntity.hasComponent(CharacterMovementComponent.class);
     }
 
-    public Vector3f getPosition() {
-        return getPosition(new Vector3f());
+    public Vector3 getPosition() {
+        return getPosition(new Vector3());
     }
 
-    public Vector3f getPosition(Vector3f out) {
+    public Vector3 getPosition(Vector3 out) {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
         if (location == null) {
             return out;
@@ -102,19 +102,19 @@ public class LocalPlayer {
         return location.getWorldPosition(out);
     }
 
-    public Quat4f getRotation() {
+    public Quaternion getRotation() {
         LocationComponent location = getCharacterEntity().getComponent(LocationComponent.class);
         if (location == null) {
-            return new Quat4f(Quat4f.IDENTITY);
+            return new Quaternion();
         }
         return location.getWorldRotation();
     }
 
-    public Vector3f getViewPosition() {
-        return getViewPosition(new Vector3f());
+    public Vector3 getViewPosition() {
+        return getViewPosition(new Vector3());
     }
 
-    public Vector3f getViewPosition(Vector3f out) {
+    public Vector3 getViewPosition(Vector3 out) {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
         if (clientComponent == null) {
             return out;
@@ -127,10 +127,10 @@ public class LocalPlayer {
         return location.getWorldPosition(out);
     }
 
-    public Quat4f getViewRotation() {
+    public Quaternion getViewRotation() {
         ClientComponent clientComponent = getClientEntity().getComponent(ClientComponent.class);
         if (clientComponent == null) {
-            return new Quat4f(Quat4f.IDENTITY);
+            return new Quaternion();
         }
         LocationComponent location = clientComponent.camera.getComponent(LocationComponent.class);
         if (location == null) {
@@ -140,20 +140,20 @@ public class LocalPlayer {
         return location.getWorldRotation();
     }
 
-    public Vector3f getViewDirection() {
-        Quat4f rot = getViewRotation();
+    public Vector3 getViewDirection() {
+        Quaternion rot = getViewRotation();
         // TODO: Put a generator for direction vectors in a util class somewhere
         // And just put quaternion -> vector somewhere too
-        Vector3f dir = Direction.FORWARD.getVector3f();
-        return rot.rotate(dir, dir);
+        Vector3 dir = Direction.FORWARD.getVector3f();
+        return dir.mul(rot);
     }
 
-    public Vector3f getVelocity() {
+    public Vector3 getVelocity() {
         CharacterMovementComponent movement = getCharacterEntity().getComponent(CharacterMovementComponent.class);
         if (movement != null) {
-            return new Vector3f(movement.getVelocity());
+            return new Vector3(movement.getVelocity());
         }
-        return new Vector3f();
+        return new Vector3();
     }
 
 
@@ -193,8 +193,8 @@ public class LocalPlayer {
     private boolean activateTargetOrOwnedEntity(EntityRef usedOwnedEntity) {
         EntityRef character = getCharacterEntity();
         CharacterComponent characterComponent = character.getComponent(CharacterComponent.class);
-        Vector3f direction = getViewDirection();
-        Vector3f originPos = getViewPosition();
+        Vector3 direction = getViewDirection();
+        Vector3 originPos = getViewPosition();
         boolean ownedEntityUsage = usedOwnedEntity.exists();
         int activationId = nextActivationId++;
         Physics physics = CoreRegistry.get(Physics.class);
@@ -209,9 +209,9 @@ public class LocalPlayer {
             return true;
         } else if (ownedEntityUsage) {
             usedOwnedEntity.send(new ActivationPredicted(character, EntityRef.NULL, originPos, direction,
-                    originPos, new Vector3f(), activationId));
+                    originPos, new Vector3(), activationId));
             character.send(new ActivationRequest(character, ownedEntityUsage, usedOwnedEntity, eventWithTarget, EntityRef.NULL,
-                    originPos, direction, originPos, new Vector3f(), activationId));
+                    originPos, direction, originPos, new Vector3(), activationId));
             return true;
         }
         return false;

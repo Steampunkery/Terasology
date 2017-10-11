@@ -16,10 +16,10 @@
 
 package org.terasology.persistence.typeHandling.mathTypes;
 
+import com.badlogic.gdx.math.GridPoint3;
 import com.google.common.collect.Maps;
 import org.terasology.engine.module.UriUtil;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataMap;
@@ -41,8 +41,8 @@ public class Region3iTypeHandler extends SimpleTypeHandler<Region3i> {
             return context.createNull();
         } else {
             Map<String, PersistedData> map = Maps.newLinkedHashMap();
-            map.put(MIN_FIELD, context.create(value.min(), Vector3i.class));
-            map.put(SIZE_FIELD, context.create(value.size(), Vector3i.class));
+            map.put(MIN_FIELD, context.create(value.min(), GridPoint3.class));
+            map.put(SIZE_FIELD, context.create(value.size(), GridPoint3.class));
             return context.create(map);
         }
     }
@@ -51,8 +51,8 @@ public class Region3iTypeHandler extends SimpleTypeHandler<Region3i> {
     public Region3i deserialize(PersistedData data, DeserializationContext context) {
         if (!data.isNull() && data.isValueMap()) {
             PersistedDataMap map = data.getAsValueMap();
-            Vector3i min = context.deserializeAs(map.get(MIN_FIELD), Vector3i.class);
-            Vector3i size = context.deserializeAs(map.get(SIZE_FIELD), Vector3i.class);
+            GridPoint3 min = context.deserializeAs(map.get(MIN_FIELD), GridPoint3.class);
+            GridPoint3 size = context.deserializeAs(map.get(SIZE_FIELD), GridPoint3.class);
             return Region3i.createFromMinAndSize(min, size);
         }
         return null;

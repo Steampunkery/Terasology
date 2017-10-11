@@ -15,6 +15,7 @@
  */
 package org.terasology.input;
 
+import com.badlogic.gdx.math.GridPoint2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
@@ -59,7 +60,6 @@ import org.terasology.input.internal.BindableAxisImpl;
 import org.terasology.input.internal.BindableButtonImpl;
 import org.terasology.input.internal.BindableRealAxis;
 import org.terasology.logic.players.LocalPlayer;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.registry.In;
 
 import java.util.ArrayList;
@@ -296,7 +296,7 @@ public class InputSystem extends BaseComponentSystem {
             return;
         }
 
-        Vector2i deltaMouse = mouse.getDelta();
+        GridPoint2 deltaMouse = mouse.getDelta();
         //process mouse movement x axis
         if (deltaMouse.x != 0) {
             MouseAxisEvent event = new MouseXAxisEvent(deltaMouse.x * config.getInput().getMouseSensitivity(), delta);
@@ -525,7 +525,7 @@ public class InputSystem extends BaseComponentSystem {
         return consumed;
     }
 
-    private boolean sendMouseEvent(MouseInput button, boolean buttonDown, Vector2i position, float delta) {
+    private boolean sendMouseEvent(MouseInput button, boolean buttonDown, GridPoint2 position, float delta) {
         MouseButtonEvent event;
         switch (button) {
             case NONE:
@@ -552,7 +552,7 @@ public class InputSystem extends BaseComponentSystem {
         return consumed;
     }
 
-    private boolean sendMouseWheelEvent(Vector2i pos, int wheelTurns, float delta) {
+    private boolean sendMouseWheelEvent(GridPoint2 pos, int wheelTurns, float delta) {
         MouseWheelEvent mouseWheelEvent = new MouseWheelEvent(pos, wheelTurns, delta);
         setupTarget(mouseWheelEvent);
         for (EntityRef entity : getInputEntities()) {

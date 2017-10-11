@@ -16,19 +16,19 @@
 
 package org.terasology.world.chunks.event;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.entitySystem.event.Event;
-import org.terasology.math.geom.Vector3i;
 
 /**
  */
 public class OnChunkLoaded implements Event {
-    private Vector3i chunkPos = new Vector3i();
+    private GridPoint3 chunkPos = new GridPoint3();
 
-    public OnChunkLoaded(Vector3i chunkPos) {
+    public OnChunkLoaded(GridPoint3 chunkPos) {
         this.chunkPos.set(chunkPos);
     }
 
-    public Vector3i getChunkPos() {
+    public GridPoint3 getChunkPos() {
         return chunkPos;
     }
 }

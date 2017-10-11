@@ -16,15 +16,15 @@
 
 package org.terasology.rendering.assets.texture;
 
+import com.badlogic.gdx.math.Rectangle;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Rect2f;
 
 /**
  */
 public abstract class Texture extends TextureRegionAsset<TextureData> {
 
-    public static final Rect2f FULL_TEXTURE_REGION = Rect2f.createFromMinAndSize(0, 0, 1, 1);
+    public static final Rectangle FULL_TEXTURE_REGION = new Rectangle(0,0,1,1);
 
     protected Texture(ResourceUrn urn, AssetType<?, TextureData> assetType) {
         super(urn, assetType);

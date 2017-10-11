@@ -15,9 +15,9 @@
  */
 package org.terasology.physics;
 
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.List;
 import java.util.Set;
@@ -35,7 +35,7 @@ public interface Physics {
      *                        object of any of these groups is hit it will be registered.
      * @return A HitResult object that contains the info about the ray trace.
      */
-    HitResult rayTrace(Vector3f from, Vector3f direction, float distance, CollisionGroup... collisionGroups);
+    HitResult rayTrace(Vector3 from, Vector3 direction, float distance, CollisionGroup... collisionGroups);
 
     /**
      * Executes a rayTrace on the physics engine, excluding hitting entities specified
@@ -48,7 +48,7 @@ public interface Physics {
      *                         object of any of these groups is hit it will be registered.
      * @return A HitResult object that contains the info about the ray trace.
      */
-    HitResult rayTrace(Vector3f from, Vector3f direction, float distance, Set<EntityRef> excludedEntities, CollisionGroup... collisionGroups);
+    HitResult rayTrace(Vector3 from, Vector3 direction, float distance, Set<EntityRef> excludedEntities, CollisionGroup... collisionGroups);
 
     /**
      * Scans the given area for physics objects of the given groups and returns

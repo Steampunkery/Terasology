@@ -16,11 +16,9 @@
 package org.terasology.world.generation;
 
 import com.badlogic.gdx.math.GridPoint3;
-import com.badlogic.gdx.math.Rectangle;
 import com.google.common.base.Preconditions;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Region2i;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.Objects;
 
@@ -67,9 +65,15 @@ public class Border3D {
      * @param region The original region to be used.
      * @return The 2D representation with the additional space added to it.
      */
-    public Rect2i expandTo2D(Region3i region) {
-        return Rect2i.createFromMinAndMax(region.minX() - getSides(), region.minZ() - getSides(),
-                region.maxX() + getSides(), region.maxZ() + getSides());
+    public Region2i expandTo2D(Region3i region) {
+        return new Region2i(
+                region.minX() - getSides(),
+                region.minZ() - getSides(),
+                (region.maxX() + getSides()) - (region.minX() - getSides()) + 1 ,
+                (region.maxZ() + getSides()) - (region.minZ() - getSides()) + 1);
+
+        //return Rect2i.createFromMinAndMax(region.minX() - getSides(), region.minZ() - getSides(),
+        //        region.maxX() + getSides(), region.maxZ() + getSides());
     }
 
     /**
@@ -77,8 +81,12 @@ public class Border3D {
      * @param size The size used.
      * @return The 2D representation with the additional space added to it with the additional space added to it in the 3 dimensions.
      */
-    public Rect2i expandTo2D(GridPoint3 size) {
-        return Rect2i.createFromMinAndMax(-getSides(), -getSides(), size.x + getSides() - 1, size.z + getSides() - 1);
+    public Region2i expandTo2D(GridPoint3 size) {
+        return new Region2i(
+                -getSides(),
+                -getSides(),
+                (size.x + getSides() - 1) + getSides() + 1,
+                (size.z + getSides() - 1)+ getSides() + 1);
     }
 
     /**

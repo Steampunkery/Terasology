@@ -15,27 +15,27 @@
  */
 package org.terasology.rendering.world.viewDistance;
 
+import com.badlogic.gdx.math.GridPoint3;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.terasology.math.geom.Vector3i;
 
 /**
  * The possible view distance options, that can be selected by the user.
  */
 public enum ViewDistance {
 
-    LEGALLY_BLIND("${engine:menu#view-distance-blind}", 0, new Vector3i(5, 5, 5)),
-    NEAR("${engine:menu#view-distance-near}", 1, new Vector3i(9, 7, 9)),
-    MODERATE("${engine:menu#view-distance-moderate}", 2, new Vector3i(13, 7, 13)),
-    FAR("${engine:menu#view-distance-far}", 3, new Vector3i(17, 7, 17)),
-    ULTRA("${engine:menu#view-distance-ultra}", 4, new Vector3i(25, 7, 25)),
-    MEGA("${engine:menu#view-distance-mega}", 5, new Vector3i(33, 7, 33)),
-    EXTREME("${engine:menu#view-distance-extreme}", 6, new Vector3i(63, 7, 63));
+    LEGALLY_BLIND("${engine:menu#view-distance-blind}", 0, new GridPoint3(5, 5, 5)),
+    NEAR("${engine:menu#view-distance-near}", 1, new GridPoint3(9, 7, 9)),
+    MODERATE("${engine:menu#view-distance-moderate}", 2, new GridPoint3(13, 7, 13)),
+    FAR("${engine:menu#view-distance-far}", 3, new GridPoint3(17, 7, 17)),
+    ULTRA("${engine:menu#view-distance-ultra}", 4, new GridPoint3(25, 7, 25)),
+    MEGA("${engine:menu#view-distance-mega}", 5, new GridPoint3(33, 7, 33)),
+    EXTREME("${engine:menu#view-distance-extreme}", 6, new GridPoint3(63, 7, 63));
 
     private static TIntObjectMap<ViewDistance> indexLookup = new TIntObjectHashMap<>();
 
     private String displayName;
-    private Vector3i chunkDistance;
+    private GridPoint3 chunkDistance;
     private int index;
 
     static {
@@ -44,13 +44,13 @@ public enum ViewDistance {
         }
     }
 
-    ViewDistance(String displayName, int index, Vector3i chunkDistance) {
+    ViewDistance(String displayName, int index, GridPoint3 chunkDistance) {
         this.displayName = displayName;
         this.index = index;
         this.chunkDistance = chunkDistance;
     }
 
-    public Vector3i getChunkDistance() {
+    public GridPoint3 getChunkDistance() {
         return chunkDistance;
     }
 
@@ -68,6 +68,6 @@ public enum ViewDistance {
 
     @Override
     public String toString() {
-        return String.format("%1s (%2$dx%3$dx%4$d)", displayName, chunkDistance.getX(), chunkDistance.getY(), chunkDistance.getZ());
+        return String.format("%1s (%2$dx%3$dx%4$d)", displayName, chunkDistance.x, chunkDistance.y, chunkDistance.z);
     }
 }

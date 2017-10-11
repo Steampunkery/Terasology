@@ -15,8 +15,8 @@
  */
 package org.terasology.persistence;
 
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.entitySystem.entity.EntityRef;
-import org.terasology.math.geom.Vector3f;
 
 /**
  */
@@ -53,12 +53,12 @@ public interface PlayerStore {
      *
      * @param location
      */
-    void setRelevanceLocation(Vector3f location);
+    void setRelevanceLocation(Vector3 location);
 
     /**
      * @return The location that is the center of the area relevant for the player.
      */
-    Vector3f getRelevanceLocation();
+    Vector3 getRelevanceLocation();
 
     /**
      * @return Whether the player has a character or not

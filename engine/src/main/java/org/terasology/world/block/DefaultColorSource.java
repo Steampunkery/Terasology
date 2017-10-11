@@ -17,11 +17,10 @@ package org.terasology.world.block;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.math.Vector4;
 import org.terasology.world.biomes.Biome;
 
 import javax.imageio.ImageIO;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -33,32 +32,32 @@ public enum DefaultColorSource implements BlockColorSource {
 
     DEFAULT {
         @Override
-        public Vector4f calcColor(Biome biome) {
-            return new Vector4f(1, 1, 1, 1);
+        public Vector4 calcColor(Biome biome) {
+            return new Vector4(1, 1, 1, 1);
         }
     },
     COLOR_LUT {
         @Override
-        public Vector4f calcColor(Biome biome) {
+        public Vector4 calcColor(Biome biome) {
             float humidity = biome.getHumidity();
             float temperature = biome.getTemperature();
             float prod = temperature * humidity;
             int rgbValue = colorLut.getRGB((int) ((1.0 - temperature) * 255.0), (int) ((1.0 - prod) * 255.0));
 
             Color c = new Color(rgbValue);
-            return new Vector4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1.0f);
+            return new Vector4(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1.0f);
         }
     },
     FOLIAGE_LUT {
         @Override
-        public Vector4f calcColor(Biome biome) {
+        public Vector4 calcColor(Biome biome) {
             float humidity = biome.getHumidity();
             float temperature = biome.getTemperature();
             float prod = humidity * temperature;
             int rgbValue = foliageLut.getRGB((int) ((1.0 - temperature) * 255.0), (int) ((1.0 - prod) * 255.0));
 
             Color c = new Color(rgbValue);
-            return new Vector4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1.0f);
+            return new Vector4(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f, 1.0f);
         }
     };
 

@@ -15,19 +15,19 @@
  */
 package org.terasology.entitySystem.entity.internal;
 
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.iterator.TLongObjectIterator;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.entitySystem.Component;
@@ -44,8 +44,6 @@ import org.terasology.entitySystem.metadata.ComponentLibrary;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.entitySystem.prefab.PrefabManager;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.persistence.typeHandling.TypeSerializationLibrary;
 
 import java.util.ArrayList;
@@ -220,7 +218,7 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public EntityRef create(String prefabName, Vector3f position) {
+    public EntityRef create(String prefabName, Vector3 position) {
         if (prefabName != null && !prefabName.isEmpty()) {
             Prefab prefab = prefabManager.getPrefab(prefabName);
             return create(prefab, position);
@@ -229,7 +227,7 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public EntityRef create(Prefab prefab, Vector3f position, Quat4f rotation) {
+    public EntityRef create(Prefab prefab, Vector3 position, Quaternion rotation) {
         List<Component> components = Lists.newArrayList();
         for (Component component : prefab.iterateComponents()) {
             Component newComp = componentLibrary.copy(component);
@@ -250,7 +248,7 @@ public class PojoEntityManager implements EngineEntityManager {
     }
 
     @Override
-    public EntityRef create(Prefab prefab, Vector3f position) {
+    public EntityRef create(Prefab prefab, Vector3 position) {
         List<Component> components = Lists.newArrayList();
         for (Component component : prefab.iterateComponents()) {
             Component newComp = componentLibrary.copy(component);

@@ -16,10 +16,9 @@
 
 package org.terasology.rendering.assets.skeletalmesh;
 
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Lists;
-
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector3f;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,13 +28,13 @@ import java.util.List;
 public class Bone {
     private String name;
     private int index;
-    private Vector3f objectSpacePos = new Vector3f();
-    private Quat4f rotation = new Quat4f(0, 0, 0, 1);
+    private Vector3 objectSpacePos = new Vector3();
+    private Quaternion rotation = new Quaternion(0, 0, 0, 1);
 
     private Bone parent;
     private List<Bone> children = Lists.newArrayList();
 
-    public Bone(int index, String name, Vector3f position, Quat4f rotation) {
+    public Bone(int index, String name, Vector3 position, Quaternion rotation) {
         this.index = index;
         this.name = name;
         this.objectSpacePos.set(position);
@@ -50,37 +49,37 @@ public class Bone {
         return index;
     }
 
-    public Vector3f getObjectPosition() {
+    public Vector3 getObjectPosition() {
         return objectSpacePos;
     }
 
-    public void setObjectPos(Vector3f newObjectSpacePos) {
+    public void setObjectPos(Vector3 newObjectSpacePos) {
         this.objectSpacePos = newObjectSpacePos;
     }
 
-    public Vector3f getLocalPosition() {
-        Vector3f pos = new Vector3f(objectSpacePos);
+    public Vector3 getLocalPosition() {
+        Vector3 pos = new Vector3(objectSpacePos);
         if (parent != null) {
             pos.sub(parent.getObjectPosition());
-            Quat4f inverseParentRot = new Quat4f();
+            Quaternion inverseParentRot = new Quaternion();
             inverseParentRot.inverse(parent.getObjectRotation());
             inverseParentRot.rotate(pos, pos);
         }
         return pos;
     }
 
-    public Quat4f getObjectRotation() {
+    public Quaternion getObjectRotation() {
         return rotation;
     }
 
-    public void setObjectRotation(Quat4f newRotation) {
+    public void setObjectRotation(Quaternion newRotation) {
         this.rotation = newRotation;
     }
 
-    public Quat4f getLocalRotation() {
-        Quat4f rot = new Quat4f(rotation);
+    public Quaternion getLocalRotation() {
+        Quaternion rot = new Quaternion(rotation);
         if (parent != null) {
-            Quat4f inverseParentRot = new Quat4f();
+            Quaternion inverseParentRot = new Quaternion();
             inverseParentRot.inverse(parent.getObjectRotation());
             rot.mul(inverseParentRot, rot);
         }

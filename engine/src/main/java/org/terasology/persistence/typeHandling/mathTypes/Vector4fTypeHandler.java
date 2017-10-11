@@ -17,7 +17,7 @@ package org.terasology.persistence.typeHandling.mathTypes;
 
 
 import gnu.trove.list.TFloatList;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.math.Vector4;
 import org.terasology.persistence.typeHandling.DeserializationContext;
 import org.terasology.persistence.typeHandling.PersistedData;
 import org.terasology.persistence.typeHandling.PersistedDataArray;
@@ -26,10 +26,10 @@ import org.terasology.persistence.typeHandling.SimpleTypeHandler;
 
 /**
  */
-public class Vector4fTypeHandler extends SimpleTypeHandler<Vector4f> {
+public class Vector4fTypeHandler extends SimpleTypeHandler<Vector4> {
 
     @Override
-    public PersistedData serialize(Vector4f value, SerializationContext context) {
+    public PersistedData serialize(Vector4 value, SerializationContext context) {
         if (value == null) {
             return context.createNull();
         } else {
@@ -38,12 +38,12 @@ public class Vector4fTypeHandler extends SimpleTypeHandler<Vector4f> {
     }
 
     @Override
-    public Vector4f deserialize(PersistedData data, DeserializationContext context) {
+    public Vector4 deserialize(PersistedData data, DeserializationContext context) {
         if (data.isArray()) {
             PersistedDataArray dataArray = data.getAsArray();
             if (dataArray.isNumberArray() && dataArray.size() > 3) {
                 TFloatList floats = dataArray.getAsFloatArray();
-                return new Vector4f(floats.get(0), floats.get(1), floats.get(2), floats.get(3));
+                return new Vector4(floats.get(0), floats.get(1), floats.get(2), floats.get(3));
             }
         }
         return null;

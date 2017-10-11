@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.backdrop;
 
-import org.terasology.math.geom.Vector3f;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  * Implementations of this interface provide read and/or write access to the backdrop,
@@ -38,6 +38,6 @@ public interface BackdropProvider {
 
     float getSunPositionAngle();
 
-    Vector3f getSunDirection(boolean moonlightFlip);
+    Vector3 getSunDirection(boolean moonlightFlip);
 
 }

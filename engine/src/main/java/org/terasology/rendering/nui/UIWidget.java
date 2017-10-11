@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.nui;
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.databinding.Binding;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 import org.terasology.rendering.nui.skin.UISkin;
@@ -92,9 +92,9 @@ public interface UIWidget extends Iterable<UIWidget> {
 
     void onBindEvent(BindButtonEvent event);
 
-    Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint);
+    GridPoint2 getPreferredContentSize(Canvas canvas, GridPoint2 sizeHint);
 
-    Vector2i getMaxContentSize(Canvas canvas);
+    GridPoint2 getMaxContentSize(Canvas canvas);
 
     boolean isSkinAppliedByCanvas();
 

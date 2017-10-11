@@ -16,8 +16,8 @@
 
 package org.terasology.world.block.tiles;
 
+import com.badlogic.gdx.math.Vector2;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Vector2f;
 import org.terasology.module.sandbox.API;
 
 /**
@@ -44,8 +44,8 @@ public interface WorldAtlas {
      * @param warnOnError Whether a warning should be logged if the asset cannot be found
      * @return The tex coords of the tile in the atlas.
      */
-    Vector2f getTexCoords(BlockTile tile, boolean warnOnError);
+    Vector2 getTexCoords(BlockTile tile, boolean warnOnError);
 
-    Vector2f getTexCoords(ResourceUrn uri, boolean warnOnError);
+    Vector2 getTexCoords(ResourceUrn uri, boolean warnOnError);
 
 }

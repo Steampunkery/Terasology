@@ -16,10 +16,15 @@
 
 package org.terasology.persistence.typeHandling;
 
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.audio.StaticSound;
@@ -28,15 +33,9 @@ import org.terasology.engine.SimpleUri;
 import org.terasology.entitySystem.prefab.Prefab;
 import org.terasology.logic.behavior.asset.BehaviorTree;
 import org.terasology.math.IntegerRange;
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Region2i;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Quat4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.math.Vector4;
 import org.terasology.naming.Name;
 import org.terasology.persistence.typeHandling.coreTypes.BooleanTypeHandler;
 import org.terasology.persistence.typeHandling.coreTypes.ByteTypeHandler;
@@ -82,6 +81,7 @@ import org.terasology.rendering.assets.texture.TextureRegionAsset;
 import org.terasology.rendering.nui.Color;
 import org.terasology.rendering.nui.asset.UIElement;
 import org.terasology.utilities.ReflectionUtil;
+
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -146,7 +146,7 @@ public class TypeSerializationLibrary {
                                                                 CopyStrategyLibrary copyStrategies) {
         TypeSerializationLibrary serializationLibrary = new TypeSerializationLibrary(factory, copyStrategies);
         serializationLibrary.add(Color.class, new ColorTypeHandler());
-        serializationLibrary.add(Quat4f.class, new Quat4fTypeHandler());
+        serializationLibrary.add(Quaternion.class, new Quat4fTypeHandler());
         serializationLibrary.add(Texture.class, new AssetTypeHandler<>(Texture.class));
         serializationLibrary.add(UIElement.class, new AssetTypeHandler<>(UIElement.class));
         serializationLibrary.add(Mesh.class, new AssetTypeHandler<>(Mesh.class));
@@ -158,13 +158,13 @@ public class TypeSerializationLibrary {
         serializationLibrary.add(MeshAnimation.class, new AssetTypeHandler<>(MeshAnimation.class));
         serializationLibrary.add(TextureRegion.class, new TextureRegionTypeHandler());
         serializationLibrary.add(TextureRegionAsset.class, new TextureRegionTypeHandler());
-        serializationLibrary.add(Vector4f.class, new Vector4fTypeHandler());
-        serializationLibrary.add(Vector3f.class, new Vector3fTypeHandler());
-        serializationLibrary.add(Vector2f.class, new Vector2fTypeHandler());
-        serializationLibrary.add(Vector3i.class, new Vector3iTypeHandler());
-        serializationLibrary.add(Vector2i.class, new Vector2iTypeHandler());
-        serializationLibrary.add(Rect2i.class, new Rect2iTypeHandler());
-        serializationLibrary.add(Rect2f.class, new Rect2fTypeHandler());
+        serializationLibrary.add(Vector4.class, new Vector4fTypeHandler());
+        serializationLibrary.add(Vector3.class, new Vector3fTypeHandler());
+        serializationLibrary.add(Vector2.class, new Vector2fTypeHandler());
+        serializationLibrary.add(GridPoint3.class, new Vector3iTypeHandler());
+        serializationLibrary.add(GridPoint2.class, new Vector2iTypeHandler());
+        serializationLibrary.add(Region2i.class, new Rect2iTypeHandler());
+        serializationLibrary.add(Rectangle.class, new Rect2fTypeHandler());
         serializationLibrary.add(Region3i.class, new Region3iTypeHandler());
         serializationLibrary.add(Prefab.class, new PrefabTypeHandler());
         serializationLibrary.add(BehaviorTree.class, new AssetTypeHandler<>(BehaviorTree.class));

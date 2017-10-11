@@ -18,10 +18,6 @@ package org.terasology.math;
 
 import com.badlogic.gdx.math.GridPoint3;
 import com.badlogic.gdx.math.Vector3;
-import org.terasology.math.geom.BaseVector3f;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.Iterator;
 
@@ -52,7 +48,7 @@ public final class Region3i implements Iterable<GridPoint3> {
      * @return a new region base on the min point and region size, empty if the size is negative
      */
     public static Region3i createFromMinAndSize(GridPoint3 min, GridPoint3 size) {
-        if (size.x() <= 0 || size.y() <= 0 || size.z() <= 0) {
+        if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
             return EMPTY;
         }
         return new Region3i(min, size);
@@ -88,7 +84,7 @@ public final class Region3i implements Iterable<GridPoint3> {
     /**
      * Create a region with center point and extents size
      * @param center the center point of region
-     * @param extents the extents size of region
+     * @param extent the extents size of region
      * @return a new region base on the center point and extents size
      */
     public static Region3i createFromCenterExtents(GridPoint3 center, int extent) {
@@ -136,10 +132,23 @@ public final class Region3i implements Iterable<GridPoint3> {
         if (b.isEmpty()) {
             return a;
         }
-        Vector3i min = a.min();
-        min.min(b.min());
-        Vector3i max = a.max();
-        max.max(b.max());
+
+        GridPoint3 min = a.min();
+        GridPoint3 max = a.max();
+
+        GridPoint3 min1 = a.min();
+        GridPoint3 max1 = a.max();
+
+        min.set(
+                Math.min(min.x,min1.x),
+                Math.min(min.y,min1.y),
+                Math.min(min.z,min1.z));
+        max.set(
+                Math.max(max.x,max1.x),
+                Math.max(max.y,max1.y),
+                Math.max(max.z,max1.z));
+
+
         return createFromMinMax(min, max);
     }
 
@@ -213,12 +222,22 @@ public final class Region3i implements Iterable<GridPoint3> {
      * do not overlap then the empty region is returned
      */
     public Region3i intersect(Region3i other) {
-        Vector3i intersectMin = min();
-        intersectMin.max(other.min());
-        Vector3i intersectMax = max();
-        intersectMax.min(other.max());
 
-        return createFromMinMax(intersectMin, intersectMax);
+        GridPoint3 min = new GridPoint3(
+                Math.max(minX(),other.minX()),
+                Math.max(minY(),other.minY()),
+                Math.max(minZ(),other.minZ()));
+
+        GridPoint3 max = new GridPoint3(
+                Math.max(maxX(),other.maxX()),
+                Math.max(maxY(),other.maxY()),
+                Math.max(maxZ(),other.maxZ()));
+
+//        GridPoint3 intersectMin = min();
+//        intersectMin.max(other.min());
+//        GridPoint3 intersectMax = max();
+//        intersectMax.min(other.max());
+        return createFromMinMax(min, max);
     }
 
     /**
@@ -251,11 +270,20 @@ public final class Region3i implements Iterable<GridPoint3> {
         return createFromMinMax(expandedMin, expandedMax);
     }
 
-    public Region3i expandToContain(BaseVector3i adjPos) {
-        Vector3i expandedMin = min();
-        expandedMin.min(adjPos);
-        Vector3i expandedMax = max();
-        expandedMax.max(adjPos);
+    public Region3i expandToContain(GridPoint3 adjPos) {
+        GridPoint3 expandedMin = new GridPoint3(
+                Math.min(minX(),adjPos.x),
+                Math.min(minY(),adjPos.y),
+                Math.min(minZ(),adjPos.z));
+
+        GridPoint3 expandedMax = new GridPoint3(
+                Math.max(maxX(),adjPos.x),
+                Math.max(maxY(),adjPos.y),
+                Math.max(maxZ(),adjPos.z));
+
+//        expandedMin.min(adjPos);
+//        GridPoint3 expandedMax = max();
+//        expandedMax.max(adjPos);
         return createFromMinMax(expandedMin, expandedMax);
     }
 
@@ -296,10 +324,14 @@ public final class Region3i implements Iterable<GridPoint3> {
      * @param pos
      * @return The nearest position within the region to the given pos.
      */
-    public Vector3i getNearestPointTo(BaseVector3i pos) {
-        Vector3i result = new Vector3i(pos);
-        result.min(max());
-        result.max(min);
+    public GridPoint3 getNearestPointTo(GridPoint3 pos) {
+        GridPoint3 result = new GridPoint3(
+                Math.max(min.x,Math.min(pos.x,maxX())),
+                Math.max(min.y,Math.min(pos.y,maxY())),
+                Math.max(min.z,Math.min(pos.z,maxZ())));
+
+//        result.min(max());
+//        result.max(min);
         return result;
     }
 
@@ -347,7 +379,7 @@ public final class Region3i implements Iterable<GridPoint3> {
 
         @Override
         public GridPoint3 next() {
-            GridPoint3 result = new Vector3i(pos.x + min.x, pos.y + min.y, pos.z + min.z);
+            GridPoint3 result = new GridPoint3(pos.x + min.x, pos.y + min.y, pos.z + min.z);
             pos.z++;
             if (pos.z >= size.z) {
                 pos.z = 0;
@@ -366,9 +398,9 @@ public final class Region3i implements Iterable<GridPoint3> {
         }
     }
 
-    private class SubtractiveIterator implements Iterator<Vector3i> {
-        private Iterator<Vector3i> innerIterator;
-        private Vector3i next;
+    private class SubtractiveIterator implements Iterator<GridPoint3> {
+        private Iterator<GridPoint3> innerIterator;
+        private GridPoint3 next;
         private Region3i other;
 
          SubtractiveIterator(Region3i other) {
@@ -393,8 +425,8 @@ public final class Region3i implements Iterable<GridPoint3> {
         }
 
         @Override
-        public Vector3i next() {
-            Vector3i result = new Vector3i(next);
+        public GridPoint3 next() {
+            GridPoint3 result = new GridPoint3(next);
             updateNext();
             return result;
         }

@@ -15,8 +15,8 @@
  */
 package org.terasology.world.block.structure;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.block.Block;
 
 import java.util.Map;
@@ -37,7 +37,7 @@ public interface BlockStructuralSupport {
      * @param sideChanged Side that has triggered this check.
      * @return If the block should be immediately removed.
      */
-    boolean shouldBeRemovedDueToChange(Vector3i location, Side sideChanged);
+    boolean shouldBeRemovedDueToChange(GridPoint3 location, Side sideChanged);
 
     /**
      * Checks if the block at location is sufficiently supported.
@@ -46,5 +46,5 @@ public interface BlockStructuralSupport {
      * @param blockOverrides
      * @return
      */
-    boolean isSufficientlySupported(Vector3i location, Map<Vector3i, Block> blockOverrides);
+    boolean isSufficientlySupported(GridPoint3 location, Map<GridPoint3, Block> blockOverrides);
 }

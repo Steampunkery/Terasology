@@ -16,6 +16,8 @@
 
 package org.terasology.network.internal;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.base.Objects;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
@@ -23,11 +25,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-
+import com.google.common.math.DoubleMath;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-
 import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,6 @@ import org.terasology.logic.characters.PredictionSystem;
 import org.terasology.logic.common.DisplayNameComponent;
 import org.terasology.logic.location.LocationComponent;
 import org.terasology.math.ChunkMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.network.Client;
 import org.terasology.network.ClientComponent;
 import org.terasology.network.ColorComponent;
@@ -96,7 +96,7 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private BiomeManager biomeManager;
 
     // Relevance
-    private Set<Vector3i> relevantChunks = Sets.newHashSet();
+    private Set<GridPoint3> relevantChunks = Sets.newHashSet();
     private TIntSet netRelevant = new TIntHashSet();
 
     // Entity replication data
@@ -122,8 +122,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     private List<NetData.EventMessage> queuedOutgoingEvents = Lists.newArrayList();
     private final List<BlockFamily> newlyRegisteredFamilies = Lists.newArrayList();
 
-    private Map<Vector3i, Chunk> readyChunks = Maps.newLinkedHashMap();
-    private Set<Vector3i> invalidatedChunks = Sets.newLinkedHashSet();
+    private Map<GridPoint3, Chunk> readyChunks = Maps.newLinkedHashMap();
+    private Set<GridPoint3> invalidatedChunks = Sets.newLinkedHashSet();
 
 
     // Incoming messages
@@ -249,15 +249,19 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
             chunkSendCounter += chunkSendRate * NET_TICK_RATE * networkSystem.getBandwidthPerClient();
             if (chunkSendCounter > 1.0f) {
                 chunkSendCounter -= 1.0f;
-                Vector3i center = new Vector3i();
+                GridPoint3 center = new GridPoint3();
                 LocationComponent loc = getEntity().getComponent(ClientComponent.class).character.getComponent(LocationComponent.class);
                 if (loc != null) {
-                    center.set(ChunkMath.calcChunkPos(new Vector3i(loc.getWorldPosition(), RoundingMode.HALF_UP)));
+                    Vector3 pos = loc.getWorldPosition();
+                    center.set(ChunkMath.calcChunkPos(new GridPoint3(
+                            DoubleMath.roundToInt(pos.x, RoundingMode.HALF_UP),
+                            DoubleMath.roundToInt(pos.y, RoundingMode.HALF_UP),
+                            DoubleMath.roundToInt(pos.z, RoundingMode.HALF_UP))));
                 }
-                Vector3i pos = null;
+                GridPoint3 pos = null;
                 int distance = Integer.MAX_VALUE;
-                for (Vector3i chunkPos : readyChunks.keySet()) {
-                    int chunkDistance = chunkPos.distanceSquared(center);
+                for (GridPoint3 chunkPos : readyChunks.keySet()) {
+                    int chunkDistance = (int)chunkPos.dst2(center);
                     if (pos == null || chunkDistance < distance) {
                         pos = chunkPos;
                         distance = chunkDistance;
@@ -273,9 +277,9 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     private void sendChunkInvalidations(NetData.NetMessage.Builder message) {
-        Iterator<Vector3i> i = invalidatedChunks.iterator();
+        Iterator<GridPoint3> i = invalidatedChunks.iterator();
         while (i.hasNext()) {
-            Vector3i pos = i.next();
+            GridPoint3 pos = i.next();
             i.remove();
             relevantChunks.remove(pos);
             message.addInvalidateChunk(NetData.InvalidateChunkMessage.newBuilder().setPos(NetMessageUtil.convert(pos)));
@@ -379,20 +383,20 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     @Override
-    public void onChunkRelevant(Vector3i pos, Chunk chunk) {
+    public void onChunkRelevant(GridPoint3 pos, Chunk chunk) {
         invalidatedChunks.remove(pos);
         readyChunks.put(pos, chunk);
     }
 
     @Override
-    public void onChunkIrrelevant(Vector3i pos) {
+    public void onChunkIrrelevant(GridPoint3 pos) {
         readyChunks.remove(pos);
         invalidatedChunks.add(pos);
     }
 
     @Override
-    public void onBlockChanged(Vector3i pos, Block newBlock, Block originalBlock) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
+    public void onBlockChanged(GridPoint3 pos, Block newBlock, Block originalBlock) {
+        GridPoint3 chunkPos = ChunkMath.calcChunkPos(pos);
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBlockChanges.add(NetData.BlockChangeMessage.newBuilder()
                     .setPos(NetMessageUtil.convert(pos))
@@ -402,8 +406,8 @@ public class NetClient extends AbstractClient implements WorldChangeListener {
     }
 
     @Override
-    public void onBiomeChanged(Vector3i pos, Biome newBiome, Biome originalBiome) {
-        Vector3i chunkPos = ChunkMath.calcChunkPos(pos);
+    public void onBiomeChanged(GridPoint3 pos, Biome newBiome, Biome originalBiome) {
+        GridPoint3 chunkPos = ChunkMath.calcChunkPos(pos);
         if (relevantChunks.contains(chunkPos)) {
             queuedOutgoingBiomeChanges.add(NetData.BiomeChangeMessage.newBuilder()
                     .setPos(NetMessageUtil.convert(pos))

@@ -15,13 +15,12 @@
  */
 package org.terasology.rendering.nui.layouts;
 
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.Vector2;
 import com.google.common.collect.Lists;
-
 import org.terasology.input.Keyboard;
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Region2i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector2f;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreLayout;
@@ -43,17 +42,17 @@ import java.util.List;
  */
 public class ZoomableLayout extends CoreLayout {
     private List<PositionalWidget> widgets = Lists.newArrayList();
-    private Vector2f pixelSize;
-    private Vector2i screenSize;
-    private Vector2f windowPosition = new Vector2f();
-    private Vector2f windowSize = new Vector2f(50, 50);
+    private Vector2 pixelSize;
+    private GridPoint2 screenSize;
+    private Vector2 windowPosition = new Vector2();
+    private Vector2 windowSize = new Vector2(50, 50);
 
-    private Vector2i last;
+    private GridPoint2 last;
 
     private InteractionListener dragListener = new BaseInteractionListener() {
         @Override
         public void onMouseOver(NUIMouseOverEvent event) {
-            last = new Vector2i(event.getRelativeMousePosition());
+            last = new GridPoint2(event.getRelativeMousePosition());
         }
 
         @Override
@@ -63,7 +62,7 @@ public class ZoomableLayout extends CoreLayout {
 
         @Override
         public void onMouseDrag(NUIMouseDragEvent event) {
-            Vector2f p = screenToWorld(last);
+            Vector2 p = screenToWorld(last);
             p.sub(screenToWorld(event.getRelativeMousePosition()));
             p.add(windowPosition);
 
@@ -134,22 +133,22 @@ public class ZoomableLayout extends CoreLayout {
             if (!widget.isVisible()) {
                 continue;
             }
-            Vector2i screenStart = worldToScreen(widget.getPosition());
-            Vector2f worldEnd = new Vector2f(widget.getPosition());
+            GridPoint2 screenStart = worldToScreen(widget.getPosition());
+            Vector2 worldEnd = new Vector2(widget.getPosition());
             worldEnd.add(widget.getSize());
-            Vector2i screenEnd = worldToScreen(worldEnd);
-            canvas.drawWidget(widget, Rect2i.createFromMinAndMax(screenStart, screenEnd));
+            GridPoint2 screenEnd = worldToScreen(worldEnd);
+            canvas.drawWidget(widget, new Region2i(screenStart.x,screenStart.y,screenEnd.x - screenStart.x + 1,screenEnd.y - screenStart.y + 1));
         }
     }
 
     @Override
-    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return Vector2i.zero();
+    public GridPoint2 getPreferredContentSize(Canvas canvas, GridPoint2 sizeHint) {
+        return new GridPoint2();
     }
 
     @Override
-    public Vector2i getMaxContentSize(Canvas canvas) {
-        return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    public GridPoint2 getMaxContentSize(Canvas canvas) {
+        return new GridPoint2(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     @Override
@@ -185,41 +184,41 @@ public class ZoomableLayout extends CoreLayout {
         };
     }
 
-    public Vector2f screenToWorld(Vector2i screenPos) {
-        Vector2f world = new Vector2f(screenPos.x / pixelSize.x, screenPos.y / pixelSize.y);
+    public Vector2 screenToWorld(GridPoint2 screenPos) {
+        Vector2 world = new Vector2(screenPos.x / pixelSize.x, screenPos.y / pixelSize.y);
         world.add(windowPosition);
         return world;
     }
 
-    public Vector2i worldToScreen(Vector2f world) {
-        return new Vector2i(TeraMath.ceilToInt((world.x - windowPosition.x) * pixelSize.x), TeraMath.ceilToInt((world.y - windowPosition.y) * pixelSize.y));
+    public GridPoint2 worldToScreen(Vector2 world) {
+        return new GridPoint2(TeraMath.ceilToInt((world.x - windowPosition.x) * pixelSize.x), TeraMath.ceilToInt((world.y - windowPosition.y) * pixelSize.y));
     }
 
-    public void setWindowPosition(Vector2f pos) {
+    public void setWindowPosition(Vector2 pos) {
         windowPosition = pos;
     }
 
-    public void setWindowSize(Vector2f size) {
+    public void setWindowSize(Vector2 size) {
         windowSize = size;
     }
 
-    public void setScreenSize(Vector2i size) {
+    public void setScreenSize(GridPoint2 size) {
         screenSize = size;
     }
 
-    public Vector2f getPixelSize() {
+    public Vector2 getPixelSize() {
         return pixelSize;
     }
 
-    public Vector2i getScreenSize() {
+    public GridPoint2 getScreenSize() {
         return screenSize;
     }
 
-    public Vector2f getWindowPosition() {
+    public Vector2 getWindowPosition() {
         return windowPosition;
     }
 
-    public Vector2f getWindowSize() {
+    public Vector2 getWindowSize() {
         return windowSize;
     }
 
@@ -241,20 +240,20 @@ public class ZoomableLayout extends CoreLayout {
         }
 
         if ((windowSize.x > 0) && (windowSize.y > 0)) {
-            pixelSize = new Vector2f(screenSize.x / windowSize.x, screenSize.y / windowSize.y);
+            pixelSize = new Vector2(screenSize.x / windowSize.x, screenSize.y / windowSize.y);
         } else {
-            pixelSize = new Vector2f();
+            pixelSize = new Vector2();
         }
     }
 
-    public void zoom(float zoomX, float zoomY, Vector2i mousePos) {
-        Vector2f mouseBefore = screenToWorld(mousePos);
+    public void zoom(float zoomX, float zoomY, GridPoint2 mousePos) {
+        Vector2 mouseBefore = screenToWorld(mousePos);
 
         windowSize.x *= zoomX;
         windowSize.y *= zoomY;
         calculateSizes();
 
-        Vector2f mouseAfter = screenToWorld(mousePos);
+        Vector2 mouseAfter = screenToWorld(mousePos);
 
         windowPosition.x -= mouseAfter.x - mouseBefore.x;
         windowPosition.y -= mouseAfter.y - mouseBefore.y;
@@ -262,9 +261,9 @@ public class ZoomableLayout extends CoreLayout {
 
 
     public interface PositionalWidget<L extends ZoomableLayout> extends UIWidget {
-        Vector2f getPosition();
+        Vector2 getPosition();
 
-        Vector2f getSize();
+        Vector2 getSize();
 
         void onAdded(L layout);
 

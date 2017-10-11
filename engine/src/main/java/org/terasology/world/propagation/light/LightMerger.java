@@ -15,11 +15,11 @@
  */
 package org.terasology.world.propagation.light;
 
+import com.badlogic.gdx.math.GridPoint3;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.chunks.Chunk;
 import org.terasology.world.chunks.LitChunk;
 import org.terasology.world.chunks.internal.GeneratingChunkProvider;
@@ -90,7 +90,7 @@ public class LightMerger<T> {
         for (BatchPropagator propagator : propagators) {
             // Propagate Inwards
             for (Side side : Side.values()) {
-                Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPosition());
+                GridPoint3 adjChunkPos = side.getAdjacentPos(chunk.getPosition());
                 LitChunk adjChunk = chunkProvider.getChunkUnready(adjChunkPos);
                 if (adjChunk != null) {
                     propagator.propagateBetween(adjChunk, chunk, side.reverse(), false);
@@ -99,7 +99,7 @@ public class LightMerger<T> {
 
             // Propagate Outwards
             for (Side side : Side.values()) {
-                Vector3i adjChunkPos = side.getAdjacentPos(chunk.getPosition());
+                GridPoint3 adjChunkPos = side.getAdjacentPos(chunk.getPosition());
                 LitChunk adjChunk = chunkProvider.getChunk(adjChunkPos);
                 if (adjChunk != null) {
                     propagator.propagateBetween(chunk, adjChunk, side, true);

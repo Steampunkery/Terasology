@@ -16,10 +16,10 @@
 
 package org.terasology.rendering.assets.font;
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Vector2i;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public abstract class Font extends Asset<FontData> {
 
     public abstract int getBaseHeight();
 
-    public abstract Vector2i getSize(List<String> lines);
+    public abstract GridPoint2 getSize(List<String> lines);
 
     public abstract boolean hasCharacter(Character c);
 

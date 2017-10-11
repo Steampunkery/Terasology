@@ -15,11 +15,10 @@
  */
 package org.terasology.logic.characters.events;
 
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.event.AbstractConsumableEvent;
-import org.terasology.entitySystem.event.Event;
 import org.terasology.logic.location.LocationComponent;
-import org.terasology.math.geom.Vector3f;
 
 /**
  */
@@ -27,17 +26,17 @@ public class ActivationPredicted extends AbstractConsumableEvent {
 
     private EntityRef instigator;
     private EntityRef target;
-    private Vector3f origin;
-    private Vector3f direction;
-    private Vector3f hitPosition;
-    private Vector3f hitNormal;
+    private Vector3 origin;
+    private Vector3 direction;
+    private Vector3 hitPosition;
+    private Vector3 hitNormal;
     private int activationId;
 
     public ActivationPredicted() {
     }
 
-    public ActivationPredicted(EntityRef instigator, EntityRef target, Vector3f origin, Vector3f direction,
-                               Vector3f hitPosition, Vector3f hitNormal, int activationId) {
+    public ActivationPredicted(EntityRef instigator, EntityRef target, Vector3 origin, Vector3 direction,
+                               Vector3 hitPosition, Vector3 hitNormal, int activationId) {
         this.instigator = instigator;
         this.target = target;
         this.direction = direction;
@@ -55,19 +54,19 @@ public class ActivationPredicted extends AbstractConsumableEvent {
         return target;
     }
 
-    public Vector3f getOrigin() {
+    public Vector3 getOrigin() {
         return origin;
     }
 
-    public Vector3f getDirection() {
+    public Vector3 getDirection() {
         return direction;
     }
 
-    public Vector3f getHitPosition() {
+    public Vector3 getHitPosition() {
         return hitPosition;
     }
 
-    public Vector3f getHitNormal() {
+    public Vector3 getHitNormal() {
         return hitNormal;
     }
 
@@ -75,7 +74,7 @@ public class ActivationPredicted extends AbstractConsumableEvent {
         return activationId;
     }
 
-    public Vector3f getTargetLocation() {
+    public Vector3 getTargetLocation() {
         LocationComponent loc = target.getComponent(LocationComponent.class);
         if (loc != null) {
             return loc.getWorldPosition();
@@ -83,11 +82,11 @@ public class ActivationPredicted extends AbstractConsumableEvent {
         return null;
     }
 
-    public Vector3f getInstigatorLocation() {
+    public Vector3 getInstigatorLocation() {
         LocationComponent loc = instigator.getComponent(LocationComponent.class);
         if (loc != null) {
             return loc.getWorldPosition();
         }
-        return new Vector3f();
+        return new Vector3();
     }
 }

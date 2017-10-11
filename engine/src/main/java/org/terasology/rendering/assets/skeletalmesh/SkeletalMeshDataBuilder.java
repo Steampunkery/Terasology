@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.assets.skeletalmesh;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Lists;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.assets.mesh.MeshBuilder;
 import org.terasology.rendering.assets.mesh.MeshData;
 
@@ -33,13 +33,13 @@ public class SkeletalMeshDataBuilder {
 
     private List<Bone> bones = Lists.newArrayList();
     private List<BoneWeight> weights = Lists.newArrayList();
-    private List<Vector2f> uvs = Lists.newArrayList();
+    private List<Vector2> uvs = Lists.newArrayList();
     private TIntList vertexStartWeights = new TIntArrayList();
     private TIntList vertexWeightCounts = new TIntArrayList();
     private TIntList indices = new TIntArrayList();
     private MeshBuilder.TextureMapper textureMapper;
-    private Vector3f minOfAABB;
-    private Vector3f maxOfAABB;
+    private Vector3 minOfAABB;
+    private Vector3 maxOfAABB;
 
     public SkeletalMeshDataBuilder() {
 
@@ -53,16 +53,22 @@ public class SkeletalMeshDataBuilder {
     }
 
     public SkeletalMeshDataBuilder addWeight(BoneWeight boneWeight) {
-        Vector3f pos = boneWeight.getPosition();
+        Vector3 pos = boneWeight.getPosition();
         if (minOfAABB == null) {
-            minOfAABB = new Vector3f(pos);
+            minOfAABB = new Vector3(pos);
         } else {
-            minOfAABB.min(pos);
+            minOfAABB.set(
+                    Math.min(minOfAABB.x,pos.x),
+                    Math.min(minOfAABB.y,pos.y),
+                    Math.min(minOfAABB.z,pos.z));
         }
         if (maxOfAABB == null) {
-            maxOfAABB = new Vector3f(pos);
+            maxOfAABB = new Vector3(pos);
         } else {
-            maxOfAABB.max(pos);
+            maxOfAABB.set(
+                    Math.max(maxOfAABB.x,pos.x),
+                    Math.max(maxOfAABB.y,pos.y),
+                    Math.max(maxOfAABB.z,pos.z));
         }
         weights.add(boneWeight);
         return this;
@@ -72,7 +78,7 @@ public class SkeletalMeshDataBuilder {
         return addMesh(bone, builder.getMeshData());
     }
 
-    public SkeletalMeshDataBuilder addBox(Bone bone, Vector3f offset, Vector3f size, float u, float v) {
+    public SkeletalMeshDataBuilder addBox(Bone bone, Vector3 offset, Vector3 size, float u, float v) {
         MeshBuilder meshBuilder = new MeshBuilder();
         meshBuilder.setTextureMapper(textureMapper);
         meshBuilder.addBox(offset, size, u, v);
@@ -89,14 +95,14 @@ public class SkeletalMeshDataBuilder {
             float x = meshVertices.get(i * 3);
             float y = meshVertices.get(i * 3 + 1);
             float z = meshVertices.get(i * 3 + 2);
-            Vector3f pos = new Vector3f(x, y, z);
+            Vector3 pos = new Vector3(x, y, z);
             BoneWeight weight = new BoneWeight(pos, 1, bone.getIndex());
             // TODO Meshes may contain normal vectors and we may copy them to the weight here
             //   - but they are recalculated later on in either case. needs some rework
             addWeight(weight);
             vertexStartWeights.add(weightsStart + i);
             vertexWeightCounts.add(1);
-            uvs.add(new Vector2f(texCoord0.get(i * 2), texCoord0.get(i * 2 + 1)));
+            uvs.add(new Vector2(texCoord0.get(i * 2), texCoord0.get(i * 2 + 1)));
         }
 
         for (int i = 0; i < meshIndices.size(); i++) {
@@ -116,7 +122,7 @@ public class SkeletalMeshDataBuilder {
         this.vertexWeightCounts.addAll(vertexWeightCount);
     }
 
-    public void setUvs(List<Vector2f> uvs) {
+    public void setUvs(List<Vector2> uvs) {
         this.uvs.clear();
         this.uvs.addAll(uvs);
     }

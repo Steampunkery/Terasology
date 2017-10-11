@@ -15,12 +15,9 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.terasology.assets.Asset;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2d;
-import org.terasology.math.geom.Vector2i;
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.GridPoint3;
+import org.terasology.math.Region2i;
 import org.terasology.rendering.nui.BaseInteractionListener;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -29,7 +26,6 @@ import org.terasology.rendering.nui.events.NUIMouseClickEvent;
 import org.terasology.rendering.nui.events.NUIMouseDragEvent;
 import org.terasology.rendering.nui.events.NUIMouseOverEvent;
 import org.terasology.rendering.nui.events.NUIMouseReleaseEvent;
-import org.terasology.utilities.Assets;
 
 /**
  * A radial menu widget
@@ -91,26 +87,26 @@ public class UIRadialRing extends CoreWidget {
 
     private void initialise(Canvas canvas) {
         final double CIRCLE_TO_SQUARE = 0.707106781;
-        Rect2i region = canvas.getRegion();
+        Region2i region = canvas.getRegion();
 
-        int sectionWidth = region.width() / 4;
+        int sectionWidth = region.width / 4;
         double offset = sectionWidth * 1.5;
         radius = sectionWidth * 2;
         sectionAngle = (Math.PI * 2) / sections.length;
         int infoSquareSize = (int) (radius * CIRCLE_TO_SQUARE);
         int sectionSquareSize = (int) (sectionWidth * CIRCLE_TO_SQUARE);
-        Rect2i infoRegion = Rect2i.createFromMinAndSize(
+        Region2i infoRegion = new Region2i(
                 sectionWidth + infoSquareSize / 4,
                 sectionWidth + infoSquareSize / 4,
                 infoSquareSize,
                 infoSquareSize);
 
         for (int i = 0; i < sections.length; i++) {
-            sections[i].setDrawRegion(Rect2i.createFromMinAndSize(
+            sections[i].setDrawRegion(new Region2i(
                     (int) (Math.cos(i * sectionAngle + sectionAngle / 2) * offset + sectionWidth * 1.5),
                     (int) (Math.sin(i * sectionAngle + sectionAngle / 2) * offset + sectionWidth * 1.5),
                     sectionWidth, sectionWidth));
-            sections[i].setInnerRegion(Rect2i.createFromMinAndSize(
+            sections[i].setInnerRegion(new Region2i(
                     (int) (Math.cos(i * sectionAngle + sectionAngle / 2) * offset + sectionWidth * 1.5 + sectionSquareSize / 4),
                     (int) (Math.sin(i * sectionAngle + sectionAngle / 2) * offset + sectionWidth * 1.5 + sectionSquareSize / 4),
                     sectionSquareSize, sectionSquareSize));
@@ -143,19 +139,20 @@ public class UIRadialRing extends CoreWidget {
     }
 
     @Override
-    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i sizeHint) {
-        return canvas.getRegion().size();
+    public GridPoint2 getPreferredContentSize(Canvas canvas, GridPoint2 sizeHint) {
+        Region2i p = canvas.getRegion();
+        return new GridPoint2(p.width,p.height);
     }
 
 
-    private int getSectionOver(Vector2i mousePos) {
+    private int getSectionOver(GridPoint2 mousePos) {
         mousePos.x -= radius;
         mousePos.y -= radius;
 
-        double angle = Math.atan2(mousePos.y(), mousePos.x());
+        double angle = Math.atan2(mousePos.y, mousePos.x);
         angle = angle < 0 ? angle + Math.PI * 2 : angle;
 
-        double dist = Math.sqrt(mousePos.x() * mousePos.x() + mousePos.y() * mousePos.y());
+        double dist = Math.sqrt(mousePos.x * mousePos.x + mousePos.y * mousePos.y);
         if (dist < radius / 2 || dist > radius) {
             return -1;
         }

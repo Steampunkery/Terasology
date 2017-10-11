@@ -15,7 +15,7 @@
  */
 package org.terasology.rendering.nui.widgets;
 
-import org.terasology.math.geom.Vector2i;
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.rendering.assets.font.Font;
 import org.terasology.rendering.nui.Canvas;
 import org.terasology.rendering.nui.CoreWidget;
@@ -96,7 +96,7 @@ public class UILabel extends CoreWidget {
     }
 
     @Override
-    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
+    public GridPoint2 getPreferredContentSize(Canvas canvas, GridPoint2 areaHint) {
         Font font = canvas.getCurrentStyle().getFont();
         List<String> lines = TextLineBuilder.getLines(font, getText(), areaHint.x);
         return font.getSize(lines);

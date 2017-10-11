@@ -16,14 +16,14 @@
 
 package org.terasology.rendering.assets.material;
 
+import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.math.Vector4;
 import org.terasology.rendering.assets.shader.ShaderProgramFeature;
 import org.terasology.rendering.assets.texture.Texture;
 import org.terasology.rendering.cameras.Camera;
@@ -87,9 +87,9 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name
      * @param value
      */
-    public abstract void setFloat2(String name, Vector2f value);
+    public abstract void setFloat2(String name, Vector2 value);
 
-    public abstract void setFloat2(String name, Vector2f value, boolean currentOnly);
+    public abstract void setFloat2(String name, Vector2 value, boolean currentOnly);
 
     /**
      * Sets a float2 uniform parameter (for all feature permutations)
@@ -119,9 +119,9 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name
      * @param value
      */
-    public abstract void setFloat3(String name, Vector3f value);
+    public abstract void setFloat3(String name, Vector3 value);
 
-    public abstract void setFloat3(String name, Vector3f value, boolean currentOnly);
+    public abstract void setFloat3(String name, Vector3 value, boolean currentOnly);
 
     /**
      * Sets a float3 uniform parameter (for all feature permutations)
@@ -152,9 +152,9 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name
      * @param value
      */
-    public abstract void setFloat4(String name, Vector4f value);
+    public abstract void setFloat4(String name, Vector4 value);
 
-    public abstract void setFloat4(String name, Vector4f value, boolean currentOnly);
+    public abstract void setFloat4(String name, Vector4 value, boolean currentOnly);
 
     /**
      * Sets a float4 uniform parameter (for all feature permutations)
@@ -192,9 +192,9 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name
      * @param matrix
      */
-    public abstract void setMatrix3(String name, Matrix3f matrix);
+    public abstract void setMatrix3(String name, Matrix3 matrix);
 
-    public abstract void setMatrix3(String name, Matrix3f matrix, boolean currentOnly);
+    public abstract void setMatrix3(String name, Matrix3 matrix, boolean currentOnly);
 
     /**
      * Sets a matrix3 uniform parameter (for all feature permutations)
@@ -212,9 +212,9 @@ public abstract class Material extends Asset<MaterialData> {
      * @param name
      * @param matrix
      */
-    public abstract void setMatrix4(String name, Matrix4f matrix);
+    public abstract void setMatrix4(String name, Matrix4 matrix);
 
-    public abstract void setMatrix4(String name, Matrix4f matrix, boolean currentOnly);
+    public abstract void setMatrix4(String name, Matrix4 matrix, boolean currentOnly);
 
     /**
      * Sets a matrix3 uniform parameter (for all feature permutations)

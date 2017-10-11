@@ -15,7 +15,7 @@
  */
 package org.terasology.persistence;
 
-import org.terasology.math.geom.Vector3i;
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.network.Client;
 import org.terasology.world.chunks.Chunk;
 
@@ -50,7 +50,7 @@ public interface StorageManager {
      *
      * @param chunkPos
      */
-    ChunkStore loadChunkStore(Vector3i chunkPos);
+    ChunkStore loadChunkStore(GridPoint3 chunkPos);
 
     void finishSavingAndShutdown();
 

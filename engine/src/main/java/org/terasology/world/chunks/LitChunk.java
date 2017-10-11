@@ -15,7 +15,7 @@
  */
 package org.terasology.world.chunks;
 
-import org.terasology.math.geom.BaseVector3i;
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.module.sandbox.API;
 
 /**
@@ -23,27 +23,27 @@ import org.terasology.module.sandbox.API;
 @API
 public interface LitChunk extends CoreChunk {
 
-    byte getSunlight(BaseVector3i pos);
+    byte getSunlight(GridPoint3 pos);
 
     byte getSunlight(int x, int y, int z);
 
-    boolean setSunlight(BaseVector3i pos, byte amount);
+    boolean setSunlight(GridPoint3 pos, byte amount);
 
     boolean setSunlight(int x, int y, int z, byte amount);
 
-    byte getSunlightRegen(BaseVector3i pos);
+    byte getSunlightRegen(GridPoint3 pos);
 
     byte getSunlightRegen(int x, int y, int z);
 
-    boolean setSunlightRegen(BaseVector3i pos, byte amount);
+    boolean setSunlightRegen(GridPoint3 pos, byte amount);
 
     boolean setSunlightRegen(int x, int y, int z, byte amount);
 
-    byte getLight(BaseVector3i pos);
+    byte getLight(GridPoint3 pos);
 
     byte getLight(int x, int y, int z);
 
-    boolean setLight(BaseVector3i pos, byte amount);
+    boolean setLight(GridPoint3 pos, byte amount);
 
     boolean setLight(int x, int y, int z, byte amount);
 }

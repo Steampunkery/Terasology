@@ -16,12 +16,12 @@
 
 package org.terasology.world.internal;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.terasology.math.ChunkMath;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.biomes.BiomeManager;
 import org.terasology.world.block.Block;
@@ -35,21 +35,21 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
 
     private static final Logger logger = LoggerFactory.getLogger(ChunkViewCoreImpl.class);
 
-    private Vector3i offset;
+    private GridPoint3 offset;
     private Region3i chunkRegion;
     private Region3i blockRegion;
     private Chunk[] chunks;
 
-    private Vector3i chunkPower;
-    private Vector3i chunkFilterSize;
+    private GridPoint3 chunkPower;
+    private GridPoint3 chunkFilterSize;
 
     private Block defaultBlock;
 
-    public ChunkViewCoreImpl(Chunk[] chunks, Region3i chunkRegion, Vector3i offset, Block defaultBlock) {
+    public ChunkViewCoreImpl(Chunk[] chunks, Region3i chunkRegion, GridPoint3 offset, Block defaultBlock) {
         this.chunkRegion = chunkRegion;
         this.chunks = chunks;
         this.offset = offset;
-        setChunkSize(new Vector3i(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
+        setChunkSize(new GridPoint3(ChunkConstants.SIZE_X, ChunkConstants.SIZE_Y, ChunkConstants.SIZE_Z));
         this.defaultBlock = defaultBlock;
     }
 
@@ -69,7 +69,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public Block getBlock(Vector3i pos) {
+    public Block getBlock(GridPoint3 pos) {
         return getBlock(pos.x, pos.y, pos.z);
     }
 
@@ -93,7 +93,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public Biome getBiome(Vector3i pos) {
+    public Biome getBiome(GridPoint3 pos) {
         return getBiome(pos.x, pos.y, pos.z);
     }
 
@@ -104,7 +104,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
         }
 
         int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-        Vector3i blockPos = ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize);
+        GridPoint3 blockPos = ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize);
         return chunks[chunkIndex].getBiome(blockPos.x, blockPos.y, blockPos.z);
     }
 
@@ -114,7 +114,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public byte getSunlight(Vector3i pos) {
+    public byte getSunlight(GridPoint3 pos) {
         return getSunlight(pos.x, pos.y, pos.z);
     }
 
@@ -124,7 +124,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public byte getLight(Vector3i pos) {
+    public byte getLight(GridPoint3 pos) {
         return getLight(pos.x, pos.y, pos.z);
     }
 
@@ -149,7 +149,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public void setBlock(Vector3i pos, Block type) {
+    public void setBlock(GridPoint3 pos, Block type) {
         setBlock(pos.x, pos.y, pos.z, type);
     }
 
@@ -164,7 +164,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public void setBiome(Vector3i pos, Biome biome) {
+    public void setBiome(GridPoint3 pos, Biome biome) {
         setBiome(pos.x, pos.y, pos.z, biome);
     }
 
@@ -172,7 +172,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     public void setBiome(int blockX, int blockY, int blockZ, Biome biome) {
         if (blockRegion.encompasses(blockX, blockY, blockZ)) {
             int chunkIndex = relChunkIndex(blockX, blockY, blockZ);
-            Vector3i pos = ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize);
+            GridPoint3 pos = ChunkMath.calcBlockPos(blockX, blockY, blockZ, chunkFilterSize);
             chunks[chunkIndex].setBiome(pos.x, pos.y, pos.z, biome);
         } else {
             logger.warn("Attempt to modify biome outside of the view");
@@ -180,7 +180,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public LiquidData getLiquid(Vector3i pos) {
+    public LiquidData getLiquid(GridPoint3 pos) {
         return getLiquid(pos.x, pos.y, pos.z);
     }
 
@@ -195,7 +195,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public void setLiquid(Vector3i pos, LiquidData newState) {
+    public void setLiquid(GridPoint3 pos, LiquidData newState) {
         setLiquid(pos.x, pos.y, pos.z, newState);
     }
 
@@ -210,7 +210,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public void setLight(Vector3i pos, byte light) {
+    public void setLight(GridPoint3 pos, byte light) {
         setLight(pos.x, pos.y, pos.z, light);
     }
 
@@ -225,7 +225,7 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public void setSunlight(Vector3i pos, byte light) {
+    public void setSunlight(GridPoint3 pos, byte light) {
         setSunlight(pos.x, pos.y, pos.z, light);
     }
 
@@ -240,23 +240,23 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
     }
 
     @Override
-    public void setDirtyAround(Vector3i blockPos) {
-        for (Vector3i pos : ChunkMath.getChunkRegionAroundWorldPos(blockPos, 1)) {
+    public void setDirtyAround(GridPoint3 blockPos) {
+        for (GridPoint3 pos : ChunkMath.getChunkRegionAroundWorldPos(blockPos, 1)) {
             chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);
         }
     }
 
     @Override
     public void setDirtyAround(Region3i region) {
-        Vector3i minPos = new Vector3i(region.min());
+        GridPoint3 minPos = new GridPoint3(region.min());
         minPos.sub(1, 1, 1);
-        Vector3i maxPos = new Vector3i(region.max());
+        GridPoint3 maxPos = new GridPoint3(region.max());
         maxPos.add(1, 1, 1);
 
-        Vector3i minChunk = ChunkMath.calcChunkPos(minPos, chunkPower);
-        Vector3i maxChunk = ChunkMath.calcChunkPos(maxPos, chunkPower);
+        GridPoint3 minChunk = ChunkMath.calcChunkPos(minPos, chunkPower);
+        GridPoint3 maxChunk = ChunkMath.calcChunkPos(maxPos, chunkPower);
 
-        for (Vector3i pos : Region3i.createFromMinMax(minChunk, maxChunk)) {
+        for (GridPoint3 pos : Region3i.createFromMinMax(minChunk, maxChunk)) {
             chunks[pos.x + offset.x + chunkRegion.size().x * (pos.z + offset.z)].setDirty(true);
         }
     }
@@ -277,21 +277,21 @@ public class ChunkViewCoreImpl implements ChunkViewCore {
                 ChunkMath.calcChunkPosZ(z, chunkPower.z) + offset.z, chunkRegion.size());
     }
 
-    public void setChunkSize(Vector3i chunkSize) {
-        this.chunkFilterSize = new Vector3i(TeraMath.ceilPowerOfTwo(chunkSize.x) - 1, TeraMath.ceilPowerOfTwo(chunkSize.y) - 1, TeraMath.ceilPowerOfTwo(chunkSize.z) - 1);
-        this.chunkPower = new Vector3i(TeraMath.sizeOfPower(chunkSize.x), TeraMath.sizeOfPower(chunkSize.y), TeraMath.sizeOfPower(chunkSize.z));
+    public void setChunkSize(GridPoint3 chunkSize) {
+        this.chunkFilterSize = new GridPoint3(TeraMath.ceilPowerOfTwo(chunkSize.x) - 1, TeraMath.ceilPowerOfTwo(chunkSize.y) - 1, TeraMath.ceilPowerOfTwo(chunkSize.z) - 1);
+        this.chunkPower = new GridPoint3(TeraMath.sizeOfPower(chunkSize.x), TeraMath.sizeOfPower(chunkSize.y), TeraMath.sizeOfPower(chunkSize.z));
 
-        Vector3i blockMin = new Vector3i();
-        blockMin.sub(offset);
-        blockMin.mul(chunkSize.x, chunkSize.y, chunkSize.z);
-        Vector3i blockSize = chunkRegion.size();
-        blockSize.mul(chunkSize.x, chunkSize.y, chunkSize.z);
+        GridPoint3 blockMin = new GridPoint3(-offset.x * chunkSize.x,-offset.y * chunkSize.y,-offset.z * chunkSize.z);
+        GridPoint3 blockSize = chunkRegion.size();
+        blockSize.x *= chunkSize.x;
+        blockSize.y *= chunkSize.y;
+        blockSize.z *= chunkSize.z;
         this.blockRegion = Region3i.createFromMinAndSize(blockMin, blockSize);
     }
 
     @Override
-    public Vector3i toWorldPos(Vector3i localPos) {
-        return new Vector3i(localPos.x + (offset.x + chunkRegion.min().x) * ChunkConstants.SIZE_X, localPos.y + (offset.y + chunkRegion.min().y) * ChunkConstants.SIZE_Y,
+    public GridPoint3 toWorldPos(GridPoint3 localPos) {
+        return new GridPoint3(localPos.x + (offset.x + chunkRegion.min().x) * ChunkConstants.SIZE_X, localPos.y + (offset.y + chunkRegion.min().y) * ChunkConstants.SIZE_Y,
                 localPos.z + (offset.z + chunkRegion.min().z) * ChunkConstants.SIZE_Z);
     }
 }

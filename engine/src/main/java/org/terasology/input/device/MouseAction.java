@@ -15,9 +15,9 @@
  */
 package org.terasology.input.device;
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.geom.Vector2i;
 
 /**
  */
@@ -25,16 +25,16 @@ public final class MouseAction {
     private final Input input;
     private final ButtonState state;
     private final int delta;
-    private final Vector2i mousePosition;
+    private final GridPoint2 mousePosition;
 
-    public MouseAction(Input input, ButtonState state, Vector2i mousePosition) {
+    public MouseAction(Input input, ButtonState state, GridPoint2 mousePosition) {
         this.mousePosition = mousePosition;
         this.input = input;
         this.state = state;
         this.delta = 0;
     }
 
-    public MouseAction(Input input, int delta, Vector2i mousePosition) {
+    public MouseAction(Input input, int delta, GridPoint2 mousePosition) {
         this.mousePosition = mousePosition;
         this.input = input;
         this.state = ButtonState.DOWN;
@@ -69,7 +69,7 @@ public final class MouseAction {
         return delta;
     }
 
-    public Vector2i getMousePosition() {
+    public GridPoint2 getMousePosition() {
         return mousePosition;
     }
 

@@ -16,19 +16,19 @@
 
 package org.terasology.world.chunks.pipeline;
 
-import org.terasology.math.geom.Vector3i;
+import com.badlogic.gdx.math.GridPoint3;
 
 /**
  */
 public abstract class AbstractChunkTask implements ChunkTask {
-    private final Vector3i position;
+    private final GridPoint3 position;
 
-    public AbstractChunkTask(Vector3i position) {
-        this.position = new Vector3i(position);
+    public AbstractChunkTask(GridPoint3 position) {
+        this.position = new GridPoint3(position);
     }
 
     @Override
-    public Vector3i getPosition() {
+    public GridPoint3 getPosition() {
         return position;
     }
 

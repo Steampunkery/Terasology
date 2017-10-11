@@ -15,9 +15,9 @@
  */
 package org.terasology.particles;
 
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import org.terasology.math.Vector4;
 import org.terasology.module.sandbox.API;
 
 /**
@@ -31,14 +31,14 @@ public final class ParticleData {
     public float energy;
 
     // 2d vectors
-    public final Vector2f textureOffset = new Vector2f();
+    public final Vector2 textureOffset = new Vector2();
 
     // 3d vectors
-    public final Vector3f position = new Vector3f();
-    public final Vector3f previousPosition = new Vector3f();
-    public final Vector3f velocity = new Vector3f();
-    public final Vector3f scale = new Vector3f();
+    public final Vector3 position = new Vector3();
+    public final Vector3 previousPosition = new Vector3();
+    public final Vector3 velocity = new Vector3();
+    public final Vector3 scale = new Vector3();
 
     // 4d vectors
-    public final Vector4f color = new Vector4f();
+    public final Vector4 color = new Vector4();
 }

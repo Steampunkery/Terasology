@@ -16,16 +16,15 @@
 
 package org.terasology.input.cameraTarget;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.base.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.math.DoubleMath;
 import org.terasology.config.Config;
 import org.terasology.entitySystem.entity.EntityRef;
 import org.terasology.entitySystem.systems.BaseComponentSystem;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.physics.CollisionGroup;
 import org.terasology.physics.HitResult;
 import org.terasology.physics.Physics;
@@ -59,9 +58,9 @@ public class CameraTargetSystem extends BaseComponentSystem {
 
     private float targetDistance;
     private EntityRef target = EntityRef.NULL;
-    private Vector3i targetBlockPos;
-    private Vector3f hitPosition = new Vector3f();
-    private Vector3f hitNormal = new Vector3f();
+    private GridPoint3 targetBlockPos;
+    private Vector3 hitPosition = new Vector3();
+    private Vector3 hitNormal = new Vector3();
     private CollisionGroup[] filter = {StandardCollisionGroup.DEFAULT, StandardCollisionGroup.WORLD, StandardCollisionGroup.CHARACTER};
     private float focalDistance;
     private boolean isBlock;
@@ -88,12 +87,12 @@ public class CameraTargetSystem extends BaseComponentSystem {
         }
     }
 
-    public Vector3f getHitPosition() {
-        return new Vector3f(hitPosition);
+    public Vector3 getHitPosition() {
+        return new Vector3(hitPosition);
     }
 
-    public Vector3f getHitNormal() {
-        return new Vector3f(hitNormal);
+    public Vector3 getHitNormal() {
+        return new Vector3(hitNormal);
 
     }
 
@@ -113,10 +112,10 @@ public class CameraTargetSystem extends BaseComponentSystem {
         }
 
 
-        HitResult hitInfo = physics.rayTrace(new Vector3f(localPlayer.getViewPosition()),
-                new Vector3f(localPlayer.getViewDirection()), targetDistance, filter);
+        HitResult hitInfo = physics.rayTrace(new Vector3(localPlayer.getViewPosition()),
+                new Vector3(localPlayer.getViewDirection()), targetDistance, filter);
         updateFocalDistance(hitInfo, delta);
-        Vector3i newBlockPos = null;
+        GridPoint3 newBlockPos = null;
 
         EntityRef newTarget = EntityRef.NULL;
         if (hitInfo.isHit()) {
@@ -124,7 +123,7 @@ public class CameraTargetSystem extends BaseComponentSystem {
             hitPosition = hitInfo.getHitPoint();
             hitNormal = hitInfo.getHitNormal();
             if (hitInfo.isWorldHit()) {
-                newBlockPos = new Vector3i(hitInfo.getBlockPosition());
+                newBlockPos = new GridPoint3(hitInfo.getBlockPosition());
             }
         }
         if (!Objects.equal(target, newTarget) || lostTarget) {
@@ -143,11 +142,11 @@ public class CameraTargetSystem extends BaseComponentSystem {
         float focusRate = 4.0f; //how fast the focus distance is updated
         //if the hit result from a trace has a recorded a hit
         if (hitInfo.isHit()) {
-            Vector3f playerToTargetRay = new Vector3f();
+            Vector3 playerToTargetRay = new Vector3(hitInfo.getHitPoint());
             //calculate the distance from the player to the hit point
-            playerToTargetRay.sub(hitInfo.getHitPoint(), localPlayer.getViewPosition());
+            playerToTargetRay.sub(localPlayer.getViewPosition());
             //gradually adjust focalDistance from it's current value to the hit point distance
-            focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.length(), delta * focusRate);
+            focalDistance = TeraMath.lerp(focalDistance, playerToTargetRay.len(), delta * focusRate);
             //if nothing was hit, gradually adjust the focusDistance to the maximum length of the update function trace
         } else {
             focalDistance = TeraMath.lerp(focalDistance, targetDistance, delta * focusRate);
@@ -175,11 +174,14 @@ public class CameraTargetSystem extends BaseComponentSystem {
         return "";
     }
 
-    public Vector3i getTargetBlockPosition() {
+    public GridPoint3 getTargetBlockPosition() {
         if (targetBlockPos != null) {
-            return new Vector3i(targetBlockPos);
+            return new GridPoint3(targetBlockPos);
         }
-        return new Vector3i(hitPosition, RoundingMode.HALF_UP);
+
+        return new GridPoint3(   DoubleMath.roundToInt(hitPosition.x, RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(hitPosition.y, RoundingMode.HALF_UP),
+                DoubleMath.roundToInt(hitPosition.z, RoundingMode.HALF_UP));
     }
 
     /**

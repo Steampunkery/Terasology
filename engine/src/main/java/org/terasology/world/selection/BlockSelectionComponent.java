@@ -15,9 +15,9 @@
  */
 package org.terasology.world.selection;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.entitySystem.Component;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.rendering.assets.texture.Texture;
 
@@ -36,7 +36,7 @@ public class BlockSelectionComponent implements Component {
     /**
      * Starting point for the block selection.   Used to re-create the currentSelection region when the ending point is changed.
      */
-    public Vector3i startPosition;
+    public GridPoint3 startPosition;
 
     /**
      * Selected block region.   Starts as null, then is set to a single block indicated by the start position

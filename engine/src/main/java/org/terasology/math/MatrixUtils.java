@@ -16,10 +16,10 @@
 
 package org.terasology.math;
 
+import com.badlogic.gdx.math.Matrix3;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import org.lwjgl.BufferUtils;
-import org.terasology.math.geom.Matrix3f;
-import org.terasology.math.geom.Matrix4f;
-import org.terasology.math.geom.Vector3f;
 
 import java.nio.FloatBuffer;
 
@@ -39,7 +39,7 @@ public final class MatrixUtils {
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
      */
-    public static FloatBuffer matrixToFloatBuffer(Matrix4f m) {
+    public static FloatBuffer matrixToFloatBuffer(Matrix4 m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         matrixToFloatBuffer(m, buffer);
         return buffer;
@@ -52,7 +52,7 @@ public final class MatrixUtils {
      * @param m the matrix to copy
      * @return A new FloatBuffer containing the matrix in column-major form.
      */
-    public static FloatBuffer matrixToFloatBuffer(Matrix3f m) {
+    public static FloatBuffer matrixToFloatBuffer(Matrix3 m) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(9);
         matrixToFloatBuffer(m, buffer);
         return buffer;
@@ -66,16 +66,16 @@ public final class MatrixUtils {
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
      */
-    public static FloatBuffer matrixToFloatBuffer(Matrix3f m, FloatBuffer fb) {
-        fb.put(m.m00);
-        fb.put(m.m10);
-        fb.put(m.m20);
-        fb.put(m.m01);
-        fb.put(m.m11);
-        fb.put(m.m21);
-        fb.put(m.m02);
-        fb.put(m.m12);
-        fb.put(m.m22);
+    public static FloatBuffer matrixToFloatBuffer(Matrix3 m, FloatBuffer fb) {
+        fb.put(m.val[Matrix3.M00]);
+        fb.put(m.val[Matrix3.M10]);
+        fb.put(m.val[Matrix3.M20]);
+        fb.put(m.val[Matrix3.M01]);
+        fb.put(m.val[Matrix3.M11]);
+        fb.put(m.val[Matrix3.M21]);
+        fb.put(m.val[Matrix3.M02]);
+        fb.put(m.val[Matrix3.M12]);
+        fb.put(m.val[Matrix3.M22]);
 
         fb.flip();
         return fb;
@@ -89,77 +89,80 @@ public final class MatrixUtils {
      * @param fb the float buffer to copy the matrix into
      * @return The provided float buffer.
      */
-    public static FloatBuffer matrixToFloatBuffer(Matrix4f m, FloatBuffer fb) {
-        fb.put(m.m00);
-        fb.put(m.m10);
-        fb.put(m.m20);
-        fb.put(m.m30);
-        fb.put(m.m01);
-        fb.put(m.m11);
-        fb.put(m.m21);
-        fb.put(m.m31);
-        fb.put(m.m02);
-        fb.put(m.m12);
-        fb.put(m.m22);
-        fb.put(m.m32);
-        fb.put(m.m03);
-        fb.put(m.m13);
-        fb.put(m.m23);
-        fb.put(m.m33);
+    public static FloatBuffer matrixToFloatBuffer(Matrix4 m, FloatBuffer fb) {
+        fb.put(m.val[Matrix4.M00]);
+        fb.put(m.val[Matrix4.M10]);
+        fb.put(m.val[Matrix4.M20]);
+        fb.put(m.val[Matrix4.M30]);
+
+        fb.put(m.val[Matrix4.M01]);
+        fb.put(m.val[Matrix4.M11]);
+        fb.put(m.val[Matrix4.M21]);
+        fb.put(m.val[Matrix4.M31]);
+
+        fb.put(m.val[Matrix4.M02]);
+        fb.put(m.val[Matrix4.M12]);
+        fb.put(m.val[Matrix4.M22]);
+        fb.put(m.val[Matrix4.M32]);
+
+        fb.put(m.val[Matrix4.M03]);
+        fb.put(m.val[Matrix4.M13]);
+        fb.put(m.val[Matrix4.M23]);
+        fb.put(m.val[Matrix4.M33]);
 
         fb.flip();
         return fb;
     }
 
-    public static Matrix4f createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
-        return createViewMatrix(new Vector3f(eyeX, eyeY, eyeZ), new Vector3f(centerX, centerY, centerZ), new Vector3f(upX, upY, upZ));
+    public static Matrix4 createViewMatrix(float eyeX, float eyeY, float eyeZ, float centerX, float centerY, float centerZ, float upX, float upY, float upZ) {
+        return createViewMatrix(new Vector3(eyeX, eyeY, eyeZ), new Vector3(centerX, centerY, centerZ), new Vector3(upX, upY, upZ));
     }
 
-    public static Matrix4f createViewMatrix(Vector3f eye, Vector3f center, Vector3f up) {
-        Matrix4f m = new Matrix4f();
+    public static Matrix4 createViewMatrix(Vector3 eye, Vector3 center, Vector3 up) {
+        Matrix4 m = new Matrix4();
 
-        Vector3f f = new Vector3f();
-        f.sub(center, eye);
+        Vector3 f = new Vector3(center);
+        f.sub(eye);
 
-        f.normalize();
-        up.normalize();
+        f.nor();
+        up.nor();
 
-        Vector3f s = new Vector3f();
-        s.cross(f, up);
-        s.normalize();
+        Vector3 s = new Vector3(f);
+        s.crs(up);
+        s.nor();
 
-        Vector3f u = new Vector3f();
-        u.cross(s, f);
-        u.normalize();
+        Vector3 u = new Vector3(s);
+        u.crs(f);
+        u.nor();
 
-        m.m00 = s.x;
-        m.m10 = s.y;
-        m.m20 = s.z;
-        m.m30 = 0;
-        m.m01 = u.x;
-        m.m11 = u.y;
-        m.m21 = u.z;
-        m.m31 = 0;
-        m.m02 = -f.x;
-        m.m12 = -f.y;
-        m.m22 = -f.z;
-        m.m32 = 0;
-        m.m03 = 0;
-        m.m13 = 0;
-        m.m23 = 0;
-        m.m33 = 1;
+        m.val[Matrix4.M00]= s.x;
+        m.val[Matrix4.M10] = s.y;
+        m.val[Matrix4.M20] = s.z;
+        m.val[Matrix4.M30] = 0;
+        m.val[Matrix4.M01] = u.x;
+        m.val[Matrix4.M11] = u.y;
+        m.val[Matrix4.M21] = u.z;
+        m.val[Matrix4.M31] = 0;
+        m.val[Matrix4.M02] = -f.x;
+        m.val[Matrix4.M12] = -f.y;
+        m.val[Matrix4.M22] = -f.z;
+        m.val[Matrix4.M32] = 0;
+        m.val[Matrix4.M03] = 0;
+        m.val[Matrix4.M13] = 0;
+        m.val[Matrix4.M23] = 0;
+        m.val[Matrix4.M33] = 1;
 
-        m.m30 = -eye.x;
-        m.m31 = -eye.y;
-        m.m32 = -eye.z;
+        m.val[Matrix4.M30] = -eye.x;
+        m.val[Matrix4.M31] = -eye.y;
+        m.val[Matrix4.M32] = -eye.z;
 
-        m.transpose();
+        m.tra();
 
         return m;
     }
 
-    public static Matrix4f createOrthogonalProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
-        Matrix4f m = new Matrix4f();
+    public static Matrix4 createOrthogonalProjectionMatrix(float left, float right, float top, float bottom, float near, float far) {
+        Matrix4 m = new Matrix4();
 
         float lateral = right - left;
         float vertical = top - bottom;
@@ -168,80 +171,80 @@ public final class MatrixUtils {
         float ty = -(top + bottom) / (top - bottom);
         float tz = -(far + near) / (far - near);
 
-        m.m00 = 2.0f / lateral;
-        m.m10 = 0.0f;
-        m.m20 = 0.0f;
-        m.m30 = tx;
-        m.m01 = 0.0f;
-        m.m11 = 2.0f / vertical;
-        m.m21 = 0.0f;
-        m.m31 = ty;
-        m.m02 = 0.0f;
-        m.m12 = 0.0f;
-        m.m22 = -2.0f / forward;
-        m.m32 = tz;
-        m.m03 = 0.0f;
-        m.m13 = 0.0f;
-        m.m23 = 0.0f;
-        m.m33 = 1.0f;
+        m.val[Matrix4.M00] = 2.0f / lateral;
+        m.val[Matrix4.M10] = 0.0f;
+        m.val[Matrix4.M20] = 0.0f;
+        m.val[Matrix4.M30] = tx;
+        m.val[Matrix4.M01] = 0.0f;
+        m.val[Matrix4.M11] = 2.0f / vertical;
+        m.val[Matrix4.M21] = 0.0f;
+        m.val[Matrix4.M31] = ty;
+        m.val[Matrix4.M02] = 0.0f;
+        m.val[Matrix4.M12] = 0.0f;
+        m.val[Matrix4.M22] = -2.0f / forward;
+        m.val[Matrix4.M32] = tz;
+        m.val[Matrix4.M03] = 0.0f;
+        m.val[Matrix4.M13] = 0.0f;
+        m.val[Matrix4.M23] = 0.0f;
+        m.val[Matrix4.M33] = 1.0f;
 
-        m.transpose();
+        m.tra();
 
         return m;
     }
 
-    public static Matrix4f createPerspectiveProjectionMatrix(float fovY, float aspectRatio, float zNear, float zFar) {
-        Matrix4f m = new Matrix4f();
+    public static Matrix4 createPerspectiveProjectionMatrix(float fovY, float aspectRatio, float zNear, float zFar) {
+        Matrix4 m = new Matrix4();
 
         float f = 1.0f / (float) Math.tan(fovY * 0.5f);
 
-        m.m00 = f / aspectRatio;
-        m.m10 = 0;
-        m.m20 = 0;
-        m.m30 = 0;
-        m.m01 = 0;
-        m.m11 = f;
-        m.m21 = 0;
-        m.m31 = 0;
-        m.m02 = 0;
-        m.m12 = 0;
-        m.m22 = (zFar + zNear) / (zNear - zFar);
-        m.m32 = (2 * zFar * zNear) / (zNear - zFar);
-        m.m03 = 0;
-        m.m13 = 0;
-        m.m23 = -1;
-        m.m33 = 0;
+        m.val[Matrix4.M00] = f / aspectRatio;
+        m.val[Matrix4.M10] = 0;
+        m.val[Matrix4.M20] = 0;
+        m.val[Matrix4.M30] = 0;
+        m.val[Matrix4.M01] = 0;
+        m.val[Matrix4.M11] = f;
+        m.val[Matrix4.M21] = 0;
+        m.val[Matrix4.M31] = 0;
+        m.val[Matrix4.M02] = 0;
+        m.val[Matrix4.M12] = 0;
+        m.val[Matrix4.M22] = (zFar + zNear) / (zNear - zFar);
+        m.val[Matrix4.M32] = (2 * zFar * zNear) / (zNear - zFar);
+        m.val[Matrix4.M03] = 0;
+        m.val[Matrix4.M13] = 0;
+        m.val[Matrix4.M23] = -1;
+        m.val[Matrix4.M33] = 0;
 
-        m.transpose();
+        m.tra();
 
         return m;
     }
 
-    public static Matrix4f calcViewProjectionMatrix(Matrix4f vm, Matrix4f p) {
-        Matrix4f result = new Matrix4f();
-        result.mul(p, vm);
+    public static Matrix4 calcViewProjectionMatrix(Matrix4 vm, Matrix4 p) {
+        Matrix4 result = new Matrix4(p);
+        result.mul(vm);
         return result;
     }
 
-    public static Matrix4f calcModelViewMatrix(Matrix4f m, Matrix4f vm) {
-        Matrix4f result = new Matrix4f();
-        result.mul(m, vm);
+    public static Matrix4 calcModelViewMatrix(Matrix4 m, Matrix4 vm) {
+        Matrix4 result = new Matrix4(m);
+        result.mul(vm);
         return result;
     }
 
-    public static Matrix3f calcNormalMatrix(Matrix4f mv) {
-        Matrix3f result = new Matrix3f();
-        result.m00 = mv.m00;
-        result.m10 = mv.m10;
-        result.m20 = mv.m20;
-        result.m01 = mv.m01;
-        result.m11 = mv.m11;
-        result.m21 = mv.m21;
-        result.m02 = mv.m02;
-        result.m12 = mv.m12;
-        result.m22 = mv.m22;
+    public static Matrix3 calcNormalMatrix(Matrix4 mv) {
+        Matrix3 result = new Matrix3();
+        result.val[Matrix3.M00] = mv.val[Matrix4.M00];
+        result.val[Matrix3.M10] = mv.val[Matrix4.M10];
+        result.val[Matrix3.M20] = mv.val[Matrix4.M20];
+        result.val[Matrix3.M01] = mv.val[Matrix4.M01];
+        result.val[Matrix3.M11] = mv.val[Matrix4.M11];
+        result.val[Matrix3.M21] = mv.val[Matrix4.M21];
+        result.val[Matrix3.M02] = mv.val[Matrix4.M02];
+        result.val[Matrix3.M12] = mv.val[Matrix4.M12];
+        result.val[Matrix3.M22] = mv.val[Matrix4.M22];
 
-        result.invert();
+        result.inv();
         result.transpose();
         return result;
     }

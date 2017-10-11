@@ -15,14 +15,13 @@
  */
 package org.terasology.world.block.shapes;
 
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
 import org.terasology.assets.Asset;
 import org.terasology.assets.AssetType;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.world.block.BlockPart;
 
 /**
@@ -62,7 +61,7 @@ public abstract class BlockShape extends Asset<BlockShapeData> {
      * @param rot
      * @return The collision offset for the given rotation
      */
-    public abstract Vector3f getCollisionOffset(Rotation rot);
+    public abstract Vector3 getCollisionOffset(Rotation rot);
 
 
     /**

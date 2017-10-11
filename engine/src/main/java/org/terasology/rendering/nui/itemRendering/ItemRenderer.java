@@ -15,8 +15,8 @@
  */
 package org.terasology.rendering.nui.itemRendering;
 
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import com.badlogic.gdx.math.GridPoint2;
+import org.terasology.math.Region2i;
 import org.terasology.rendering.nui.Canvas;
 
 /**
@@ -31,9 +31,9 @@ public interface ItemRenderer<T> {
      */
     void draw(T value, Canvas canvas);
 
-    void draw(T value, Canvas canvas, Rect2i subregion);
+    void draw(T value, Canvas canvas, Region2i subregion);
 
-    Vector2i getPreferredSize(T value, Canvas canvas);
+    GridPoint2 getPreferredSize(T value, Canvas canvas);
 
     String getTooltip(T value);
 }

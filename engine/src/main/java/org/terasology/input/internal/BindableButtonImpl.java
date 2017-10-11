@@ -15,6 +15,8 @@
  */
 package org.terasology.input.internal;
 
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.terasology.engine.SimpleUri;
@@ -26,8 +28,6 @@ import org.terasology.input.BindButtonSubscriber;
 import org.terasology.input.BindableButton;
 import org.terasology.input.ButtonState;
 import org.terasology.input.Input;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 import java.util.List;
 import java.util.Set;
@@ -153,9 +153,9 @@ public class BindableButtonImpl implements BindableButton {
                                    float delta,
                                    EntityRef[] inputEntities,
                                    EntityRef target,
-                                   Vector3i targetBlockPos,
-                                   Vector3f hitPosition,
-                                   Vector3f hitNormal,
+                                   GridPoint3 targetBlockPos,
+                                   Vector3 hitPosition,
+                                   Vector3 hitNormal,
                                    boolean initialKeyConsumed) {
         boolean keyConsumed = initialKeyConsumed;
         if (pressed) {
@@ -201,7 +201,7 @@ public class BindableButtonImpl implements BindableButton {
         return keyConsumed;
     }
 
-    public void update(EntityRef[] inputEntities, float delta, EntityRef target, Vector3i targetBlockPos, Vector3f hitPosition, Vector3f hitNormal) {
+    public void update(EntityRef[] inputEntities, float delta, EntityRef target, GridPoint3 targetBlockPos, Vector3 hitPosition, Vector3 hitNormal) {
         long activateTime = this.time.getGameTimeInMs();
         if (repeating && getState() == ButtonState.DOWN && mode.isActivatedOnPress() && activateTime - lastActivateTime > repeatTime) {
             lastActivateTime = activateTime;

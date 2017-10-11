@@ -15,9 +15,9 @@
  */
 package org.terasology.rendering;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import org.terasology.rendering.dag.nodes.RefractiveReflectiveBlocksNode;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector3f;
 
 /**
  */
@@ -25,23 +25,23 @@ public final class RenderHelper {
 
     // Parameters which are also defined on shader side
     private static final int OCEAN_OCTAVES = 16;
-    private static final Vector2f[] OCEAN_WAVE_DIRECTIONS = {
-            new Vector2f(-0.613392f, 0.617481f),
-            new Vector2f(0.170019f, -0.040254f),
-            new Vector2f(-0.299417f, 0.791925f),
-            new Vector2f(0.645680f, 0.493210f),
-            new Vector2f(-0.651784f, 0.717887f),
-            new Vector2f(0.421003f, 0.027070f),
-            new Vector2f(-0.817194f, -0.271096f),
-            new Vector2f(-0.705374f, -0.668203f),
-            new Vector2f(0.977050f, -0.108615f),
-            new Vector2f(0.063326f, 0.142369f),
-            new Vector2f(0.203528f, 0.214331f),
-            new Vector2f(-0.667531f, 0.326090f),
-            new Vector2f(-0.098422f, -0.295755f),
-            new Vector2f(-0.885922f, 0.215369f),
-            new Vector2f(0.566637f, 0.605213f),
-            new Vector2f(0.039766f, -0.396100f)
+    private static final Vector2[] OCEAN_WAVE_DIRECTIONS = {
+            new Vector2(-0.613392f, 0.617481f),
+            new Vector2(0.170019f, -0.040254f),
+            new Vector2(-0.299417f, 0.791925f),
+            new Vector2(0.645680f, 0.493210f),
+            new Vector2(-0.651784f, 0.717887f),
+            new Vector2(0.421003f, 0.027070f),
+            new Vector2(-0.817194f, -0.271096f),
+            new Vector2(-0.705374f, -0.668203f),
+            new Vector2(0.977050f, -0.108615f),
+            new Vector2(0.063326f, 0.142369f),
+            new Vector2(0.203528f, 0.214331f),
+            new Vector2(-0.667531f, 0.326090f),
+            new Vector2(-0.098422f, -0.295755f),
+            new Vector2(-0.885922f, 0.215369f),
+            new Vector2(0.566637f, 0.605213f),
+            new Vector2(0.039766f, -0.396100f)
     };
 
     private RenderHelper() {
@@ -67,7 +67,7 @@ public final class RenderHelper {
         return time * 4000.0f * speed;
     }
 
-    public static float evaluateOceanHeightAtPosition(Vector3f position, float days) {
+    public static float evaluateOceanHeightAtPosition(Vector3 position, float days) {
         float height = 0.0f;
 
         float waveSize = RefractiveReflectiveBlocksNode.waveSize;

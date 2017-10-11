@@ -15,10 +15,9 @@
  */
 package org.terasology.logic.characters;
 
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Lists;
-
 import org.terasology.entitySystem.Component;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.network.FieldReplicateType;
 import org.terasology.network.Replicate;
 import org.terasology.physics.CollisionGroup;
@@ -85,13 +84,13 @@ public final class CharacterMovementComponent implements Component {
     public float footstepDelta;
 
 
-    private Vector3f velocity = new Vector3f();
+    private Vector3 velocity = new Vector3();
 
-    public Vector3f getVelocity() {
+    public Vector3 getVelocity() {
         return velocity;
     }
 
-    public void setVelocity(Vector3f newVelocity) {
+    public void setVelocity(Vector3 newVelocity) {
         velocity.set(newVelocity);
     }
 

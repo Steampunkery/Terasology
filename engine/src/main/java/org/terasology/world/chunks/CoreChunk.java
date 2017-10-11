@@ -15,9 +15,8 @@
  */
 package org.terasology.world.chunks;
 
+import com.badlogic.gdx.math.GridPoint3;
 import org.terasology.math.Region3i;
-import org.terasology.math.geom.BaseVector3i;
-import org.terasology.math.geom.Vector3i;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.biomes.Biome;
 import org.terasology.world.block.Block;
@@ -37,29 +36,29 @@ import org.terasology.world.liquid.LiquidData;
  */
 @API
 public interface CoreChunk {
-    Vector3i getPosition();
+    GridPoint3 getPosition();
 
-    Block getBlock(BaseVector3i pos);
+    Block getBlock(GridPoint3 pos);
 
     Block getBlock(int x, int y, int z);
 
     Block setBlock(int x, int y, int z, Block block);
 
-    Block setBlock(BaseVector3i pos, Block block);
+    Block setBlock(GridPoint3 pos, Block block);
 
     Biome setBiome(int x, int y, int z, Biome biome);
 
     Biome getBiome(int x, int y, int z);
 
-    void setLiquid(BaseVector3i pos, LiquidData state);
+    void setLiquid(GridPoint3 pos, LiquidData state);
 
     void setLiquid(int x, int y, int z, LiquidData newState);
 
-    LiquidData getLiquid(BaseVector3i pos);
+    LiquidData getLiquid(GridPoint3 pos);
 
     LiquidData getLiquid(int x, int y, int z);
 
-    Vector3i getChunkWorldOffset();
+    GridPoint3 getChunkWorldOffset();
 
     int getChunkWorldOffsetX();
 
@@ -67,9 +66,9 @@ public interface CoreChunk {
 
     int getChunkWorldOffsetZ();
 
-    Vector3i chunkToWorldPosition(BaseVector3i blockPos);
+    GridPoint3 chunkToWorldPosition(GridPoint3 blockPos);
 
-    Vector3i chunkToWorldPosition(int x, int y, int z);
+    GridPoint3 chunkToWorldPosition(int x, int y, int z);
 
     int chunkToWorldPositionX(int x);
 

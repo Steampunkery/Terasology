@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import org.terasology.utilities.Assets;
 import org.terasology.math.Rotation;
 import org.terasology.math.Side;
-import org.terasology.math.geom.Vector2f;
 import org.terasology.world.block.Block;
 import org.terasology.world.block.BlockAppearance;
 import org.terasology.world.block.BlockBuilderHelper;

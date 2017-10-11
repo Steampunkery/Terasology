@@ -15,13 +15,13 @@
  */
 package org.terasology.rendering.nui;
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.assets.ResourceUrn;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.Keyboard;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import org.terasology.math.Region2i;
 import org.terasology.rendering.nui.animation.MenuAnimationSystem;
 import org.terasology.rendering.nui.animation.MenuAnimationSystemStub;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
@@ -96,7 +96,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
 
     @Override
     public void onDraw(Canvas canvas) {
-        Rect2i region = animationSystem.animateRegion(canvas.getRegion());
+        Region2i region = animationSystem.animateRegion(canvas.getRegion());
         if (isModal()) {
             canvas.addInteractionRegion(getScreenListener(), region);
         }
@@ -173,7 +173,7 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     }
 
     @Override
-    public Vector2i getPreferredContentSize(Canvas canvas, Vector2i areaHint) {
+    public GridPoint2 getPreferredContentSize(Canvas canvas, GridPoint2 areaHint) {
         return areaHint;
     }
 
@@ -183,8 +183,8 @@ public abstract class CoreScreenLayer extends AbstractWidget implements UIScreen
     }
 
     @Override
-    public Vector2i getMaxContentSize(Canvas canvas) {
-        return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    public GridPoint2 getMaxContentSize(Canvas canvas) {
+        return new GridPoint2(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     @Override

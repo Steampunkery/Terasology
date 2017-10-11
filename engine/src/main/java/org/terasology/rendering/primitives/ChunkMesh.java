@@ -15,6 +15,7 @@
  */
 package org.terasology.rendering.primitives;
 
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Maps;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.TIntList;
@@ -24,7 +25,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.terasology.engine.subsystem.lwjgl.GLBufferPool;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.rendering.VertexBufferObjectUtil;
 import org.terasology.rendering.assets.material.Material;
 import org.terasology.world.chunks.ChunkConstants;
@@ -233,7 +233,7 @@ public class ChunkMesh {
      * @param chunkPosition a Vector3f instance holding the world coordinates of a chunk
      * @param chunkIsAnimated a boolean: true if the chunk is animated, false otherwise
      */
-    public void updateMaterial(Material chunkMaterial, Vector3f chunkPosition, boolean chunkIsAnimated) {
+    public void updateMaterial(Material chunkMaterial, Vector3 chunkPosition, boolean chunkIsAnimated) {
         chunkMaterial.setFloat3("chunkPositionWorld",
                 chunkPosition.x * ChunkConstants.SIZE_X,
                 chunkPosition.y * ChunkConstants.SIZE_Y,
@@ -251,12 +251,12 @@ public class ChunkMesh {
      * @param cameraPosition a Vector3f storing the world position of the point of view from which the chunk is rendered.
      * @return Returns an integer representing the number of triangles rendered.
      */
-    public int render(ChunkMesh.RenderPhase phase, Vector3f chunkPosition, Vector3f cameraPosition) {
+    public int render(ChunkMesh.RenderPhase phase, Vector3 chunkPosition, Vector3 cameraPosition) {
         GL11.glPushMatrix();
 
         // chunkPositionRelativeToCamera = chunkCoordinates * chunkDimensions - cameraCoordinate
-        final Vector3f chunkPositionRelativeToCamera =
-                new Vector3f(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
+        final Vector3 chunkPositionRelativeToCamera =
+                new Vector3(chunkPosition.x * ChunkConstants.SIZE_X - cameraPosition.x,
                         chunkPosition.y * ChunkConstants.SIZE_Y - cameraPosition.y,
                         chunkPosition.z * ChunkConstants.SIZE_Z - cameraPosition.z);
         GL11.glTranslatef(chunkPositionRelativeToCamera.x, chunkPositionRelativeToCamera.y, chunkPositionRelativeToCamera.z);

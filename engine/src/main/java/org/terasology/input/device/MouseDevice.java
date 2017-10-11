@@ -15,10 +15,10 @@
  */
 package org.terasology.input.device;
 
-import java.util.Queue;
-
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.module.sandbox.API;
-import org.terasology.math.geom.Vector2i;
+
+import java.util.Queue;
 
 /**
  */
@@ -31,12 +31,12 @@ public interface MouseDevice extends InputDevice {
     /**
      * @return The current position of the mouse in screen space
      */
-    Vector2i getPosition();
+    GridPoint2 getPosition();
 
     /**
      * @return The change in mouse position over the last update
      */
-    Vector2i getDelta();
+    GridPoint2 getDelta();
 
     /**
      * @param button

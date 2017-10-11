@@ -15,22 +15,21 @@
  */
 package org.terasology.utilities.procedural;
 
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.math.IntMath;
-
-import org.terasology.math.geom.Rect2i;
+import org.terasology.math.Region2i;
 import org.terasology.math.Region3i;
 import org.terasology.math.TeraMath;
-import org.terasology.math.geom.Vector2f;
-import org.terasology.math.geom.Vector2i;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector3i;
 
 /**
  */
 public class SubSampledNoise extends AbstractNoise {
 
     private Noise source;
-    private Vector3f zoom = new Vector3f(1, 1, 1);
+    private Vector3 zoom = new Vector3(1, 1, 1);
     private int sampleRate = 1;
 
     /**
@@ -38,11 +37,11 @@ public class SubSampledNoise extends AbstractNoise {
      * @param zoom       the zoom factor for x, y (z will be 1)
      * @param sampleRate the sampling rate of the noise
      */
-    public SubSampledNoise(Noise source, Vector2f zoom, int sampleRate) {
-        this(source, new Vector3f(zoom.x, zoom.y, 1), sampleRate);
+    public SubSampledNoise(Noise source, Vector2 zoom, int sampleRate) {
+        this(source, new Vector3(zoom.x, zoom.y, 1), sampleRate);
     }
 
-    public SubSampledNoise(Noise source, Vector3f zoom, int sampleRate) {
+    public SubSampledNoise(Noise source, Vector3 zoom, int sampleRate) {
         this.source = source;
         this.zoom.set(zoom);
         this.sampleRate = sampleRate;
@@ -66,19 +65,19 @@ public class SubSampledNoise extends AbstractNoise {
         return TeraMath.biLerp(q00, q10, q01, q11, xMod / sampleRate, yMod / sampleRate);
     }
 
-    public float[] noise(Rect2i region) {
-        Rect2i fullRegion = determineRequiredRegion(region);
+    public float[] noise(Region2i region) {
+        Region2i fullRegion = determineRequiredRegion(region);
         float[] keyData = getKeyValues(fullRegion);
         float[] fullData = mapExpand(keyData, fullRegion);
         return getSubset(fullData, fullRegion, region);
     }
 
-    private float[] getSubset(float[] fullData, Rect2i fullRegion, Rect2i subRegion) {
-        if (subRegion.sizeX() != fullRegion.sizeX() || subRegion.sizeY() != fullRegion.sizeY()) {
-            float[] result = new float[subRegion.sizeX() * subRegion.sizeY()];
-            Vector2i offset = new Vector2i(subRegion.minX() - fullRegion.minX(), subRegion.minY() - fullRegion.minY());
-            for (int y = 0; y < subRegion.sizeY(); ++y) {
-                System.arraycopy(fullData, offset.getX() + fullRegion.sizeX() * (y + offset.getY()), result, subRegion.sizeX() * y, subRegion.sizeX());
+    private float[] getSubset(float[] fullData, Region2i fullRegion, Region2i subRegion) {
+        if (subRegion.width != fullRegion.width || subRegion.height != fullRegion.height) {
+            float[] result = new float[subRegion.width * subRegion.height];
+            GridPoint2 offset = new GridPoint2(subRegion.x - fullRegion.x, subRegion.y - fullRegion.y);
+            for (int y = 0; y < subRegion.y; ++y) {
+                System.arraycopy(fullData, offset.x + fullRegion.width * (y + offset.y), result, subRegion.width * y, subRegion.width);
             }
             return result;
         } else {
@@ -86,10 +85,10 @@ public class SubSampledNoise extends AbstractNoise {
         }
     }
 
-    private float[] mapExpand(float[] keyData, Rect2i fullRegion) {
-        float[] fullData = new float[fullRegion.sizeX() * fullRegion.sizeY()];
-        int samplesX = fullRegion.sizeX() / sampleRate + 1;
-        int samplesY = fullRegion.sizeY() / sampleRate + 1;
+    private float[] mapExpand(float[] keyData, Region2i fullRegion) {
+        float[] fullData = new float[fullRegion.width * fullRegion.height];
+        int samplesX = fullRegion.width / sampleRate + 1;
+        int samplesY = fullRegion.height / sampleRate + 1;
         for (int y = 0; y < samplesY - 1; y++) {
             for (int x = 0; x < samplesX - 1; x++) {
                 float q11 = keyData[x + y * samplesX];
@@ -98,7 +97,7 @@ public class SubSampledNoise extends AbstractNoise {
                 float q22 = keyData[(x + 1) + (y + 1) * samplesX];
                 for (int innerY = 0; innerY < sampleRate; ++innerY) {
                     for (int innerX = 0; innerX < sampleRate; ++innerX) {
-                        fullData[x * sampleRate + innerX + fullRegion.sizeX() * (y * sampleRate + innerY)] =
+                        fullData[x * sampleRate + innerX + fullRegion.width * (y * sampleRate + innerY)] =
                                 TeraMath.biLerp(q11, q21, q12, q22, (float) innerX / sampleRate, (float) innerY / sampleRate);
                     }
                 }
@@ -107,14 +106,14 @@ public class SubSampledNoise extends AbstractNoise {
         return fullData;
     }
 
-    private float[] getKeyValues(Rect2i fullRegion) {
-        int xDim = fullRegion.sizeX() / sampleRate + 1;
-        int yDim = fullRegion.sizeY() / sampleRate + 1;
+    private float[] getKeyValues(Region2i fullRegion) {
+        int xDim = fullRegion.width / sampleRate + 1;
+        int yDim = fullRegion.height / sampleRate + 1;
         float[] fullData = new float[xDim * yDim];
         for (int y = 0; y < yDim; y++) {
             for (int x = 0; x < xDim; x++) {
-                int actualX = x * sampleRate + fullRegion.minX();
-                int actualY = y * sampleRate + fullRegion.minY();
+                int actualX = x * sampleRate + fullRegion.x;
+                int actualY = y * sampleRate + fullRegion.y;
                 fullData[x + y * xDim] = source.noise(zoom.x * actualX, zoom.y * actualY);
             }
         }
@@ -122,12 +121,12 @@ public class SubSampledNoise extends AbstractNoise {
         return fullData;
     }
 
-    private Rect2i determineRequiredRegion(Rect2i region) {
-        int newMinX = region.minX() - IntMath.mod(region.minX(), sampleRate);
-        int newMinY = region.minY() - IntMath.mod(region.minY(), sampleRate);
-        int newMaxX = region.maxX() + 4 - IntMath.mod(region.maxX(), sampleRate) - 1;
-        int newMaxY = region.maxY() + 4 - IntMath.mod(region.maxY(), sampleRate) - 1;
-        return Rect2i.createFromMinAndMax(newMinX, newMinY, newMaxX, newMaxY);
+    private Region2i determineRequiredRegion(Region2i region) {
+        int newMinX = region.x - IntMath.mod(region.x, sampleRate);
+        int newMinY = region.y - IntMath.mod(region.y, sampleRate);
+        int newMaxX = (region.x + region.width) + 4 - IntMath.mod((region.x + region.width), sampleRate) - 1;
+        int newMaxY = (region.y + region.height) + 4 - IntMath.mod((region.y + region.height), sampleRate) - 1;
+        return new Region2i(newMinX,newMinY,newMaxX - newMinX + 1,newMaxY - newMinY + 1);//Rect2i.createFromMinAndMax(newMinX, newMinY, newMaxX, newMaxY);
     }
 
 
@@ -165,7 +164,7 @@ public class SubSampledNoise extends AbstractNoise {
     private float[] getSubset(float[] fullData, Region3i fullRegion, Region3i subRegion) {
         if (subRegion.sizeX() != fullRegion.sizeX() || subRegion.sizeY() != fullRegion.sizeY() || subRegion.sizeZ() != fullRegion.sizeZ()) {
             float[] result = new float[subRegion.sizeX() * subRegion.sizeY() * subRegion.sizeZ()];
-            Vector3i offset = new Vector3i(subRegion.minX() - fullRegion.minX(), subRegion.minY() - fullRegion.minY(), subRegion.minZ() - fullRegion.minZ());
+            GridPoint3 offset = new GridPoint3(subRegion.minX() - fullRegion.minX(), subRegion.minY() - fullRegion.minY(), subRegion.minZ() - fullRegion.minZ());
             for (int z = 0; z < subRegion.sizeZ(); ++z) {
                 for (int y = 0; y < subRegion.sizeY(); ++y) {
                     System.arraycopy(fullData, offset.x + fullRegion.sizeX() * (y + offset.y + fullRegion.sizeY() * (z + offset.z)),
@@ -234,6 +233,6 @@ public class SubSampledNoise extends AbstractNoise {
         int newMaxX = region.maxX() + 4 - IntMath.mod(region.maxX(), sampleRate) - 1;
         int newMaxY = region.maxY() + 4 - IntMath.mod(region.maxY(), sampleRate) - 1;
         int newMaxZ = region.maxZ() + 4 - IntMath.mod(region.maxZ(), sampleRate) - 1;
-        return Region3i.createFromMinMax(new Vector3i(newMinX, newMinY, newMinZ), new Vector3i(newMaxX, newMaxY, newMaxZ));
+        return Region3i.createFromMinMax(new GridPoint3(newMinX, newMinY, newMinZ), new GridPoint3(newMaxX, newMaxY, newMaxZ));
     }
 }

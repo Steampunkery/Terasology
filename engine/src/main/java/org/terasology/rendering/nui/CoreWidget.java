@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.nui;
 
+import com.badlogic.gdx.math.GridPoint2;
 import org.terasology.input.BindButtonEvent;
 import org.terasology.input.events.MouseButtonEvent;
 import org.terasology.input.events.MouseWheelEvent;
-import org.terasology.math.geom.Vector2i;
 import org.terasology.rendering.nui.events.NUIKeyEvent;
 
 import java.util.Collections;
@@ -58,8 +58,8 @@ public abstract class CoreWidget extends AbstractWidget {
     }
 
     @Override
-    public Vector2i getMaxContentSize(Canvas canvas) {
-        return new Vector2i(Integer.MAX_VALUE, Integer.MAX_VALUE);
+    public GridPoint2 getMaxContentSize(Canvas canvas) {
+        return new GridPoint2(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
 }

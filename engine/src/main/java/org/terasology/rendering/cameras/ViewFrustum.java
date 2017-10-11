@@ -15,10 +15,10 @@
  */
 package org.terasology.rendering.cameras;
 
+import com.badlogic.gdx.math.Vector3;
 import org.lwjgl.BufferUtils;
 import org.terasology.logic.players.LocalPlayer;
 import org.terasology.math.AABB;
-import org.terasology.math.geom.Vector3f;
 import org.terasology.registry.CoreRegistry;
 
 import java.nio.FloatBuffer;
@@ -141,9 +141,9 @@ public class ViewFrustum {
      */
     public boolean intersects(AABB aabb) {
 
-        Vector3f[] aabbVertices = aabb.getVertices();
+        Vector3[] aabbVertices = aabb.getVertices();
 
-        Vector3f cp = CoreRegistry.get(LocalPlayer.class).getViewPosition();
+        Vector3 cp = CoreRegistry.get(LocalPlayer.class).getViewPosition();
 
         for (int i = 0; i < 6; i++) {
             if (planes[i].getA() * (aabbVertices[0].x - cp.x) + planes[i].getB() * (aabbVertices[0].y - cp.y)
@@ -187,7 +187,7 @@ public class ViewFrustum {
     /**
      * Returns true if the given sphere intersects the given AABB.
      */
-    public boolean intersects(Vector3f position, float radius) {
+    public boolean intersects(Vector3 position, float radius) {
         for (int i = 0; i < 6; i++) {
             if (planes[i].getA() * position.x + planes[i].getB() * position.y + planes[i].getC() * position.z + planes[i].getD() <= -radius) {
                 return false;

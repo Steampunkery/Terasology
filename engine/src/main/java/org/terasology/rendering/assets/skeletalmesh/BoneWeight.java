@@ -16,23 +16,23 @@
 
 package org.terasology.rendering.assets.skeletalmesh;
 
-import org.terasology.math.geom.Vector3f;
+import com.badlogic.gdx.math.Vector3;
 
 /**
  */
 public class BoneWeight {
-    private Vector3f position = new Vector3f();
+    private Vector3 position = new Vector3();
     private float bias;
     private int boneIndex;
-    private Vector3f normal = new Vector3f();
+    private Vector3 normal = new Vector3();
 
-    public BoneWeight(Vector3f position, float bias, int boneIndex) {
+    public BoneWeight(Vector3 position, float bias, int boneIndex) {
         this.position.set(position);
         this.bias = bias;
         this.boneIndex = boneIndex;
     }
 
-    public Vector3f getPosition() {
+    public Vector3 getPosition() {
         return position;
     }
 
@@ -44,11 +44,11 @@ public class BoneWeight {
         return boneIndex;
     }
 
-    public Vector3f getNormal() {
+    public Vector3 getNormal() {
         return normal;
     }
 
-    public void setNormal(Vector3f normal) {
+    public void setNormal(Vector3 normal) {
         this.normal.set(normal);
     }
 }

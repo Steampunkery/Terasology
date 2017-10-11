@@ -15,9 +15,8 @@
  */
 package org.terasology.rendering.assets.texture;
 
-import org.terasology.math.geom.Rect2f;
-import org.terasology.math.geom.Rect2i;
-import org.terasology.math.geom.Vector2i;
+import com.badlogic.gdx.math.Rectangle;
+import org.terasology.math.Region2i;
 
 /**
  * Interface for any asset that describes a region of a texture that can be rendered (can include textures themselves).
@@ -30,16 +29,16 @@ public interface TextureRegion {
     /**
      * @return The region of the texture represented by this asset
      */
-    Rect2f getRegion();
+    Rectangle getRegion();
 
     /**
      * @return The pixel region of the texture represented by this asset
      */
-    Rect2i getPixelRegion();
+    Region2i getPixelRegion();
 
     int getWidth();
 
     int getHeight();
 
-    Vector2i size();
+    Region2i size();
 }

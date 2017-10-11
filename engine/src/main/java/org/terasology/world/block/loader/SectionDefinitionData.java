@@ -15,10 +15,9 @@
  */
 package org.terasology.world.block.loader;
 
+import com.badlogic.gdx.math.Vector3;
 import com.google.common.collect.Maps;
-import org.terasology.math.geom.BaseVector4f;
-import org.terasology.math.geom.Vector3f;
-import org.terasology.math.geom.Vector4f;
+import org.terasology.math.Vector4;
 import org.terasology.module.sandbox.API;
 import org.terasology.world.block.BlockPart;
 import org.terasology.world.block.DefaultColorSource;
@@ -53,13 +52,13 @@ public class SectionDefinitionData {
 
     private byte luminance;
 
-    private Vector3f tint = new Vector3f();
+    private Vector3 tint = new Vector3();
 
     private EnumMap<BlockPart, BlockTile> blockTiles = Maps.newEnumMap(BlockPart.class);
 
     private EnumMap<BlockPart, DefaultColorSource> colorSources;
 
-    private EnumMap<BlockPart, Vector4f> colorOffsets;
+    private EnumMap<BlockPart, Vector4> colorOffsets;
 
     private float mass = 10f;
     private boolean debrisOnDestroy = true;
@@ -78,7 +77,7 @@ public class SectionDefinitionData {
         colorOffsets = Maps.newEnumMap(BlockPart.class);
         for (BlockPart part : BlockPart.values()) {
             colorSources.put(part, DefaultColorSource.DEFAULT);
-            colorOffsets.put(part, new Vector4f(1, 1, 1, 1));
+            colorOffsets.put(part, new Vector4(1, 1, 1, 1));
         }
     }
 
@@ -103,7 +102,7 @@ public class SectionDefinitionData {
         this.sounds = other.sounds;
 
         this.luminance = other.luminance;
-        this.tint = new Vector3f(other.tint);
+        this.tint = new Vector3(other.tint);
 
         this.blockTiles = new EnumMap<>(other.blockTiles);
         this.colorSources = Maps.newEnumMap(other.colorSources);
@@ -251,11 +250,11 @@ public class SectionDefinitionData {
         this.luminance = luminance;
     }
 
-    public Vector3f getTint() {
+    public Vector3 getTint() {
         return tint;
     }
 
-    public void setTint(Vector3f tint) {
+    public void setTint(Vector3 tint) {
         this.tint = tint;
     }
 
@@ -279,13 +278,13 @@ public class SectionDefinitionData {
         }
     }
 
-    public EnumMap<BlockPart, Vector4f> getColorOffsets() {
+    public EnumMap<BlockPart, Vector4> getColorOffsets() {
         return colorOffsets;
     }
 
-    public void setAllColorOffsets(BaseVector4f offset) {
+    public void setAllColorOffsets(Vector4 offset) {
         for (BlockPart part : BlockPart.values()) {
-            colorOffsets.put(part, new Vector4f(offset));
+            colorOffsets.put(part, new Vector4(offset));
         }
     }
 
