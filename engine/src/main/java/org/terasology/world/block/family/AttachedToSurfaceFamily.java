@@ -83,7 +83,6 @@ public class AttachedToSurfaceFamily extends AbstractBlockFamily {
             archetype = blocks.get(Side.FRONT);
         }
         setBlockUri(new BlockUri(definition.getUrn()));
-        setCategory(definition.getCategories());
     }
 
     @Override

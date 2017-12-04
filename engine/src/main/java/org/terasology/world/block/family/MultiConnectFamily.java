@@ -51,13 +51,11 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
     public MultiConnectFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
         super(definition, shape, blockBuilder);
         this.setBlockUri(new BlockUri(definition.getUrn()));
-        this.setCategory(definition.getCategories());
     }
 
     public MultiConnectFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
         super(definition, blockBuilder);
         this.setBlockUri(new BlockUri(definition.getUrn()));
-        this.setCategory(definition.getCategories());
 
     }
 

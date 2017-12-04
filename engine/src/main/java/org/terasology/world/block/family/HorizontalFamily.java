@@ -60,7 +60,6 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
             blocks.put(side, block);
         }
         this.setBlockUri(uri);
-        this.setCategory(definition.getCategories());
     }
 
     public HorizontalFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
@@ -77,7 +76,6 @@ public class HorizontalFamily extends AbstractBlockFamily implements SideDefined
             block.setUri(new BlockUri(uri, new Name(side.name())));
             blocks.put(side, block);
         }
-        this.setCategory(definition.getCategories());
         this.setBlockUri(uri);
 
     }

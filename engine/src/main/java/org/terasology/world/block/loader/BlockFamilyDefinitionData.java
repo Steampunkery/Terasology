@@ -32,7 +32,6 @@ public class BlockFamilyDefinitionData implements AssetData {
     private Map<String, SectionDefinitionData> sections = Maps.newLinkedHashMap();
     private Class<? extends AbstractBlockFamily> family;
 
-    private List<String> categories = Lists.newArrayList();
 
     public BlockFamilyDefinitionData() {
 
@@ -44,7 +43,7 @@ public class BlockFamilyDefinitionData implements AssetData {
             sections.put(entry.getKey(), new SectionDefinitionData(entry.getValue()));
         }
         this.family = other.family;
-        this.categories = Lists.newArrayList(other.categories);
+
     }
 
     public boolean isValid() {
@@ -91,11 +90,4 @@ public class BlockFamilyDefinitionData implements AssetData {
         this.family = family;
     }
 
-    public List<String> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(List<String> categories) {
-        this.categories = categories;
-    }
 }

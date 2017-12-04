@@ -45,9 +45,7 @@ public class BlockFamilyDefinition extends Asset<BlockFamilyDefinitionData> {
         this.data = blockFamilyDefinitionData;
     }
 
-    public List<String> getCategories() {
-        return Collections.unmodifiableList(data.getCategories());
-    }
+
 
     public boolean isFreeform() {
         return BlockFamilyRegistry.isFreeformSupported(getData().getBlockFamily());

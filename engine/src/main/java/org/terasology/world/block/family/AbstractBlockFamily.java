@@ -16,21 +16,17 @@
 
 package org.terasology.world.block.family;
 
-import com.google.common.collect.Sets;
 import org.terasology.world.block.BlockBuilderHelper;
 import org.terasology.world.block.BlockUri;
 import org.terasology.world.block.loader.BlockFamilyDefinition;
 import org.terasology.world.block.shapes.BlockShape;
 
-import java.util.Locale;
-import java.util.Set;
 
 /**
  */
 public abstract class AbstractBlockFamily implements BlockFamily {
 
     private BlockUri uri;
-    private Set<String> categories = Sets.newHashSet();
 
     protected AbstractBlockFamily(BlockFamilyDefinition definition, BlockShape shape, BlockBuilderHelper blockBuilder) {
     }
@@ -38,11 +34,6 @@ public abstract class AbstractBlockFamily implements BlockFamily {
     protected AbstractBlockFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {
     }
 
-    protected void setCategory(Iterable<String> categories) {
-        for (String category : categories) {
-            this.categories.add(category.toLowerCase(Locale.ENGLISH));
-        }
-    }
 
     protected void setBlockUri(BlockUri uri) {
         this.uri = uri;
@@ -57,16 +48,6 @@ public abstract class AbstractBlockFamily implements BlockFamily {
     @Override
     public String getDisplayName() {
         return getArchetypeBlock().getDisplayName();
-    }
-
-    @Override
-    public Iterable<String> getCategories() {
-        return categories;
-    }
-
-    @Override
-    public boolean hasCategory(String category) {
-        return categories.contains(category.toLowerCase(Locale.ENGLISH));
     }
 
     @Override

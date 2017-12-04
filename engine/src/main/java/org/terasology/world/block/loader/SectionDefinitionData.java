@@ -15,6 +15,7 @@
  */
 package org.terasology.world.block.loader;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.terasology.math.geom.BaseVector4f;
 import org.terasology.math.geom.Vector3f;
@@ -26,7 +27,9 @@ import org.terasology.world.block.shapes.BlockShape;
 import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.block.tiles.BlockTile;
 
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.List;
 
 /**
  */
@@ -35,6 +38,7 @@ public class SectionDefinitionData {
     private String displayName = "";
     private boolean liquid;
     private int hardness = 0x3;
+    private List<String> categories = Lists.newArrayList();
 
     private boolean attachmentAllowed = true;
     private boolean replacementAllowed;
@@ -121,6 +125,8 @@ public class SectionDefinitionData {
         this.lava = other.lava;
         this.grass = other.grass;
         this.ice = other.ice;
+
+        this.categories = Lists.newArrayList(other.categories);
     }
 
     public String getDisplayName() {
@@ -359,5 +365,13 @@ public class SectionDefinitionData {
 
     public void setIce(boolean ice) {
         this.ice = ice;
+    }
+
+    public List<String> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
     }
 }

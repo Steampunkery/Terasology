@@ -140,7 +140,6 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
             BlockFamilyDefinitionData result = new BlockFamilyDefinitionData(base);
             setBoolean(result::setTemplate, jsonObject, "template");
             setObject(result::setBlockFamily,jsonObject,"family", Class.class, context);
-            setObject(result::setCategories, jsonObject, "categories", listOfStringType, context);
 
             deserializeSectionDefinitionData(result.getBaseSection(), jsonObject, context);
 
@@ -178,6 +177,7 @@ public class BlockFamilyDefinitionFormat extends AbstractAssetFileFormat<BlockFa
 
         private void deserializeSectionDefinitionData(SectionDefinitionData data, JsonObject jsonObject, JsonDeserializationContext context) {
             setString(data::setDisplayName, jsonObject, "displayName");
+            setObject(data::setCategories, jsonObject, "categories", listOfStringType, context);
             setBoolean(data::setLiquid, jsonObject, "liquid");
             setInt(data::setHardness, jsonObject, "hardness");
             setBoolean(data::setAttachmentAllowed, jsonObject, "attachmentAllowed");

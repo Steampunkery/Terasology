@@ -17,6 +17,7 @@ package org.terasology.world.block;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.linearmath.Transform;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import org.terasology.utilities.Assets;
@@ -44,6 +45,8 @@ import org.terasology.world.block.sounds.BlockSounds;
 import org.terasology.world.chunks.ChunkConstants;
 
 import java.math.RoundingMode;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -75,6 +78,7 @@ public final class Block {
     private BlockFamily family;
     // TODO: Remove this and replace with the rotation applied to the block
     private Side direction = Side.FRONT;
+    private List<String> categories = Lists.newArrayList();
 
     /* PROPERTIES */
 
@@ -180,6 +184,14 @@ public final class Block {
 
     public Side getDirection() {
         return direction;
+    }
+
+    public List<String> getCategories() {
+        return Collections.unmodifiableList(categories);
+    }
+
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
     }
 
     /**
