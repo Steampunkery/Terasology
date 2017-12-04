@@ -71,7 +71,6 @@ public class FreeformFamily extends AbstractBlockFamily {
         }
 
         this.setBlockUri(uri);
-        this.setCategory(definition.getCategories());
     }
 
     public FreeformFamily(BlockFamilyDefinition blockFamilyDefinition, BlockBuilderHelper blockBuilderHelper) {

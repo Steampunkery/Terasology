@@ -110,7 +110,6 @@ public abstract class MultiConnectFamily extends AbstractBlockFamily implements 
         }
         this.archetypeBlock = blocks.get(SideBitFlag.getSides(Side.RIGHT, Side.LEFT));
         this.setBlockUri(blockUri);
-        this.setCategory(definition.getCategories());
     }
 
     public byte getConnectionSides() {

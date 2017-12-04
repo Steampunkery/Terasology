@@ -205,8 +205,7 @@ public class BlockDamageAuthoritySystem extends BaseComponentSystem {
         if (event.getDamageType() != null) {
             BlockDamageModifierComponent blockDamage = event.getDamageType().getComponent(BlockDamageModifierComponent.class);
             if (blockDamage != null) {
-                BlockFamily blockFamily = block.getBlockFamily();
-                for (String category : blockFamily.getCategories()) {
+                for (String category : block.getCategories()) {
                     if (blockDamage.materialDamageMultiplier.containsKey(category)) {
                         event.multiply(blockDamage.materialDamageMultiplier.get(category));
                     }

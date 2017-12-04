@@ -47,7 +47,6 @@ public class SymmetricFamily extends AbstractBlockFamily {
         block.setUri(uri);
 
         this.setBlockUri(uri);
-        this.setCategory(definition.getCategories());
     }
 
     public SymmetricFamily(BlockFamilyDefinition definition, BlockBuilderHelper blockBuilder) {
@@ -58,7 +57,6 @@ public class SymmetricFamily extends AbstractBlockFamily {
         block.setBlockFamily(this);
         block.setUri(uri);
         this.setBlockUri(uri);
-        this.setCategory(definition.getCategories());
     }
 
 
